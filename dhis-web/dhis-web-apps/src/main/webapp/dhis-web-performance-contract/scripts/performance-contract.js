@@ -1,9 +1,9 @@
 /* global dhis2, angular, selection, i18n_ajax_login_failed, _ */
 
-dhis2.util.namespace('dhis2.pc');
+dhis2.util.namespace('dhis2.rf');
 
 // whether current user has any organisation units
-dhis2.pc.emptyOrganisationUnits = false;
+dhis2.rf.emptyOrganisationUnits = false;
 
 var i18n_no_orgunits = 'No organisation unit attached to current user, no data entry possible';
 var i18n_offline_notification = 'You are offline';
@@ -12,21 +12,22 @@ var i18n_ajax_login_failed = 'Login failed, check your username and password and
 
 var optionSetsInPromise = [];
 var attributesInPromise = [];
+var batchSize = 50;
 
-dhis2.pc.store = null;
-dhis2.pc.metaDataCached = dhis2.pc.metaDataCached || false;
-dhis2.pc.memoryOnly = $('html').hasClass('ie7') || $('html').hasClass('ie8');
+dhis2.rf.store = null;
+dhis2.rf.metaDataCached = dhis2.rf.metaDataCached || false;
+dhis2.rf.memoryOnly = $('html').hasClass('ie7') || $('html').hasClass('ie8');
 var adapters = [];    
-if( dhis2.pc.memoryOnly ) {
+if( dhis2.rf.memoryOnly ) {
     adapters = [ dhis2.storage.InMemoryAdapter ];
 } else {
     adapters = [ dhis2.storage.IndexedDBAdapter, dhis2.storage.DomLocalStorageAdapter, dhis2.storage.InMemoryAdapter ];
 }
 
-dhis2.pc.store = new dhis2.storage.Store({
-    name: 'dhis2pc',
+dhis2.rf.store = new dhis2.storage.Store({
+    name: 'dhis2rf',
     adapters: [dhis2.storage.IndexedDBAdapter, dhis2.storage.DomSessionStorageAdapter, dhis2.storage.InMemoryAdapter],
-    objectStores: ['dataSets', 'optionSets', 'dataElementGroups', 'dataElementGroupSets', 'indicatorGroups', 'indicatorGroupSets', 'categoryCombos', 'constants']
+    objectStores: ['dataSets', 'optionSets', 'dataElementGroups', 'dataElementGroupSets', 'indicatorGroups', 'indicatorGroupSets', 'categoryCombos', 'constants', 'attributes']
 });
 
 (function($) {
@@ -54,13 +55,16 @@ $(document).ready(function()
     });
 
     $('#loaderSpan').show();
+    
+    
+    downloadMetaData();
 });
 
 $(document).bind('dhis2.online', function(event, loggedIn)
 {
     if (loggedIn)
     {
-        if (dhis2.pc.emptyOrganisationUnits) {
+        if (dhis2.rf.emptyOrganisationUnits) {
             setHeaderMessage(i18n_no_orgunits);
         }
         else {
@@ -86,7 +90,7 @@ $(document).bind('dhis2.online', function(event, loggedIn)
 
 $(document).bind('dhis2.offline', function()
 {
-    if (dhis2.pc.emptyOrganisationUnits) {
+    if (dhis2.rf.emptyOrganisationUnits) {
         setHeaderMessage(i18n_no_orgunits);
     }
     else {
@@ -126,22 +130,54 @@ function downloadMetaData()
     var def = $.Deferred();
     var promise = def.promise();
 
-    promise = promise.then( dhis2.pc.store.open );
+    promise = promise.then( dhis2.rf.store.open );
     promise = promise.then( getUserRoles );
     promise = promise.then( getCalendarSetting );
+    
+    //fetch met attributes
+    promise = promise.then( getMetaAttributes );
+    promise = promise.then( filterMissingAttributes );
+    promise = promise.then( getAttributes );
+    
+    //fetch constants
+    promise = promise.then( getMetaConstants );
+    promise = promise.then( filterMissingConstants );
     promise = promise.then( getConstants );
-    promise = promise.then( getDataElementGroupSets );
-    promise = promise.then( getDataElementGroups );
-    promise = promise.then( getMetaIndicatorGroups );
-    promise = promise.then( getIndicatorGroups );
+    
+    //fetch category combos
+    promise = promise.then( getMetaCategoryCombos );
+    promise = promise.then( filterMissingCategoryCombos );
     promise = promise.then( getCategoryCombos );
-    promise = promise.then( getMetaDataSets );     
+    
+    //fetch data element group sets
+    promise = promise.then( getMetaDataElementGroupSets );
+    promise = promise.then( filterMissingDataElementGroupSets );
+    promise = promise.then( getDataElementGroupSets );
+    
+    //fetch data element groups
+    promise = promise.then( getMetaDataElementGroups );
+    promise = promise.then( filterMissingDataElementGroups );
+    promise = promise.then( getDataElementGroups );
+    
+    //fetch indicator group sets
+    promise = promise.then( getMetaIndicatorGroupSets );
+    promise = promise.then( filterMissingIndicatorGroupSets );
+    promise = promise.then( getIndicatorGroupSets );
+    
+    //fetch indicator groups
+    promise = promise.then( getMetaIndicatorGroups );
+    promise = promise.then( filterMissingIndicatorGroups );
+    promise = promise.then( getIndicatorGroups );     
+    
+    //fetch data sets
+    promise = promise.then( getMetaDataSets );
+    promise = promise.then( filterMissingDataSets );
     promise = promise.then( getDataSets );
-    promise = promise.then( getOptionSetsForDataElements );
+    
     promise.done(function() {        
         //Enable ou selection after meta-data has downloaded
         $( "#orgUnitTree" ).removeClass( "disable-clicks" );
-        dhis2.pc.metaDataCached = true;
+        dhis2.rf.metaDataCached = true;
         dhis2.availability.startAvailabilityCheck();
         console.log( 'Finished loading meta-data' );        
         selection.responseReceived(); 
@@ -149,318 +185,113 @@ function downloadMetaData()
 
     def.resolve();    
 }
-
-function processMetaDataAttribute( obj )
-{
-    if(!obj){
-        return;
-    }
-    
-    if(obj.attributeValues){
-        for(var i=0; i<obj.attributeValues.length; i++){
-            if(obj.attributeValues[i].value && obj.attributeValues[i].attribute && obj.attributeValues[i].attribute.code){
-                obj[obj.attributeValues[i].attribute.code] = obj.attributeValues[i].value;
-            }
-        }
-    }
-    
-    delete obj.attributeValues;
-   
-    return obj;    
-}
-
-function getUserRoles()
-{
+function getUserRoles(){
     var SessionStorageService = angular.element('body').injector().get('SessionStorageService');    
     if( SessionStorageService.get('USER_ROLES') ){
        return; 
-    }
-    
-    var def = $.Deferred();
-    var promise = def.promise();
-    promise = promise.then( dhis2.tracker.getTrackerObject(null, 'USER_ROLES', '../api/me.json', 'fields=id,displayName,userCredentials[userRoles[id,authorities,programs,dataSets]]', 'sessionStorage', dhis2.pc.store) );
-    promise = promise.done(function(){});    
-    def.resolve();
+    }    
+    return dhis2.metadata.getMetaObject(null, 'USER_ROLES', '../api/me.json', 'fields=id,displayName,userCredentials[userRoles[id,authorities,dataSets]]', 'sessionStorage', dhis2.rf.store);
 }
 
-function getCalendarSetting()
-{   
-    var def = $.Deferred();
-    var promise = def.promise();
-    promise = promise.then( dhis2.tracker.getTrackerObject(null, 'CALENDAR_SETTING', '../api/systemSettings', 'key=keyCalendar&key=keyDateFormat', 'localStorage', dhis2.pc.store) );
-    promise = promise.done(function(){});    
-    def.resolve();    
+function getCalendarSetting(){   
+    if(localStorage['CALENDAR_SETTING']){
+       return; 
+    }    
+    return dhis2.metadata.getMetaObject(null, 'CALENDAR_SETTING', '../api/systemSettings', 'key=keyCalendar&key=keyDateFormat', 'localStorage', dhis2.rf.store);
 }
 
-function getConstants()
-{
-    dhis2.pc.store.getKeys( 'constants').done(function(res){        
-        if(res.length > 0){
-            return;
-        }        
-        return dhis2.tracker.getTrackerObjects('constants', 'constants', '../api/constants.json', 'paging=false&fields=id,name,displayName,value', 'idb', dhis2.pc.store);        
-    });    
+function getMetaAttributes(){
+    return dhis2.metadata.getMetaObjectIds('attributes', '../api/attributes.json', 'paging=false&fields=id');
 }
 
-function getCategoryCombos()
-{    
-    dhis2.pc.store.getKeys( 'categoryCombos').done(function(res){        
-        if(res.length > 0){
-            return;
-        }
-        return dhis2.tracker.getTrackerObjects('categoryCombos', 'categoryCombos', '../api/categoryCombos.json', 'paging=false&fields=id,name,code,skipTotal,isDefault,categories[id,name,categoryOptions[id,name,code]]', 'idb', dhis2.pc.store);
-    });    
+function filterMissingAttributes( ids ){
+    return dhis2.metadata.filterMissingObjs('attributes', dhis2.rf.store, ids);
 }
 
-function getDataElementGroupSets()
- {    
-    dhis2.pc.store.getKeys( 'dataElementGroupSets').done(function(res){        
-        if(res.length > 0){
-            return;
-        }
-        return dhis2.tracker.getTrackerObjects('dataElementGroupSets', 'dataElementGroupSets', '../api/dataElementGroupSets.json', 'paging=false&fields=id,name,code', 'idb', dhis2.pc.store);
-    });
+function getAttributes( ids ){
+    return dhis2.metadata.getBatches( ids, batchSize, 'attributes', 'attributes', '../api/attributes.json', 'paging=false&fields=:all,optionSet[id,displayName,options[id,displayName,code]]', 'idb', dhis2.rf.store);
 }
 
-function getDataElementGroups()
-{    
-    dhis2.pc.store.getKeys( 'dataElementGroups').done(function(res){        
-        if(res.length > 0){
-            return;
-        }
-        return dhis2.tracker.getTrackerObjects('dataElementGroups', 'dataElementGroups', '../api/dataElementGroups.json', 'paging=false&fields=id,name,code', 'idb', dhis2.pc.store);
-    });    
+function getMetaConstants(){
+    return dhis2.metadata.getMetaObjectIds('constants', '../api/constants.json', 'paging=false&fields=id');
 }
 
-function getIndicatorGroupSets()
-{    
-    dhis2.pc.store.getKeys( 'indicatorGroupSets').done(function(res){        
-        if(res.length > 0){
-            return;
-        }
-        return dhis2.tracker.getTrackerObjects('indicatorGroupSets', 'indicatorGroupSets', '../api/indicatorGroupSets.json', 'paging=false&fields=id,name,indicatorGroups[id,name,code,indicators[id,name,code]]', 'idb', dhis2.pc.store);
-    });    
+function filterMissingConstants( ids ){
+    return dhis2.metadata.filterMissingObjs('constants', dhis2.rf.store, ids);
 }
 
-function getMetaIndicatorGroups()
-{    
-    return dhis2.tracker.getTrackerObjects('indicatorGroups', 'indicatorGroups', '../api/indicatorGroups.json', 'paging=false&fields=id,version', 'temp', dhis2.pc.store);
+function getConstants( ids ){
+    return dhis2.metadata.getBatches( ids, batchSize, 'constants', 'constants', '../api/constants.json', 'paging=false&fields=id,name,displayName,value', 'idb', dhis2.rf.store);
 }
 
-function getIndicatorGroups( indicatorGroups )
-{
-    if( !indicatorGroups ){
-        return;
-    }
-    
-    var mainDef = $.Deferred();
-    var mainPromise = mainDef.promise();
-
-    var def = $.Deferred();
-    var promise = def.promise();
-
-    var builder = $.Deferred();
-    var build = builder.promise();
-
-    var ids = [];
-    _.each( _.values( indicatorGroups ), function ( indicatorGroup ) {
-        build = build.then(function() {
-            var d = $.Deferred();
-            var p = d.promise();
-            dhis2.pc.store.get('indicatorGroups', indicatorGroup.id).done(function(obj) {
-                if(!obj || obj.version !== indicatorGroup.version) {
-                    ids.push( indicatorGroup.id );
-                }
-
-                d.resolve();
-            });
-
-            return p;
-        });
-    });
-
-    build.done(function() {
-        def.resolve();
-
-        promise = promise.done( function () {
-            var _ids = null;
-            if( ids && ids.length > 0 ){
-                _ids = ids.toString();
-                _ids = '[' + _ids + ']';
-                promise = promise.then( getAllIndicatorGroups( _ids ) );
-            } 
-            
-            mainDef.resolve( indicatorGroups, ids );
-        } );
-    }).fail(function(){
-        mainDef.resolve( null, null );
-    });
-
-    builder.resolve();
-
-    return mainPromise;
+function getMetaCategoryCombos(){
+    return dhis2.metadata.getMetaObjectIds('categoryCombos', '../api/categoryCombos.json', 'paging=false&fields=id');
 }
 
-function getAllIndicatorGroups( ids )
-{    
-    return function() {
-        return $.ajax( {
-            url: '../api/indicatorGroups.json',
-            type: 'GET',
-            data: 'fields=id,name,description,version,attributeValues[value,attribute[id,name,code]&filter=id:in:' + ids
-        }).done( function( response ){
-            
-            if(response.indicatorGroups){
-                _.each(_.values( response.indicatorGroups), function(indicatorGroup){                    
-                    indicatorGroup = processMetaDataAttribute(indicatorGroup);
-                    dhis2.pc.store.set( 'indicatorGroups', indicatorGroup );
-                });
-            }
-        });
-    };
+function filterMissingCategoryCombos( ids ){
+    return dhis2.metadata.filterMissingObjs('categoryCombos', dhis2.rf.store, ids);
 }
 
-function getMetaDataSets()
-{    
-    return dhis2.tracker.getTrackerObjects('dataSets', 'dataSets', '../api/dataSets.json', 'paging=false&fields=id,version,dataElements[[optionSet[id,version]]]', 'temp', dhis2.pc.store);
+function getCategoryCombos( ids ){    
+    return dhis2.metadata.getBatches( ids, batchSize, 'categoryCombos', 'categoryCombos', '../api/categoryCombos.json', 'paging=false&fields=id,name,code,skipTotal,isDefault,categories[id,name,categoryOptions[id,name,code]]', 'idb', dhis2.rf.store);
 }
 
-function getDataSets( dataSets )
-{
-    if( !dataSets ){
-        return;
-    }
-    
-    var mainDef = $.Deferred();
-    var mainPromise = mainDef.promise();
-
-    var def = $.Deferred();
-    var promise = def.promise();
-
-    var builder = $.Deferred();
-    var build = builder.promise();
-
-    var ids = [];
-    _.each( _.values( dataSets ), function ( dataSet ) {
-        build = build.then(function() {
-            var d = $.Deferred();
-            var p = d.promise();
-            dhis2.pc.store.get('dataSets', dataSet.id).done(function(obj) {
-                if(!obj || obj.version !== dataSet.version) {
-                    ids.push( dataSet.id );
-                }
-
-                d.resolve();
-            });
-
-            return p;
-        });
-    });
-
-    build.done(function() {
-        def.resolve();
-
-        promise = promise.done( function () {
-            var _ids = null;
-            if( ids && ids.length > 0 ){
-                _ids = ids.toString();
-                _ids = '[' + _ids + ']';
-                promise = promise.then( getAllDataSets( _ids ) );
-            } 
-            
-            mainDef.resolve( dataSets, ids );
-        } );
-    }).fail(function(){
-        mainDef.resolve( null, null );
-    });
-
-    builder.resolve();
-
-    return mainPromise;
+function getMetaDataElementGroupSets(){
+    return dhis2.metadata.getMetaObjectIds('dataElementGroupSets', '../api/dataElementGroupSets.json', 'paging=false&fields=id');
 }
 
-function getAllDataSets( ids )
-{    
-    return function() {
-        return $.ajax( {
-            url: '../api/dataSets.json',
-            type: 'GET',
-            data: 'fields=id,periodType,displayName,version,attributeValues[value,attribute[id,name,code],indicators[id,indicatorGrop[id]],organisationUnits[id,name],dataElements[id,code,name,description,formName,valueType,optionSetValue,optionSet[id],dataElementGroups[id,dataElementGroupSet[id]],categoryCombo[id,isDefault]]&paging=false&filter=id:in:' + ids
-        }).done( function( response ){
-            
-            if(response.dataSets){
-                _.each(_.values( response.dataSets), function(dataSet){
-                    var ou = {};
-                    _.each(_.values( dataSet.organisationUnits), function(o){
-                        ou[o.id] = o.name;
-                    });
-                    dataSet.organisationUnits = ou;                    
-                    dataSet = processMetaDataAttribute(dataSet);
-
-                    dhis2.pc.store.set( 'dataSets', dataSet );
-                });
-            }
-        });
-    };
+function filterMissingDataElementGroupSets( ids ){
+    return dhis2.metadata.filterMissingObjs('dataElementGroupSets', dhis2.rf.store, ids);
 }
 
-function getOptionSetsForDataElements( dataSets, dataSetIds )
-{
-    if( !dataSets ){
-        return;
-    }
-    var mainDef = $.Deferred();
-    var mainPromise = mainDef.promise();
+function getDataElementGroupSets( ids ){    
+    return dhis2.metadata.getBatches( ids, batchSize, 'dataElementGroupSets', 'dataElementGroupSets', '../api/dataElementGroupSets.json', 'paging=false&fields=id,name,code', 'idb', dhis2.rf.store);
+}
 
-    var def = $.Deferred();
-    var promise = def.promise();
+function getMetaDataElementGroups(){
+    return dhis2.metadata.getMetaObjectIds('dataElementGroups', '../api/dataElementGroups.json', 'paging=false&fields=id');
+}
 
-    var builder = $.Deferred();
-    var build = builder.promise();    
+function filterMissingDataElementGroups( ids ){
+    return dhis2.metadata.filterMissingObjs('dataElementGroups', dhis2.rf.store, ids);
+}
 
-    _.each( _.values( dataSets ), function ( dataSet ) {                
-        if(dataSet.dataElements){
-            _.each(_.values( dataSet.dataElements ), function(dataElement){            
-                if( dataElement.optionSet && dataElement.optionSet.id ){
-                    build = build.then(function() {
-                        var d = $.Deferred();
-                        var p = d.promise();
-                        dhis2.pc.store.get('optionSets', dataElement.optionSet.id).done(function(obj) {                                    
-                            if( (!obj || obj.version !== dataElement.optionSet.version) && optionSetsInPromise.indexOf(dataElement.optionSet.id) === -1) {                                
-                                optionSetsInPromise.push( dataElement.optionSet.id );
-                            }
-                            d.resolve();
-                        });
-                        return p;
-                    });
-                }            
-            });
-        }
-    });
+function getDataElementGroups( ids ){    
+    return dhis2.metadata.getBatches( ids, batchSize, 'dataElementGroups', 'dataElementGroups', '../api/dataElementGroups.json', 'paging=false&fields=id,name,code', 'idb', dhis2.rf.store);
+}
 
-    build.done(function() {
-        def.resolve();
+function getMetaIndicatorGroupSets(){
+    return dhis2.metadata.getMetaObjectIds('indicatorGroupSets', '../api/indicatorGroupSets.json', 'paging=false&fields=id');
+}
 
-        promise = promise.done( function () {
-            
-            if( optionSetsInPromise && optionSetsInPromise.length > 0 ){
-                var _optionSetsInPromise = optionSetsInPromise.toString();
-                _optionSetsInPromise = '[' + _optionSetsInPromise + ']';
-                
-                var filter = 'fields=id,displayName,version,options[id,displayName,code]';                
-                filter = filter + '&filter=id:in:' + _optionSetsInPromise + '&paging=false';
-                
-                var url = '../api/optionSets';
-                promise = promise.then( dhis2.tracker.getTrackerObjects( 'optionSets', 'optionSets', url, filter, 'idb', dhis2.pc.store ) );
-            }
-            
-            mainDef.resolve( dataSets, dataSetIds );
-        } );
-    }).fail(function(){
-        mainDef.resolve( null, null);
-    });
+function filterMissingIndicatorGroupSets( ids ){
+    return dhis2.metadata.filterMissingObjs('indicatorGroupSets', dhis2.rf.store, ids);
+}
 
-    builder.resolve();
+function getIndicatorGroupSets( ids ){    
+    return dhis2.metadata.getBatches( ids, batchSize, 'indicatorGroupSets', 'indicatorGroupSets', '../api/dataElementGroupSets.json', 'paging=false&fields=id,name,indicatorGroups[id,name,code,indicators[id,name,code]]', 'idb', dhis2.rf.store);
+}
 
-    return mainPromise;   
+function getMetaIndicatorGroups(){
+    return dhis2.metadata.getMetaObjectIds('indicatorGroups', '../api/indicatorGroups.json', 'paging=false&fields=id');
+}
+
+function filterMissingIndicatorGroups( ids ){
+    return dhis2.metadata.filterMissingObjs('indicatorGroups', dhis2.rf.store, ids);
+}
+
+function getIndicatorGroups( ids ){    
+    return dhis2.metadata.getBatches( ids, batchSize, 'indicatorGroups', 'indicatorGroups', '../api/indicatorGroups.json', 'paging=false&fields=id,name,description,version,attributeValues[value,attribute[id,name,code]]', 'idb', dhis2.rf.store);
+}
+
+function getMetaDataSets(){
+    return dhis2.metadata.getMetaObjectIds('dataSets', '../api/dataSets.json', 'paging=false&fields=id');
+}
+
+function filterMissingDataSets( ids ){
+    return dhis2.metadata.filterMissingObjs('dataSets', dhis2.rf.store, ids);
+}
+
+function getDataSets( ids ){    
+    return dhis2.metadata.getBatches( ids, batchSize, 'dataSets', 'dataSets', '../api/dataSets.json', 'paging=false&fields=id,periodType,name,displayName,version,attributeValues[value,attribute[id,name,code]],indicators[id,indicatorGrop[id]],organisationUnits[id,name],dataElements[id,code,name,description,formName,valueType,optionSetValue,optionSet[id],dataElementGroups[id,dataElementGroupSet[id]],categoryCombo[id,isDefault]]', 'idb', dhis2.rf.store);
 }

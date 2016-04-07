@@ -8,9 +8,9 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
 
 .factory('RFStorageService', function(){
     var store = new dhis2.storage.Store({
-        name: "dhis2pc",
+        name: "dhis2rf",
         adapters: [dhis2.storage.IndexedDBAdapter, dhis2.storage.DomSessionStorageAdapter, dhis2.storage.InMemoryAdapter],
-        objectStores: ['dataSets', 'optionSets', 'dataElementGroups', 'dataElementGroupSets', 'indicatorGroups', 'indicatorGroupSets', 'categoryCombos', 'constants']
+        objectStores: ['dataSets', 'optionSets', 'dataElementGroups', 'dataElementGroupSets', 'indicatorGroups', 'indicatorGroupSets', 'categoryCombos', 'constants', 'attributes']
     });
     return{
         currentStore: store
