@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+  <name>dhis-support-commons</name>
+  <comment>DHIS Support Commons is intended to be a lightweight library with very few and
+    no heavy dependencies, as well as no internal dependencies (DHIS modules).
+    This includes not depending on the dhis-support-test package, meaning any unit
+    tests must be added to an external package (dhis-support-system is a reasonable
+    choice). NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
+  <projects/>
+  <buildSpec>
+    <buildCommand>
+      <name>org.eclipse.jdt.core.javabuilder</name>
+    </buildCommand>
+  </buildSpec>
+  <natures>
+    <nature>org.eclipse.jdt.core.javanature</nature>
+  </natures>
+</projectDescription>

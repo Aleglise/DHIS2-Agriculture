@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+  "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+  "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd"
+  [<!ENTITY identifiableProperties SYSTEM "classpath://org/hisp/dhis/common/identifiableProperties.hbm">]
+  >
+
+<hibernate-mapping>
+  <class name="org.hisp.dhis.resultsframework.ResultsFramework" table="resultsframework">
+
+    <cache usage="read-write" />
+
+    <id name="id" column="resultsframeworkid">
+      <generator class="native" />
+    </id>
+    &identifiableProperties;
+
+    <property name="name" column="name" not-null="true" length="1000" />
+
+    <property name="description" type="text" />
+    
+    <property name="active" />
+  
+    <set name="impacts" table="resultsframeworkimpacts">
+      <cache usage="read-write" />
+      <key column="resultsframeworkid" foreign-key="fk_resultsframeworkimpacts_resultsframeworkid" />
+      <many-to-many class="org.hisp.dhis.indicator.IndicatorGroup" column="indicatorgroupid"
+        foreign-key="fk_resultsframework_indicatorgroupid" />
+    </set>
+    
+    <set name="outcomes" table="resultsframeworkoutcomes">
+      <cache usage="read-write" />
+      <key column="resultsframeworkid" foreign-key="fk_resultsframeworkoutcomes_resultsframeworkid" />
+      <many-to-many class="org.hisp.dhis.indicator.IndicatorGroup" column="indicatorgroupid"
+        foreign-key="fk_resultsframework_indicatorgroupid" />
+    </set>
+    
+    <set name="outputs" table="resultsframeworkoutputs">
+      <cache usage="read-write" />
+      <key column="resultsframeworkid" foreign-key="fk_resultsframeworkoutputs_resultsframeworkid" />
+      <many-to-many class="org.hisp.dhis.indicator.IndicatorGroup" column="indicatorgroupid"
+        foreign-key="fk_resultsframework_indicatorgroupid" />
+    </set>
+    
+    <set name="programms" table="resultsframeworkprogramms">
+      <cache usage="read-write" />
+      <key column="resultsframeworkid" foreign-key="fk_resultsframeworkprogramms_resultsframeworkid" />
+      <many-to-many class="org.hisp.dhis.resultsframework.Programm" column="programmid"
+        foreign-key="fk_resultsframework_programmid" />
+    </set>
+    
+    <set name="dataSets" table="resultsframeworkdatasets">
+      <cache usage="read-write" />
+      <key column="resultsframeworkid" foreign-key="fk_resultsframeworkdatasets_resultsframeworkid" />
+      <many-to-many class="org.hisp.dhis.dataset.DataSet" column="datatsetid"
+        foreign-key="fk_resultsframework_datasetid" />
+    </set>
+    
+    <!-- Dynamic attribute values -->
+    <set name="attributeValues" table="resultsframeworkattributevalues" cascade="delete-orphan">
+      <cache usage="read-write" />
+      <key column="resultsframeworkid" />
+      <many-to-many class="org.hisp.dhis.attribute.AttributeValue" column="attributevalueid" unique="true" />
+    </set>
+    
+        
+  </class>
+</hibernate-mapping>

@@ -1,0 +1,118 @@
+<input type="text" meta-data-cached ng-model="model.metaDataCached" ng-hide=true>
+
+<div id="leftBar">
+    <div ng-include="'views/left-bar-icons.html'"></div>
+    <div ng-include="'views/left-bar-menu.html'"></div>    
+</div>
+
+<div class="page" id="mainPage">
+    <div ng-if="model.metaDataCached">
+        <div class="row top-bar">        
+            <div class="col-sm-12">            
+                {{'results_framework'| translate}}
+                <div class="pull-right">
+                    <button type="button" class="btn btn-primary" ng-click="showAddResultsFramework()" ng-disabled="model.showEditResultsFrameworkDiv || model.showAddResultsFrameworkDiv || model.showStructureResultsFrameworkDiv">
+                        {{'add_new'| translate}}
+                    </button>
+                </div>            
+            </div>        
+        </div>
+        <hr>
+
+        <div ng-if="!model.showEditResultsFrameworkDiv && !model.showAddResultsFrameworkDiv && !model.showStructureResultsFrameworkDiv">
+            <div class="hideInPrint">
+                <div ng-if="model.resultsFrameworks.length < 1" class="alert alert-warning">{{'no_results_framework_available'| translate}}</div> 
+                <div ng-if="model.resultsFrameworks.length > 0">
+
+                    <!-- context menu begins -->
+                    <div id="contextMenu" class="contextMenu" style="width: 180px;">
+                        <ul id="contextMenuItems" class="contextMenuItems">
+                            <li><a href ng-click="showEditResultsFramework()"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span>&nbsp;&nbsp;{{'edit'| translate}}</a></li>
+                            <li><a href ng-click="showStructureResultsFramework()"><span class="glyphicon glyphicon-align-left" aria-hidden="true"></span>&nbsp;&nbsp;{{'view'| translate}}</a></li>
+                            <li class="divider"></li>
+                            <li><a href ng-click="showActivateResultsFramework()"><span ng-class="{false: 'glyphicon glyphicon-ok', true: 'glyphicon glyphicon-remove'} [model.selectedResultsFramework.active]" aria-hidden="true"></span>&nbsp;&nbsp;{{model.selectedResultsFramework.active ? 'deactivate' : 'activate'| translate}}</a></li>
+                        </ul>
+                    </div>
+                    <!-- context menu ends -->         
+
+                    <table class="listTable dhis2-table-striped-border dhis2-table-hover">
+                        <thead>
+                            <tr>
+                                <th>
+                                    {{'name'| translate}}
+                                </th>
+                                <th>
+                                    {{'description'| translate}}
+                                </th>
+                                <th>
+                                    {{'status'| translate}}
+                                </th>                            
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="resultsFramework in model.resultsFrameworks | orderBy:'name'"                                  
+                                ng-click="setSelectedResultsFramework(resultsFramework)"
+                                ng-class="{true: 'alert-danger bold'}[resultsFramework.active]"
+                                d2-context-menu 
+                                selected-item={{resultsFramework}}>
+                                <td>
+                                    {{resultsFramework.name}}
+                                </td>                            
+                                <td>
+                                    {{resultsFramework.description}}
+                                </td>
+                                <td>
+                                    {{resultsFramework.active ? 'active' : 'inactive' | translate}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <form name="resultsFrameworkForm" novalidate>
+                <div class="col-sm-12">
+                    <div ng-if="model.showAddResultsFrameworkDiv || model.showEditResultsFrameworkDiv">
+                        <div ng-include="'components/results-framework/results-framework-form.html'"></div>                        
+                    </div>               
+                    <div class="vertical-spacing" ng-if="model.showAddResultsFrameworkDiv || model.showEditResultsFrameworkDiv">                
+                        <button type="button" class="btn btn-primary" ng-click="add()" ng-if="model.showAddResultsFrameworkDiv">{{'save'| translate}} </button>
+                        <button type="button" class="btn btn-primary" ng-click="update()" ng-if="model.showEditResultsFrameworkDiv">{{'update'| translate}}</button>
+                        <button type="button" class="btn btn-danger" ng-click="delete()" ng-if="model.showEditResultsFrameworkDiv">{{'delete'| translate}}</button>
+                        <button type="button" class="btn btn-default small-horizonal-spacing" ng-click="cancel()">{{'cancel'| translate}}</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div ng-if="model.showStructureResultsFrameworkDiv">
+            <div class="row" ng-if="model.showStructureResultsFrameworkDiv">
+                <div class="col-sm-12">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-primary" ng-click="hideResultsFrameworkDivs()">
+                            {{'close'| translate}}
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <table class="table table-bordered table-compact">
+                        <tbody ng-repeat="row in model.frameworkStructure">
+                            <tr ng-class="row.class">
+                                <td>
+                                    <div ng-class="row.class">{{row.name}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div ng-if="!model.metaDataCached">
+        <img src="../images/ajax-loader-bar.gif" alt="{{'in_progress'| translate}}" ng-if="!selectedOrgUnit"/><br>
+        {{'loading_metadata'| translate}}
+    </div>
+    
+</div>

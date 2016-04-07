@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+  "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+  "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd"
+  [<!ENTITY identifiableProperties SYSTEM "classpath://org/hisp/dhis/common/identifiableProperties.hbm">]
+  >       
+        
+<hibernate-mapping>
+  <class name="org.hisp.dhis.resultsframework.Project" table="project">
+
+    <cache usage="read-write" />
+
+    <id name="id" column="projectid">
+      <generator class="native" />
+    </id>
+    &identifiableProperties;
+
+    <property name="name" not-null="true" length="1000" />
+
+    <property name="description" type="text" />    
+    
+   	<property name="contactName" />
+   	   	  	
+   	<property name="contactPhone" />
+   	
+   	<property name="contactEmail" /> 
+   	
+   	<property name="totalCost" />
+   	
+   	<property name="costByGovernment" />
+   	
+   	<property name="costByLeadDonor" />
+   	
+   	<property name="costByOthers" />
+   	
+   	<property name="leadDonor" />
+   	
+   	<property name="startDate" />
+   	
+   	<property name="endDate" />
+   	
+   	<property name="extensionPossible" />
+   	
+   	<property name="status" length="40">
+      <type name="org.hibernate.type.EnumType">
+        <param name="enumClass">org.hisp.dhis.resultsframework.ProjectStatus</param>
+        <param name="useNamed">true</param>
+        <param name="type">12</param>
+      </type>
+    </property>
+    
+    <set name="subProgramms" table="projectsubprograms">
+      <cache usage="read-write" />
+      <key column="projectid" foreign-key="fk_projectsubprograms_projectid" />
+      <many-to-many class="org.hisp.dhis.resultsframework.SubProgramm" column="subprogramid"
+        foreign-key="fk_project_subprogramid" />
+    </set>
+    
+    <many-to-one name="budgetExecutionDataSet" class="org.hisp.dhis.dataset.DataSet" column="budgetexecutiondatasetid"
+      foreign-key="fk_budgetexecutiondataset_project"/>
+    
+    <many-to-one name="budgetForecastDataSet" class="org.hisp.dhis.dataset.DataSet" column="budgetforecastdatasetid"
+      foreign-key="fk_budgetforecastdataset_project"/>
+    
+    <!-- Dynamic attribute values -->
+    <set name="attributeValues" table="projectattributevalues" cascade="delete-orphan">
+      <cache usage="read-write" />
+      <key column="projectid" />
+      <many-to-many class="org.hisp.dhis.attribute.AttributeValue" column="attributevalueid" unique="true" />
+    </set>
+        
+  </class>
+</hibernate-mapping>

@@ -1,0 +1,96 @@
+<div class="modal-header">
+    <h3>{{operationMode === 'ADD' ? 'adding_sub_program' : 'editing_sub_program'| translate}}</h3>
+</div>
+<div class="modal-body">
+    <form name="subProgramForm" novalidate>
+        <div class="row">
+            <div class="col-sm-8">
+                <table class="dhis2-list-table-striped dhis2-table-hover">
+                    <tr>
+                        <td>
+                            {{'name'| translate}}
+                            <span class="required">*</span>
+                        </td>
+                        <td>
+                            <input type="text"
+                                   name="name" 
+                                   class="form-control"
+                                   ng-model="model.selectedSubProgram.name" 
+                                   ng-required="true"/>
+                            <div ng-messages="subProgramForm.name.$error" ng-if="interacted(subProgramForm.name, subProgramForm)" class="required hideInPrint" ng-messages-include="../dhis-web-commons/angular-forms/error-messages.html">
+
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            {{'code'| translate}}
+                            <span class="required">*</span>
+                        </td>
+                        <td>
+                            <input type="text"
+                                   name="code" 
+                                   class="form-control"
+                                   ng-model="model.selectedSubProgram.code" 
+                                   ng-required="true"/>
+                            <div ng-messages="subProgramForm.code.$error" ng-if="interacted(subProgramForm.code, subProgramForm)" class="required hideInPrint" ng-messages-include="../dhis-web-commons/angular-forms/error-messages.html">
+
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            {{'description'| translate}}
+                            <span class="required">*</span>
+                        </td>
+                        <td>
+                            <textarea
+                                name="description" 
+                                class="form-control"
+                                rows="4"
+                                ng-model="model.selectedSubProgram.description" 
+                                ng-required="true">                                   
+                            </textarea>
+                            <div ng-messages="subProgramForm.description.$error" ng-if="interacted(subProgramForm.description, subProgramForm)" class="required hideInPrint" ng-messages-include="../dhis-web-commons/angular-forms/error-messages.html">
+
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+                <div ng-include="'views/meta-attributes-form.html'"></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <tabset justified="true">
+                    <tab heading="{{'outputs'| translate}}" class="bold">
+                        <d2-multi-select 
+                            ng-model="model.selectedSubProgram.outputs" 
+                            available="model.outputIndicatorGroups" 
+                            available-label="{{'available'| translate}}" 
+                            selected-label="{{'selected'| translate}}"                     
+                            display-attr="name">
+                        </d2-multi-select>
+                    </tab>
+                    <tab heading="{{'data_sets'| translate}}" class="bold">
+                        <d2-multi-select 
+                            ng-model="model.selectedSubProgram.dataSets" 
+                            available="model.outputDataSets" 
+                            available-label="{{'available'| translate}}" 
+                            selected-label="{{'selected'| translate}}"                     
+                            display-attr="name">
+                        </d2-multi-select>
+                    </tab>                    
+                </tabset>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <div class="pull-left">
+        <button class="btn btn-primary" ng-click="addSubProgram()" ng-if="operationMode === 'ADD'">{{'add'| translate}}</button>
+        <button class="btn btn-primary" ng-click="updateSubProgram()" ng-if="operationMode === 'EDIT'">{{'update'| translate}}</button>
+        <button class="btn btn-danger" ng-click="deleteSubProgram()" ng-if="operationMode === 'EDIT'">{{'delete'| translate}}</button>
+        <button class="btn btn-default" ng-click="close(null)">{{'close'| translate}}</button>
+    </div>        
+</div>

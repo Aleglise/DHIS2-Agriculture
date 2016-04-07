@@ -1,0 +1,108 @@
+<div class="row">
+    <div class="col-sm-8">
+        <table class="dhis2-list-table-striped dhis2-table-hover">
+            <tr>
+                <td>
+                    {{'name'| translate}}
+                    <span class="required">*</span>
+                </td>
+                <td>
+                    <input type="text"
+                           name="name" 
+                           class="form-control"
+                           ng-model="model.selectedResultsFramework.name" 
+                           ng-required="true"/>
+                    <div ng-messages="resultsFrameworkForm.name.$error" ng-if="interacted(resultsFrameworkForm.name, resultsFrameworkForm)" class="required hideInPrint" ng-messages-include="../dhis-web-commons/angular-forms/error-messages.html">
+
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    {{'code'| translate}}
+                    <span class="required">*</span>
+                </td>
+                <td>
+                    <input type="text"
+                           name="code" 
+                           class="form-control"
+                           ng-model="model.selectedResultsFramework.code" 
+                           ng-required="true"/>
+                    <div ng-messages="resultsFrameworkForm.code.$error" ng-if="interacted(resultsFrameworkForm.code, resultsFrameworkForm)" class="required hideInPrint" ng-messages-include="../dhis-web-commons/angular-forms/error-messages.html">
+
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    {{'description'| translate}}
+                    <span class="required">*</span>
+                </td>
+                <td>
+                    <textarea
+                        name="description" 
+                        class="form-control"
+                        rows="4"
+                        ng-model="model.selectedResultsFramework.description" 
+                        ng-required="true">                                   
+                    </textarea>
+                    <div ng-messages="resultsFrameworkForm.description.$error" ng-if="interacted(resultsFrameworkForm.description, resultsFrameworkForm)" class="required hideInPrint" ng-messages-include="../dhis-web-commons/angular-forms/error-messages.html">
+
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <div ng-include="'views/meta-attributes-form.html'"></div>
+    </div>
+</div>
+<div class="row vertical-spacing">
+    <div class="col-sm-12">
+        <tabset justified="true">
+            <tab heading="{{'impacts'| translate}}" class="bold">                
+                <d2-multi-select 
+                    ng-model="model.selectedResultsFramework.impacts" 
+                    available="model.impactIndicatorGroups" 
+                    available-label="{{'available' | translate}}" 
+                    selected-label="{{'selected' | translate}}"                     
+                    display-attr="name">
+                </d2-multi-select>
+            </tab>
+            <tab heading="{{'outcomes'| translate}}" class="bold">
+                <d2-multi-select 
+                    ng-model="model.selectedResultsFramework.outcomes" 
+                    available="model.outcomeIndicatorGroups" 
+                    available-label="{{'available' | translate}}" 
+                    selected-label="{{'selected' | translate}}"                     
+                    display-attr="name">
+                </d2-multi-select>
+            </tab>
+            <!--<tab heading="{{'outputs'| translate}}" class="bold">
+                <d2-multi-select 
+                    ng-model="model.selectedResultsFramework.outputs" 
+                    available="model.outputIndicatorGroups" 
+                    available-label="{{'available' | translate}}" 
+                    selected-label="{{'selected' | translate}}"                     
+                    display-attr="name">
+                </d2-multi-select>
+            </tab>-->
+            <tab heading="{{'programs'| translate}}" class="bold">            
+                <d2-multi-select 
+                    ng-model="model.selectedResultsFramework.programms" 
+                    available="model.programs" 
+                    available-label="{{'available' | translate}}" 
+                    selected-label="{{'selected' | translate}}"                     
+                    display-attr="name">
+                </d2-multi-select> 
+            </tab>
+            <tab heading="{{'data_sets'| translate}}" class="bold">
+                <d2-multi-select 
+                    ng-model="model.selectedResultsFramework.dataSets" 
+                    available="model.impactOutcomeDataSets" 
+                    available-label="{{'available'| translate}}" 
+                    selected-label="{{'selected'| translate}}"                     
+                    display-attr="name">
+                </d2-multi-select>
+            </tab> 
+        </tabset>
+    </div>
+</div>

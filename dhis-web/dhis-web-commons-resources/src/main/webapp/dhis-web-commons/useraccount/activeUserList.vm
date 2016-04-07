@@ -1,0 +1,63 @@
+
+<script type="text/javascript">
+function expireNow( sessionId ) 
+{
+  $.ajax({
+    method: "POST",
+    url: "activeUserList.action",
+    data: "sessionId=" + sessionId,
+    success: function() {
+      window.location.reload();
+    },
+    error: function( e ) {
+      console.log(e);
+      window.location.reload();
+    }
+  });
+}
+
+</script>
+
+#set( $tabIndex = 1 )
+#if ( $activeUsers.size() > 0 )
+
+ <div id="formResult">
+    <table class="formSection" style="width:100%;" border="1">
+    	<tr bgcolor="#CBDDEB">
+            #if( $auth.hasAccess( "dhis-web-commons-about", "expireActiveUsers") )
+				<h3><th colspan="4" style="text-align: center;">$i18n.getString( "active_user_list" )</th></h3>
+			#else
+				<h3><th colspan="3" style="text-align: center;">$i18n.getString( "active_user_list" )</th></h3>
+			#end	
+    	</tr>	
+    </ br>
+    	
+    	<tr bgcolor="#CBDDEB">
+    		<th style="text-align: center;">$i18n.getString( "Name" )</th>
+			<th style="text-align: center;">$i18n.getString( "Username" )</th>
+			<th style="text-align: center;">$i18n.getString( "Active since" )</th>
+			#if( $auth.hasAccess( "dhis-web-commons-about", "expireActiveUsers") )
+				<th style="text-align: center;">$i18n.getString( "Expire Now" )</th>
+			#end
+    	</tr>
+    	#set( $slNo = 1 )
+    	#set( $mark = false )
+    	#foreach($activeUser in $activeUsers )
+    		<tr #alternate($mark)>
+				#set( $sessionInfo = $!sessionInformationMap.get($activeUser.uid) )
+    			<td><label>$activeUser.name</label></td>
+				<td><label>$activeUser.getUsername()</label></td>
+				<td><label>$sessionInfo.getLastRequest()</label></td>
+				#if( $auth.hasAccess( "dhis-web-commons-about", "expireActiveUsers") )
+					<td><label><button style="text-align: center;" onclick="expireNow('$sessionInfo.getSessionId()')" >Expire</button> </label></td>
+				#end	
+    		</tr>
+			#set( $slNo = $slNo + 1 )
+    		#set( $tabIndex = $tabIndex + 1 )
+    		#set( $mark = !$mark)	
+    	#end
+    </table>
+	
+#end
+</div>
+</form>

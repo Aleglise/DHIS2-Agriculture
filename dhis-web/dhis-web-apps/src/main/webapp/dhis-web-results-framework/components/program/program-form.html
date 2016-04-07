@@ -1,0 +1,113 @@
+<div class="row">
+    <div class="col-sm-8">
+        <table class="dhis2-list-table-striped dhis2-table-hover">
+            <tr>
+                <td>
+                    {{'name'| translate}}
+                    <span class="required">*</span>
+                </td>
+                <td>
+                    <input type="text"
+                           name="name" 
+                           class="form-control"
+                           ng-model="model.selectedProgram.name" 
+                           ng-required="true"/>
+                    <div ng-messages="programForm.name.$error" ng-if="interacted(programForm.name, programForm)" class="required hideInPrint" ng-messages-include="../dhis-web-commons/angular-forms/error-messages.html">
+
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    {{'code'| translate}}
+                    <span class="required">*</span>
+                </td>
+                <td>
+                    <input type="text"
+                           name="code" 
+                           class="form-control"
+                           ng-model="model.selectedProgram.code" 
+                           ng-required="true"/>
+                    <div ng-messages="programForm.code.$error" ng-if="interacted(programForm.code, programForm)" class="required hideInPrint" ng-messages-include="../dhis-web-commons/angular-forms/error-messages.html">
+
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    {{'description'| translate}}
+                    <span class="required">*</span>
+                </td>
+                <td>
+                    <textarea
+                        name="description" 
+                        class="form-control"
+                        rows="4"
+                        ng-model="model.selectedProgram.description" 
+                        ng-required="true">                                   
+                    </textarea>
+                    <div ng-messages="programForm.description.$error" ng-if="interacted(programForm.description, programForm)" class="required hideInPrint" ng-messages-include="../dhis-web-commons/angular-forms/error-messages.html">
+
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <div ng-include="'views/meta-attributes-form.html'"></div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-12">
+        <h3>
+            {{'sub_programs'| translate}}
+        </h3>
+        <div class="row">
+            <div class="col-sm-12">
+                <button type="button" class="btn btn-primary pull-right" ng-disabled="model.showAddProgramDiv" ng-click="showSubProgramDiv('ADD', null)">{{'add_new'| translate}} </button>                    
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div ng-if="model.showEditProgramDiv && (!model.selectedProgram.subProgramms || model.selectedProgram.subProgramms.length < 1)" class="alert alert-warning vertical-spacing">
+            {{'no_sub_program_available'| translate}}
+        </div>
+        <div ng-if="model.showAddProgramDiv" class="alert alert-info vertical-spacing">
+            {{'program_is_required'| translate}}
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div ng-if="model.selectedProgram.subProgramms.length > 0" class="col-sm-12 vertical-spacing">
+        <table class="listTable dhis2-table-striped-border dhis2-table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        {{'name'| translate}}
+                    </th>
+                    <th>
+                        {{'code'| translate}}
+                    </th>
+                    <th>
+                        {{'description'| translate}}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr title="{{'edit'| translate}}" ng-click="showSubProgramDiv('EDIT', subProgram)" ng-repeat="subProgram in model.selectedProgram.subProgramms| orderBy: 'name'">
+                    <td>
+                        {{subProgram.name}}
+                    </td>
+                    <td>
+                        {{subProgram.code}}
+                    </td>
+                    <td>
+                        {{subProgram.description}}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div> 
+</div>

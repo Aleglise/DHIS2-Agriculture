@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+  "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+  "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd"
+  [<!ENTITY identifiableProperties SYSTEM "classpath://org/hisp/dhis/common/identifiableProperties.hbm">]
+  >
+
+<hibernate-mapping>
+  <class name="org.hisp.dhis.resultsframework.SubProgramm" table="subprogramm">
+
+    <cache usage="read-write" />
+
+    <id name="id" column="subprogrammid">
+      <generator class="native" />
+    </id>
+    &identifiableProperties;
+
+    <property name="name" column="name" not-null="true" length="1000" />
+
+    <property name="description" type="text" />
+    
+    <property name="sortOrder" column="sortorder" />
+    
+    <set name="outputs" table="subprogrammoutputs">
+      <cache usage="read-write" />
+      <key column="subprogrammid" foreign-key="fk_subprogrammoutputs_subprogrammid" />
+      <many-to-many class="org.hisp.dhis.indicator.IndicatorGroup" column="indicatorgroupid"
+        foreign-key="fk_subprogramm_indicatorgroupid" />
+    </set>
+    
+    <set name="dataSets" table="subprogrammdatasets">
+      <cache usage="read-write" />
+      <key column="subprogrammid" foreign-key="fk_subprogrammdatasets_subprogrammid" />
+      <many-to-many class="org.hisp.dhis.dataset.DataSet" column="datatsetid"
+        foreign-key="fk_subprogramm_datasetid" />
+    </set>
+    
+    <many-to-one name="programm" class="org.hisp.dhis.resultsframework.Programm" column="programmid"
+      foreign-key="fk_subprogramm_programm"/>
+    
+    <!-- Dynamic attribute values -->
+    <set name="attributeValues" table="subprogrammattributevalues" cascade="delete-orphan">
+      <cache usage="read-write" />
+      <key column="subprogrammid" />
+      <many-to-many class="org.hisp.dhis.attribute.AttributeValue" column="attributevalueid" unique="true" />
+    </set>
+        
+  </class>
+</hibernate-mapping>

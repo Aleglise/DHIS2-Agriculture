@@ -1,0 +1,83 @@
+<div class="modal-header">
+    <h3>{{'contribution_result_framework'| translate}}</h3>
+</div>
+<div class="modal-body">
+    <div class="alert alert-info">
+        {{model.activeResultsFramework.name}}
+    </div>
+    <form name="subProgramForm" novalidate>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <td class="col-sm-2 active">
+                            {{'select'| translate}}
+                        </td>
+                        <td class="col-sm-10 active">
+                            {{'sub_program'| translate}}
+                        </td>
+                    </tr>
+                </thead>
+                <tbody ng-repeat="program in model.activeResultsFramework.programms">
+                    <tr>
+                        <td colspan="2">
+                            {{program.name}}
+                        </td>
+                    </tr>
+                    <tr ng-repeat="subProgram in program.subProgramms">
+                        <td>
+                            <input type="checkbox"
+                                   ng-model="model.selectedSubPrograms[subProgram.id]"
+                                   class="form-control-checkbox"
+                                   name="foo"/>
+                        </td>
+                        <td>
+                            {{subProgram.name}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <!--<div class="row">
+            <div class="col-sm-12">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <td class="col-sm-2 active">
+                                {{'select'| translate}}
+                            </td>
+                            <td class="col-sm-10 active">
+                                {{'sub_program'| translate}}
+                            </td>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="program in model.activeResultsFramework.programms">
+                        <tr>
+                            <td colspan="2">
+                                {{program.name}}
+                            </td>
+                        </tr>
+                        <tr ng-repeat="subProgram in program.subProgramms">
+                            <td>
+                                <input type="checkbox"
+                                       class="form-control-checkbox"
+                                       name="foo"/>
+                            </td>
+                            <td>
+                                {{subProgram.name}}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div> -->       
+    </form>
+</div>
+<div class="modal-footer">
+    <div class="pull-left">
+        <button class="btn btn-primary" ng-click="save()">{{'save'| translate}}</button>
+        <button class="btn btn-default" ng-click="close(null)">{{'close'| translate}}</button>
+    </div>        
+</div>
+
+

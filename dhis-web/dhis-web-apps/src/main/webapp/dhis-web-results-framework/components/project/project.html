@@ -1,0 +1,86 @@
+<div id="leftBar">
+    <div ng-include="'views/left-bar-icons.html'"></div>
+    <div ng-include="'views/left-bar-menu.html'"></div>    
+</div>
+
+<div class="page" id="mainPage">
+    <div class="row top-bar">        
+        <div class="col-sm-12">            
+            {{'project'| translate}}
+            <div class="pull-right">
+                <button type="button" class="btn btn-primary" ng-click="showAddProject()" ng-disabled="model.showEditProject || model.showAddProjectDiv">
+                    {{'add_new'| translate}}
+                </button>
+            </div>            
+        </div>        
+    </div>
+    <hr>
+    <div class="row">
+        <div ng-if="!model.showEditProject && !model.showAddProjectDiv">
+            
+            <!-- context menu begins -->
+            <div id="contextMenu" class="contextMenu" style="width: 250px;">
+                <ul id="contextMenuItems" class="contextMenuItems">
+                    <li><a href ng-click="showEditProject()"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span>&nbsp;&nbsp;{{'edit'| translate}}</a></li>
+                    <li><a href ng-click="showBudgetForecast()"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>&nbsp;&nbsp;{{'budget_forecast'| translate}}</a></li>
+                    <li class="divider"></li>
+                    <li><a href ng-click="contributionToResultFramework()"><span class="glyphicon glyphicon-align-left" aria-hidden="true"></span>&nbsp;&nbsp;{{'contribution_result_framework'| translate}}</a></li>
+                </ul>
+            </div>
+            <!-- context menu ends -->
+            
+            <div class="col-sm-12 hideInPrint">
+                <div ng-if="model.projects.length < 1" class="alert alert-warning">{{'no_project_available'| translate}}</div> 
+                <div ng-if="model.projects.length > 0">
+                    <table class="listTable dhis2-table-striped-border dhis2-table-hover">
+                        <thead>
+                            <tr>
+                                <th>
+                                    {{'name'| translate}}
+                                </th>
+                                <th>
+                                    {{'code'| translate}}
+                                </th>
+                                <th>
+                                    {{'description'| translate}}
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr title="{{'edit'| translate}}" 
+                                ng-click="setSelectedProject(project)"
+                                ng-repeat="project in model.projects | orderBy: 'name'"
+                                d2-context-menu 
+                                selected-item={{project}}>
+                                <td>
+                                    {{project.name}}
+                                </td>
+                                <td>
+                                    {{project.code}}
+                                </td>
+                                <td>
+                                    {{project.description}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <form name="projectForm" novalidate>
+            <div class="col-sm-12">
+                <div ng-if="model.showAddProjectDiv || model.showEditProject">
+                    <div ng-include="'components/project/project-form.html'"></div>
+                </div>
+                <div class="vertical-spacing" ng-if="model.showAddProjectDiv || model.showEditProject">                
+                    <button type="button" class="btn btn-primary" ng-click="addProject()" ng-if="model.showAddProjectDiv">{{'save'| translate}} </button>
+                    <button type="button" class="btn btn-primary" ng-click="updateProject()" ng-if="model.showEditProject">{{'update'| translate}}</button>
+                    <button type="button" class="btn btn-danger" ng-click="deleteProject()" ng-if="model.showEditProject">{{'delete'| translate}}</button>
+                    <button type="button" class="btn btn-default small-horizonal-spacing" ng-click="cancel()">{{'cancel'| translate}}</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

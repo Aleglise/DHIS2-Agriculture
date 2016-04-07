@@ -1,0 +1,154 @@
+<table class="dhis2-list-table-striped dhis2-table-hover">
+    <tr ng-repeat="attribute in model.metaAttributes">
+        <td>
+            {{attribute.displayName}}
+            <span class="required" ng-if="attribute.mandatory">*</span>
+        </td>
+        <td>
+            <ng-form name="innerForm">
+                <div ng-if="attribute.optionSet && attribute.optionSet.id">
+                    <ui-select ng-model="model.metaAttributeValues[attribute.id]"
+                                theme="select2" 
+                                ng-required={{attribute.mandatory}}
+                                name="foo" 
+                                input-field-id={{attribute.id}} 
+                                style="width:100%;">
+                        <ui-select-match allow-clear="true" class="form-control-ui-select" placeholder="{{'select_or_search' | translate}}">{{$select.selected.displayName  || $select.selected}}</ui-select-match>
+                        <ui-select-choices  repeat="option.displayName as option in attribute.optionSet.options | filter: $select.search | limitTo:maxOptionSize">
+                            <span ng-bind-html="option.displayName | highlight: $select.search"></span>
+                        </ui-select-choices>
+                    </ui-select>
+                </div>
+
+                <div ng-if="!attribute.optionSet" ng-switch="attribute.valueType">
+                    <div ng-switch-when="NUMBER">
+                        <input type="number"
+                               d2-number-validator
+                               number-type={{attribute.valueType}}
+                               ng-model="model.metaAttributeValues[attribute.id]" 
+                               ng-required={{attribute.mandatory}}
+                               name="foo" 
+                               input-field-id={{attribute.id}} 
+                               class="form-control"/>
+                    </div>
+                    <div ng-switch-when="INTEGER">
+                        <input type="number"
+                               d2-number-validator
+                               number-type={{attribute.valueType}}
+                               ng-model="model.metaAttributeValues[attribute.id]" 
+                               ng-required={{attribute.mandatory}}
+                               name="foo" 
+                               input-field-id={{attribute.id}} 
+                               class="form-control"/>
+                    </div>
+                    <div ng-switch-when="INTEGER_POSITIVE">
+                        <input type="number"
+                               d2-number-validator
+                               number-type={{attribute.valueType}}
+                               ng-model="model.metaAttributeValues[attribute.id]" 
+                               ng-required={{attribute.mandatory}}
+                               name="foo" 
+                               input-field-id={{attribute.id}} 
+                               class="form-control"/>
+                    </div>
+                    <div ng-switch-when="INTEGER_NEGATIVE">
+                        <input type="number"
+                               d2-number-validator
+                               number-type={{attribute.valueType}}
+                               ng-model="model.metaAttributeValues[attribute.id]" 
+                               ng-required={{attribute.mandatory}}
+                               name="foo" 
+                               input-field-id={{attribute.id}} 
+                               class="form-control"/>
+                    </div>
+                    <div ng-switch-when="INTEGER_ZERO_OR_POSITIVE">
+                        <input type="number"
+                               d2-number-validator
+                               number-type={{attribute.valueType}}
+                               ng-model="model.metaAttributeValues[attribute.id]" 
+                               ng-required={{attribute.mandatory}}
+                               name="foo" 
+                               input-field-id={{attribute.id}} 
+                               class="form-control"/>
+                    </div>
+                    <!--<div ng-switch-when="TEXT">
+                        <input type="text"
+                                ng-model="model.metaAttributeValues[attribute.id]" 
+                                ng-required={{attribute.mandatory}}
+                                name="foo" 
+                                input-field-id={{attribute.id}}
+                                class="form-control"/>
+                    </div>-->
+                    <div ng-switch-when="LONG_TEXT">
+                        <textarea rows="3"
+                                ng-model="model.metaAttributeValues[attribute.id]" 
+                                ng-required={{attribute.mandatory}}
+                                name="foo" 
+                                input-field-id={{attribute.id}}
+                                class="form-control">
+                            </textarea>
+                    </div>
+                    <div ng-switch-when="BOOLEAN">
+                         <select ng-model="model.metaAttributeValues[attribute.id]" 
+                                ng-required={{attribute.mandatory}}
+                                name="foo" 
+                                input-field-id={{attribute.id}}
+                                class="form-control">
+                            <option value="">{{'please_select'| translate}}</option>                        
+                            <option value="false">{{'no'| translate}}</option>
+                            <option value="true">{{'yes'| translate}}</option>
+                        </select>
+                    </div>
+                    <div ng-switch-when="DATE">
+                        <input type="text"
+                               placeholder="{{dhis2CalendarFormat.keyDateFormat}}"
+                               d2-date                               
+                               d2-date-validator
+                               ng-model="model.metaAttributeValues[attribute.id]" 
+                               ng-required={{attribute.mandatory}}
+                               name="foo" 
+                               input-field-id={{attribute.id}}
+                               class="form-control">
+                    </div>                    
+                    <div ng-switch-when="TEXT">
+                        <div class="input-group">
+                            <div class="form-control">
+                                <a ng-if="model.metaAttributes[attribute.id]" href ng-click="downloadFile(model.metaAttributeValues[attribute.id])" title="{{fileNames[attribute.id]}}">{{fileNames[attribute.id].length > 20 ? fileNames[attribute.id].substr(0,20).contact('...') : fileNames[attribute.id]}}</a>                                        
+                            </div>
+                            <span class="input-group-btn">
+                                <span class="btn btn-primary btn-file" ng-if="model.metaAttributeValues[attribute.id]" ng-click="deleteFile(attribute.id)">
+                                    <span
+                                          title="{{'delete' | translate}}" 
+                                          d3-file-input-name="fileNames[attribute.id]" 
+                                          d3-file-input-delete="model.metaAttributeValues[attribute.id]">
+                                        <i class="fa fa-trash"></i>
+                                    </span>
+                                </span>
+                                <span class="btn btn-primary btn-file" ng-if="!model.metaAttributeValues[attribute.id]">
+                                    <span title="{{'upload' | translate}}">
+                                        <i class="fa fa-upload"></i>
+                                        <input type="file" 
+                                               ng-required={{attribute.mandatory}}
+                                               name="foo"
+                                               input-field-id={{attribute.id}}
+                                               d3-file-input="model.metaAttributeValues" 
+                                               d3-file-input-name="fileNames">
+                                    </span>                                                
+                                </span>
+                            </span>                
+                        </div>
+                    </div>
+                    <div ng-switch-default>
+                        <input type="text"
+                                ng-model="model.metaAttributeValues[attribute.id]" 
+                                ng-required={{attribute.mandatory}}
+                                name="foo" 
+                                input-field-id={{attribute.id}}
+                                class="form-control"/>
+                    </div>
+                </div>                        
+                <div ng-messages="innerForm.foo.$error" ng-if="interacted(innerForm.foo, innerForm)" class="required hideInPrint" ng-messages-include="../dhis-web-commons/angular-forms/error-messages.html"></div>
+            </ng-form>
+        </td>
+    </tr>
+</table>

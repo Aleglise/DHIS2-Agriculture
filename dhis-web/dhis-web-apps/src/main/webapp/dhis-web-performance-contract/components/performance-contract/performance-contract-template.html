@@ -1,0 +1,39 @@
+<div ng-if="model.selectedDataSet && model.selectedPeriod" class="vertical-spacing">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th class="pull-center" ng-repeat="header in model.templateLayout.columns">
+                    {{header.name}}
+                </th>
+            </tr>
+        </thead>
+        <tbody ng-repeat="row in model.templateLayout.rows">
+            <tr>
+                <td colspan="{{model.templateLayout.columns.length}}">
+                    {{row.name}}
+                </td>
+            </tr>
+        </tbody>
+        <tbody>
+            <tr ng-repeat="de in model.data">
+                <td class="vertical-center" rowspan="{{model.data.length}}" ng-if="$index===0">
+                    {{model.selectedDataSet.displayName}}
+                </td>
+                <td class="vertical-center" ng-if="$index % 2 === 0" rowspan="2">
+                    {{de.name}}
+                </td>
+                <td class="vertical-center" ng-if="$index % 2 === 0">
+                    Target
+                </td>
+                <td class="vertical-center" ng-if="$index % 2 > 0">
+                    Progress
+                </td>
+                <td class="vertical-center" ng-repeat="header in model.templateLayout.columns" ng-if="header.id !== 'frameworkColId' && header.id !== 'categoryColId' && header.id !== 'indicatorColId'">
+                    {{header.value}}
+                </td>
+            </tr>            
+        </tbody>            
+    </table>
+    
+    
+</div> 
