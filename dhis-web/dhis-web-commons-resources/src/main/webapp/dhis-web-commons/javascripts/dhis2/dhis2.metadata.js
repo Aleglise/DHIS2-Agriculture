@@ -128,8 +128,8 @@ dhis2.metadata.filterMissingObjs  = function( store, db, ids )
     return mainPromise;
 };
 
-dhis2.metadata.getBatches = function( ids, batchSize, store, objs, url, filter, storage, db )
-{
+dhis2.metadata.getBatches = function( ids, batchSize, store, objs, url, filter, storage, db, func )
+{    
     if( !ids || !ids.length || ids.length < 1){
         return;
     }
@@ -147,7 +147,7 @@ dhis2.metadata.getBatches = function( ids, batchSize, store, objs, url, filter, 
     
     _.each( _.values( batches ), function ( batch ) {        
         promise = promise.then(function(){
-            return dhis2.metadata.fetchBatchItems( batch, store, objs, url, filter, storage, db );
+            return dhis2.metadata.fetchBatchItems( batch, store, objs, url, filter, storage, db, func );
         });
     });
 
@@ -166,14 +166,14 @@ dhis2.metadata.getBatches = function( ids, batchSize, store, objs, url, filter, 
     return mainPromise;
 };
 
-dhis2.metadata.fetchBatchItems = function( batch, store, objs, url, filter, storage, db )
+dhis2.metadata.fetchBatchItems = function( batch, store, objs, url, filter, storage, db, func )
 {   
     var ids = '[' + batch.toString() + ']';             
     filter = filter + '&filter=id:in:' + ids;    
-    return dhis2.metadata.getMetaObjects( store, objs, url, filter, storage, db );    
+    return dhis2.metadata.getMetaObjects( store, objs, url, filter, storage, db, func );    
 };
 
-dhis2.metadata.getMetaObjects = function( store, objs, url, filter, storage, db )
+dhis2.metadata.getMetaObjects = function( store, objs, url, filter, storage, db, func )
 {
     var def = $.Deferred();
 
@@ -185,6 +185,9 @@ dhis2.metadata.getMetaObjects = function( store, objs, url, filter, storage, db 
         if(response[objs]){            
             _.each( _.values( response[objs] ), function ( obj ) {        
                 obj = dhis2.metadata.processMetaDataAttribute( obj );
+                if( func ) {
+                    obj = func(obj, 'organisationUnits');
+                }
             });            
             
             if(storage === 'idb'){
@@ -244,4 +247,13 @@ dhis2.metadata.getMetaObject = function( id, store, url, filter, storage, db )
     });
     
     return def.promise();
+};
+
+dhis2.metadata.processObject = function(obj, prop){    
+    var oo = {};
+    _.each(_.values( obj[prop]), function(o){
+        oo[o.id] = o.name;
+    });
+    obj[prop] = oo;
+    return obj;
 };

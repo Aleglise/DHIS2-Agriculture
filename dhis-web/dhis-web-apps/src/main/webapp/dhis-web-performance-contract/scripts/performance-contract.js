@@ -1,6 +1,7 @@
 /* global dhis2, angular, selection, i18n_ajax_login_failed, _ */
 
 dhis2.util.namespace('dhis2.rf');
+dhis2.util.namespace('dhis2.tc');
 
 // whether current user has any organisation units
 dhis2.rf.emptyOrganisationUnits = false;
@@ -15,7 +16,7 @@ var attributesInPromise = [];
 var batchSize = 50;
 
 dhis2.rf.store = null;
-dhis2.rf.metaDataCached = dhis2.rf.metaDataCached || false;
+dhis2.tc.metaDataCached = dhis2.rf.metaDataCached || false;
 dhis2.rf.memoryOnly = $('html').hasClass('ie7') || $('html').hasClass('ie8');
 var adapters = [];    
 if( dhis2.rf.memoryOnly ) {
@@ -177,7 +178,7 @@ function downloadMetaData()
     promise.done(function() {        
         //Enable ou selection after meta-data has downloaded
         $( "#orgUnitTree" ).removeClass( "disable-clicks" );
-        dhis2.rf.metaDataCached = true;
+        dhis2.tc.metaDataCached = true;
         dhis2.availability.startAvailabilityCheck();
         console.log( 'Finished loading meta-data' );        
         selection.responseReceived(); 
@@ -293,5 +294,5 @@ function filterMissingDataSets( ids ){
 }
 
 function getDataSets( ids ){    
-    return dhis2.metadata.getBatches( ids, batchSize, 'dataSets', 'dataSets', '../api/dataSets.json', 'paging=false&fields=id,periodType,name,displayName,version,attributeValues[value,attribute[id,name,code]],indicators[id,indicatorGrop[id]],organisationUnits[id,name],dataElements[id,code,name,description,formName,valueType,optionSetValue,optionSet[id],dataElementGroups[id,dataElementGroupSet[id]],categoryCombo[id,isDefault]]', 'idb', dhis2.rf.store);
+    return dhis2.metadata.getBatches( ids, batchSize, 'dataSets', 'dataSets', '../api/dataSets.json', 'paging=false&fields=id,periodType,name,displayName,version,attributeValues[value,attribute[id,name,code]],indicators[id,indicatorGrop[id]],organisationUnits[id,name],dataElements[id,code,name,description,formName,valueType,optionSetValue,optionSet[id],dataElementGroups[id,dataElementGroupSet[id]],categoryCombo[id,isDefault]]', 'idb', dhis2.rf.store, dhis2.metadata.processObject);
 }
