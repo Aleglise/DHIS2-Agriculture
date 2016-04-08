@@ -13,8 +13,7 @@ resultsFramework.controller('ProjectController',
                 DataSetFactory,
                 MetaAttributesFactory,
                 ContextMenuSelectedItem,
-                RfUtils,
-                DateUtils) {
+                RfUtils) {
 
     $scope.fileNames = [];
     $scope.maxOptionSize = 30;
@@ -28,6 +27,7 @@ resultsFramework.controller('ProjectController',
                         budgetForecastDataSets: [],
                         indicatorGroups: [],
                         metaAttributes: [],
+                        metaAttributesById: [],
                         metaAttributeValues: {}
                     };
 
@@ -46,6 +46,7 @@ resultsFramework.controller('ProjectController',
                 else{
                     $scope.model.metaAttributes.push( att );
                 }
+                $scope.model.metaAttributesById[att.id] = att;
             });
 
             DataSetFactory.getAll().then(function(dss){
@@ -61,14 +62,18 @@ resultsFramework.controller('ProjectController',
 
     $scope.showAddProject = function(){
         $scope.model.showAddProjectDiv = !$scope.model.showAddProjectDiv;
+        $scope.model.metaAttributeValues = {};
     };
 
     $scope.showEditProject = function(){
         $scope.model.metaAttributeValues = {};
         $scope.model.selectedProject = ContextMenuSelectedItem.getSelectedItem();
-        angular.forEach($scope.model.selectedProject.attributeValues, function(av){
-            $scope.model.metaAttributeValues[av.attribute.id] = av.value;
-        });
+        
+        $scope.model.selectedProject = RfUtils.convertToUserDate($scope.model.selectedProject, 'startDate');
+        $scope.model.selectedProject = RfUtils.convertToUserDate($scope.model.selectedProject, 'endDate');
+        
+        $scope.model.metaAttributeValues = RfUtils.processMetaAttributeValues($scope.model.selectedProject, $scope.model.metaAttributeValues, $scope.model.metaAttributesById);
+                
         $scope.model.showAddProjectDiv = false;
         $scope.model.showEditProject = true;
     };
@@ -147,7 +152,10 @@ resultsFramework.controller('ProjectController',
         }
 
         $scope.model.selectedProject.attributeValues = RfUtils.processMetaAttributes($scope.model.metaAttributes, $scope.model.metaAttributeValues);
-
+                
+        $scope.model.selectedProject = RfUtils.convertToServerDate($scope.model.selectedProject, 'startDate');
+        $scope.model.selectedProject = RfUtils.convertToServerDate($scope.model.selectedProject, 'endDate');
+        
         //form is valid, continue with adding
         ProjectFactory.create($scope.model.selectedProject).then(function(data){
             if (data.response.status === 'ERROR') {
@@ -162,7 +170,9 @@ resultsFramework.controller('ProjectController',
 
                 //add the new project to the grid
                 var pr = angular.copy($scope.model.selectedProject);
-                pr.id = data.lastImported;
+                pr.id = $scope.model.selectedProject.id = data.response.lastImported;
+                
+                console.log('the project is:  ', $scope.model.selectedProject);
                 $scope.model.projects.splice(0,0,pr);
 
                 //reset form
@@ -179,6 +189,9 @@ resultsFramework.controller('ProjectController',
             return false;
         }
 
+        $scope.model.selectedProject = RfUtils.convertToServerDate($scope.model.selectedProject, 'startDate');
+        $scope.model.selectedProject = RfUtils.convertToServerDate($scope.model.selectedProject, 'endDate');
+        
         $scope.model.selectedProject.attributeValues = RfUtils.processMetaAttributes($scope.model.metaAttributes, $scope.model.metaAttributeValues);
 
         //form is valid, continue with adding

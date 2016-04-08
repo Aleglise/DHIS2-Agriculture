@@ -24,6 +24,7 @@ resultsFramework.controller('ProgramController',
                         outputDataSets: [],
                         metaAttributes: [],
                         metaAttributeValues: {},
+                        metaAttributesById: [],
                         selectedProgram: {outcomes: [], outputs: [], subProgramms: []},
                         indicatorGroups: []
                     };
@@ -39,6 +40,7 @@ resultsFramework.controller('ProgramController',
         MetaAttributesFactory.getAttributesForObject( 'programmAttribute' ).then(function(attributes){
             angular.forEach(attributes, function(att){
                 $scope.model.metaAttributes.push( att );
+                $scope.model.metaAttributesById[att.id] = att;
             });
             
             DataSetFactory.getAll().then(function(dss){
@@ -75,6 +77,7 @@ resultsFramework.controller('ProgramController',
     });
     
     $scope.showAddProgram = function(){
+        $scope.model.metaAttributeValues = {};
         $scope.model.showAddProgramDiv = !$scope.model.showAddProgramDiv;
     };
     
@@ -85,9 +88,7 @@ resultsFramework.controller('ProgramController',
         $scope.model.selectedProgram.outputs = $scope.model.selectedProgram.outputs ? $scope.model.selectedProgram.outputs : [];
         $scope.model.selectedProgram.subProgramms = $scope.model.selectedProgram.subProgramms ? $scope.model.selectedProgram.subProgramms : [];
         
-        angular.forEach($scope.model.selectedProgram.attributeValues, function(av){
-            $scope.model.metaAttributeValues[av.attribute.id] = av.value;
-        });
+        $scope.model.metaAttributeValues = RfUtils.processMetaAttributeValues($scope.model.selectedProgram, $scope.model.metaAttributeValues, $scope.model.metaAttributesById);
         
         $scope.model.showAddProgramDiv = false;
         $scope.model.showEditProgramDiv = true;
@@ -172,7 +173,8 @@ resultsFramework.controller('ProgramController',
                 
                 //add the new program to the grid
                 var pr = angular.copy($scope.model.selectedProgram);
-                pr.id = data.lastImported;                
+                
+                pr.id = $scope.model.selectedProgram.id = data.response.lastImported;
                 $scope.model.programs.splice(0,0,pr);
                     
                 //reset form              

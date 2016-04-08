@@ -30,6 +30,7 @@ resultsFramework.controller('ResultsFrameworkController',
                         metaDataCached: false,
                         metaAttributes: [],
                         metaAttributeValues: {},
+                        metaAttributesById: [],
                         impactOutcomeDataSets: []
                     };
                     
@@ -46,6 +47,7 @@ resultsFramework.controller('ResultsFrameworkController',
                 MetaAttributesFactory.getAttributesForObject( 'resultsFrameworkAttribute' ).then(function(attributes){
                     angular.forEach(attributes, function(att){
                         $scope.model.metaAttributes.push( att );
+                        $scope.model.metaAttributesById[att.id] = att;
                     });
 
                     DataSetFactory.getAll().then(function(dss){
@@ -68,6 +70,7 @@ resultsFramework.controller('ResultsFrameworkController',
     });    
             
     $scope.showAddResultsFramework = function(){
+        $scope.model.metaAttributeValues = {};
         $scope.model.selectedResultsFramework = {impacts: [], outcomes: [], outputs: [], programms: [], dataSets: []};
         $scope.model.showAddResultsFrameworkDiv = !$scope.model.showAddResultsFrameworkDiv;
         $scope.model.showStructureResultsFrameworkDiv = false;
@@ -77,9 +80,8 @@ resultsFramework.controller('ResultsFrameworkController',
     $scope.showEditResultsFramework = function(){        
         $scope.model.selectedResultsFramework = ContextMenuSelectedItem.getSelectedItem();
         $scope.model.metaAttributeValues = {};
-        angular.forEach($scope.model.selectedResultsFramework.attributeValues, function(av){
-            $scope.model.metaAttributeValues[av.attribute.id] = av.value;
-        });
+        
+        $scope.model.metaAttributeValues = RfUtils.processMetaAttributeValues($scope.model.selectedResultsFramework, $scope.model.metaAttributeValues, $scope.model.metaAttributesById);
         
         $scope.model.showEditResultsFrameworkDiv = true;
         $scope.model.showAddResultsFrameworkDiv = false;
@@ -227,7 +229,7 @@ resultsFramework.controller('ResultsFrameworkController',
                 
                 //add the new results framework to the grid
                 var rf = angular.copy($scope.model.selectedResultsFramework);
-                rf.id = data.lastImported;                
+                rf.id = $scope.model.selectedResultsFramework.id = data.response.lastImported;
                 $scope.model.resultsFrameworks.splice(0,0,rf);
                     
                 //reset form              

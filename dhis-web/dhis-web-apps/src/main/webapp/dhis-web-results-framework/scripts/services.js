@@ -395,10 +395,6 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
 
         get: function(uid){
             var promise = $http.get('../api/projects/' + uid + '.json?fields=id,name,code,totalCost,costByGovernment,costByLeadDonor,costByOthers,leadDonor,startDate,endDate,extensionPossible,description,contactName,contactPhone,contactEmail,status,budgetForecastDataSet[id,name],budgetExecutionDataSet[id,name],subProgramms[id,name,code,description],attributeValues[value,attribute[id,name,code]]').then(function(response){
-                if( response.data.startDate && response.data.endDate){
-                    response.data.startDate = DateUtils.formatFromApiToUser(response.data.startDate);
-                    response.data.endDate = DateUtils.formatFromApiToUser(response.data.endDate);
-                }
                 return response.data;
             }, function(response){
                 RfUtils.errorNotifier(response);
@@ -407,12 +403,6 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
         },
         getAll: function(){
             var promise = $http.get('../api/projects.json?fields=id,name,code,totalCost,costByGovernment,costByLeadDonor,costByOthers,leadDonor,startDate,endDate,extensionPossible,description,contactName,contactPhone,contactEmail,status,budgetForecastDataSet[id,name],budgetExecutionDataSet[id,name],subProgramms[id,name,code,description],attributeValues[value,attribute[id,name,code]]&paging=false').then(function(response){
-                if( response.data.projects ) {
-                    angular.forEach(response.data.projects, function(pr){
-                        pr.startDate = DateUtils.formatFromApiToUser(pr.startDate);
-                        pr.endDate = DateUtils.formatFromApiToUser(pr.endDate);
-                    });
-                }
                 return response.data;
             }, function(response){
                 RfUtils.errorNotifier(response);
@@ -420,13 +410,6 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
             return promise;
         },
         create: function(project){
-            if( project.startDate ){
-                project.startDate = DateUtils.formatFromUserToApi(project.startDate);
-            }
-            if( project.endDate ){
-                project.endDate = DateUtils.formatFromUserToApi(project.endDate);
-            }
-
             var promise = $http.post('../api/projects.json', project).then(function(response){
                 return response.data;
             });
@@ -439,13 +422,6 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
             return promise;
         },
         update: function(project){
-            if( project.startDate ){
-                project.startDate = DateUtils.formatFromUserToApi(project.startDate);
-            }
-            if( project.endDate ){
-                project.endDate = DateUtils.formatFromUserToApi(project.endDate);
-            }
-
             var promise = $http.put('../api/projects/' + project.id, project).then(function(response){
                 return response.data;
             });
@@ -481,7 +457,7 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
     };
 })
 
-.service('RfUtils', function($translate, DialogService, ModalService){
+.service('RfUtils', function($translate, DialogService, ModalService, DateUtils){
 
     return {
         removeItems: function(bag, items){
@@ -511,6 +487,20 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
             });
             return atts;
         },
+        processMetaAttributeValues: function(src, des, attributesById){            
+            if(!src || !src.attributeValues || !des ){
+                return;
+            }
+            angular.forEach(src.attributeValues, function(av){
+                if( av.attribute.id ){                
+                    /*if( attributesById[av.attribute.id] && attributesById[av.attribute.id].valueType === 'DATE'){
+                        av.value = DateUtils.formatFromApiToUser( av.value );
+                    }*/                
+                    des[av.attribute.id] = av.value;
+                }
+            });
+            return des;            
+        },
         deleteFile: function(id, obj, fileNames){
 
             if( !id || !obj ){
@@ -533,6 +523,18 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
                 fileNames[id] = null;
                 obj[id] = null;
             });
+        },
+        convertToServerDate: function(obj, prop){            
+            if(obj[prop]){
+                obj[prop] = DateUtils.formatFromUserToApi( obj[prop] );
+            }            
+            return obj;
+        },
+        convertToUserDate: function(obj, prop){            
+            if(obj[prop]){
+                obj[prop] = DateUtils.formatFromApiToUser( obj[prop] );
+            }            
+            return obj;
         }
     };
 })

@@ -27,6 +27,7 @@ resultsFramework.controller('SubProgramController',
                         outputDataSets: outputDataSets,                        
                         outputIndicatorGroups: outputIndicatorGroups,
                         metaAttributes: [],
+                        metaAttributesById: [],
                         metaAttributeValues: {}
                     };
 
@@ -37,9 +38,8 @@ resultsFramework.controller('SubProgramController',
             $scope.model.selectedSubProgram.dataSets = sp.dataSets ? sp.dataSets : [];
             $scope.model.selectedSubProgram.attributeValues = sp.attributeValues ? sp.attributeValues : [];
             $scope.model.metaAttributeValues = {};
-            angular.forEach($scope.model.selectedSubProgram.attributeValues, function(av){
-                $scope.model.metaAttributeValues[av.attribute.id] = av.value;
-            });
+            
+            $scope.model.metaAttributeValues = RfUtils.processMetaAttributeValues($scope.model.selectedSubProgram, $scope.model.metaAttributeValues, $scope.model.metaAttributesById);
         });
     }
     else{
@@ -49,6 +49,7 @@ resultsFramework.controller('SubProgramController',
     MetaAttributesFactory.getAttributesForObject( 'subProgrammAttribute' ).then(function(attributes){
         angular.forEach(attributes, function(att){
             $scope.model.metaAttributes.push( att );
+            $scope.model.metaAttributesById[att.id] = att;
         });         
     });
         

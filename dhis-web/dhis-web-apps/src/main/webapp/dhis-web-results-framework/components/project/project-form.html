@@ -116,6 +116,7 @@
                 <td>
                     <input type="text"
                            name="startDate" 
+                           placeholder="{{dhis2CalendarFormat.keyDateFormat}}"
                            d2-date-validator 
                            d2-date 
                            class="form-control"
@@ -132,6 +133,7 @@
                 <td>
                     <input type="text"
                            name="endDate" 
+                           placeholder="{{dhis2CalendarFormat.keyDateFormat}}"
                            d2-date-validator 
                            d2-date 
                            class="form-control"
@@ -145,17 +147,15 @@
                     {{'extension_possible'| translate}}
                     <span class="required">*</span>
                 </td>
-                <td class="form-control">
-                    <label class="radio-inline">
-                        <input type="radio" name="extensionPossible" ng-model="model.selectedProject.extensionPossible" value=true>{{'yes'| translate}}
-                    </label>
-                    <label class="radio-inline">
-                        <input type="radio" name="extensionPossible" ng-model="model.selectedProject.extensionPossible" value=false>{{'no'| translate}}
-                    </label>
-                    <label class="radio-inline">
-                        <input type="radio" name="extensionPossible" ng-model="model.selectedProject.extensionPossible" value="">{{'unknown'| translate}}
-                    </label>
-                    <div ng-messages="projectForm.extensionPossible.$error" ng-if="interacted(projectForm.extensionPossible, projectForm)" class="required hideInPrint" ng-messages-include="../dhis-web-commons/angular-forms/error-messages.html"></div>
+                <td>
+                    <select name="extensionPossible" 
+                           class="form-control"
+                           ng-model="model.selectedProject.extensionPossible" 
+                           ng-required="true">
+                        <option value="true">{{'yes' | translate}}</option>
+                        <option value="false">{{'no' | translate}}</option>
+                        <option value="">{{'unknown' | translate}}</option>                        
+                    </select> 
                 </td>
             </tr>
             <tr>
