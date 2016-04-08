@@ -1,0 +1,44 @@
+<div class="modal-header">
+    <h3>{{'budget_forecast_breakdown'| translate}}</h3>
+</div>
+<div class="modal-body">
+    <div class="alert alert-info">
+        {{$scope.selectedProject.budgetForecastDataSet.dataElements[0].name}}
+    </div>
+    <form name="budgetForecastForm" novalidate>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <td class="col-sm-2 active">
+                            {{'year'| translate}}
+                        </td>
+                        <td class="col-sm-10 active">
+                            {{'cost'| translate}}
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="item in selectedProject.budgetForecastData">
+                        <td>
+                            {{item.year}}
+                        </td>
+                        <td>
+                            <input type="text"
+                                   name="forecastYearCost"
+                                   class="form-control"
+                                   ng-model="selectedProject.budgetForecastData[$index].cost"
+                                   ng-required="true"/>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <div class="pull-left">
+        <button class="btn btn-primary" ng-click="save()">{{'save'| translate}}</button>
+        <button class="btn btn-default" ng-click="close(null)">{{'close'| translate}}</button>
+    </div>
+</div>
