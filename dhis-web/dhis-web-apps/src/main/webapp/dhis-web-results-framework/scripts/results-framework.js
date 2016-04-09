@@ -192,9 +192,9 @@ function getUserRoles(){
 }
 
 function getCalendarSetting(){   
-    if(localStorage['CALENDAR_SETTING']){
+    /*if(localStorage['CALENDAR_SETTING']){
        return; 
-    }    
+    }*/    
     return dhis2.metadata.getMetaObject(null, 'CALENDAR_SETTING', '../api/systemSettings', 'key=keyCalendar&key=keyDateFormat', 'localStorage', dhis2.rf.store);
 }
 

@@ -22,6 +22,7 @@ resultsFramework.controller('ProjectController',
                         selectSize: 20,
                         projects: [],
                         donorList: [],
+                        statusList: [],
                         selectedProject: {},
                         budgetExecutionDataSets: [],
                         budgetForecastDataSets: [],
@@ -43,6 +44,9 @@ resultsFramework.controller('ProjectController',
                 if(att.code === 'donorList' && att.optionSet && att.optionSet.options && att.optionSet.options.length > 0){
                     $scope.model.donorList = att.optionSet.options;
                 }
+                else if(att.code === 'projectStatus' && att.optionSet && att.optionSet.options && att.optionSet.options.length > 0){
+                    $scope.model.statusList = att.optionSet.options;
+                }
                 else{
                     $scope.model.metaAttributes.push( att );
                 }
@@ -50,8 +54,6 @@ resultsFramework.controller('ProjectController',
             });
 
             DataSetFactory.getAll().then(function(dss){
-                //$scope.model.budgetExecutionDataSets = $filter('filter')(dss, {dataSetType: "BUDGETEXECUTION"});
-                //$scope.model.budgetForecastDataSets = $filter('filter')(dss, {dataSetType: "BUDGETFORECAST"});
 
                 ProjectFactory.getAll().then(function(response){
                     $scope.model.projects = response.projects ? response.projects : [];
@@ -64,8 +66,12 @@ resultsFramework.controller('ProjectController',
                         if( pr.budgetExecutionDataSet ){
                             assignedExecutionDataSets.push( pr.budgetExecutionDataSet.id);
                         }
+                        
+                        pr = RfUtils.convertToUserDate(pr, 'startDate');
+                        pr = RfUtils.convertToUserDate(pr, 'endDate');                        
+                        pr.extensionPossible = pr.extensionPossible === true ? "true" : pr.extensionPossible === false ? "false" : "unknown";
                     });
-
+                    
                     angular.forEach(dss, function(ds){
                         if( assignForecastDataSets.indexOf(ds.id) === -1 && assignedExecutionDataSets.indexOf(ds.id) === -1 ){
                             if( ds.dataSetType === 'BUDGETEXECUTION'){
@@ -89,9 +95,6 @@ resultsFramework.controller('ProjectController',
     $scope.showEditProject = function(){
         $scope.model.metaAttributeValues = {};
         $scope.model.selectedProject = ContextMenuSelectedItem.getSelectedItem();
-        
-        $scope.model.selectedProject = RfUtils.convertToUserDate($scope.model.selectedProject, 'startDate');
-        $scope.model.selectedProject = RfUtils.convertToUserDate($scope.model.selectedProject, 'endDate');
         
         $scope.model.metaAttributeValues = RfUtils.processMetaAttributeValues($scope.model.selectedProject, $scope.model.metaAttributeValues, $scope.model.metaAttributesById);
                 
@@ -181,14 +184,16 @@ resultsFramework.controller('ProjectController',
         if( $scope.projectForm.$invalid ){
             return false;
         }
-
-        $scope.model.selectedProject.attributeValues = RfUtils.processMetaAttributes($scope.model.metaAttributes, $scope.model.metaAttributeValues);
-                
-        $scope.model.selectedProject = RfUtils.convertToServerDate($scope.model.selectedProject, 'startDate');
-        $scope.model.selectedProject = RfUtils.convertToServerDate($scope.model.selectedProject, 'endDate');
+        
+        var pr = angular.copy($scope.model.selectedProject);
+        
+        pr.attributeValues = RfUtils.processMetaAttributes($scope.model.metaAttributes, $scope.model.metaAttributeValues);                
+        pr = RfUtils.convertToServerDate(pr, 'startDate');
+        pr = RfUtils.convertToServerDate(pr, 'endDate');        
+        pr.extensionPossible = pr.extensionPossible === 'true' ? true : pr.extensionPossible === 'false' ? false : "";
         
         //form is valid, continue with adding
-        ProjectFactory.create($scope.model.selectedProject).then(function(data){
+        ProjectFactory.create(pr).then(function(data){
             if (data.response.status === 'ERROR') {
                 var dialogOptions = {
                     headerText: 'project_saving_error',
@@ -199,10 +204,9 @@ resultsFramework.controller('ProjectController',
             }
             else {
 
-                //add the new project to the grid
-                var pr = angular.copy($scope.model.selectedProject);
-                pr.id = $scope.model.selectedProject.id = data.response.lastImported;
-                $scope.model.projects.splice(0,0,pr);
+                //add the new project to the grid                
+                $scope.model.selectedProject.id = data.response.lastImported;
+                $scope.model.projects.splice(0,0,$scope.model.selectedProject);
 
                 //reset form
                 $scope.cancel();
@@ -217,14 +221,16 @@ resultsFramework.controller('ProjectController',
         if( $scope.projectForm.$invalid ){
             return false;
         }
-
-        $scope.model.selectedProject = RfUtils.convertToServerDate($scope.model.selectedProject, 'startDate');
-        $scope.model.selectedProject = RfUtils.convertToServerDate($scope.model.selectedProject, 'endDate');
         
-        $scope.model.selectedProject.attributeValues = RfUtils.processMetaAttributes($scope.model.metaAttributes, $scope.model.metaAttributeValues);
-
+        var pr = angular.copy($scope.model.selectedProject);
+        
+        pr.attributeValues = RfUtils.processMetaAttributes($scope.model.metaAttributes, $scope.model.metaAttributeValues);                
+        pr = RfUtils.convertToServerDate(pr, 'startDate');
+        pr = RfUtils.convertToServerDate(pr, 'endDate');        
+        pr.extensionPossible = pr.extensionPossible === 'true' ? true : pr.extensionPossible === 'false' ? false : "";
+        
         //form is valid, continue with adding
-        ProjectFactory.update($scope.model.selectedProject).then(function(data){
+        ProjectFactory.update(pr).then(function(data){
             if (data.response.status === 'ERROR') {
                 var dialogOptions = {
                     headerText: 'project_saving_error',

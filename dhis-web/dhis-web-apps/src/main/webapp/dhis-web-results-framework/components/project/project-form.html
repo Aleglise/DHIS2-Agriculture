@@ -151,11 +151,12 @@
                     <select name="extensionPossible" 
                            class="form-control"
                            ng-model="model.selectedProject.extensionPossible" 
-                           ng-required="true">
+                           data-ng-required="true">
                         <option value="true">{{'yes' | translate}}</option>
                         <option value="false">{{'no' | translate}}</option>
-                        <option value="">{{'unknown' | translate}}</option>                        
-                    </select> 
+                        <option value="unknown">{{'unknown' | translate}}</option>                        
+                    </select>
+                    <div ng-messages="projectForm.extensionPossible.$error" ng-if="interacted(projectForm.endDate, projectForm)" class="required hideInPrint" ng-messages-include="../dhis-web-commons/angular-forms/error-messages.html"></div>
                 </td>
             </tr>
             <tr>
@@ -222,16 +223,15 @@
                     <span class="required">*</span>
                 </td>
                 <td>
-                    <select name="status" 
-                           class="form-control"
-                           ng-model="model.selectedProject.status" 
-                           ng-required="true">
-                        <option value="">{{'please_select' | translate}}</option>
-                        <option value="APPROVED">{{'approved' | translate}}</option>
-                        <option value="CLOSED">{{'closed' | translate}}</option>
-                        <option value="FORECAST">{{'forecast' | translate}}</option>
-                        <option value="STARTED">{{'started' | translate}}</option>                        
-                    </select>
+                    <ui-select ng-model="model.selectedProject.status" 
+                            theme="select2" 
+                            name="status"
+                            style="width:100%;">
+                        <ui-select-match allow-clear="true" class="form-control-ui-select" placeholder="{{'select_or_search' | translate}}">{{$select.selected.displayName  || $select.selected}}</ui-select-match>
+                        <ui-select-choices  repeat="option.displayName as option in model.statusList | filter: $select.search | limitTo:maxOptionSize">
+                            <span ng-bind-html="option.displayName | highlight: $select.search"></span>
+                        </ui-select-choices>
+                    </ui-select>
                     <div ng-messages="projectForm.status.$error" ng-if="interacted(projectForm.status, projectForm)" class="required hideInPrint" ng-messages-include="../dhis-web-commons/angular-forms/error-messages.html"></div>
                 </td>
             </tr>

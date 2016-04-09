@@ -32,7 +32,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.hisp.dhis.common.BaseIdentifiableObject;
-import org.hisp.dhis.common.BaseNameableObject;
 import org.hisp.dhis.common.DxfNamespaces;
 import org.hisp.dhis.common.IdentifiableObject;
 import org.hisp.dhis.common.MergeMode;
@@ -54,7 +53,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
  */
 @JacksonXmlRootElement( localName = "project", namespace = DxfNamespaces.DXF_2_0 )
 public class Project
-    extends BaseNameableObject
+    extends BaseIdentifiableObject
 {
     private String description;    
     
@@ -80,7 +79,7 @@ public class Project
     
     private Boolean extensionPossible;
     
-    private ProjectStatus status;
+    private String status;
     
     private DataSet budgetExecutionDataSet;
     
@@ -300,7 +299,7 @@ public class Project
     {
         this.endDate = endDate;
     }
-
+    
     /**
      * @return the extensionPossible
      */
@@ -324,7 +323,7 @@ public class Project
      */
     @JsonProperty
     @JacksonXmlProperty( namespace = DxfNamespaces.DXF_2_0 )
-    public ProjectStatus getStatus()
+    public String getStatus()
     {
         return status;
     }
@@ -332,7 +331,7 @@ public class Project
     /**
      * @param status the status to set
      */
-    public void setStatus( ProjectStatus status )
+    public void setStatus( String status )
     {
         this.status = status;
     }

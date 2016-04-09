@@ -31,7 +31,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.hisp.dhis.common.BaseIdentifiableObject;
-import org.hisp.dhis.common.BaseNameableObject;
 import org.hisp.dhis.common.DxfNamespaces;
 import org.hisp.dhis.common.IdentifiableObject;
 import org.hisp.dhis.common.MergeMode;
@@ -54,7 +53,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
  */
 @JacksonXmlRootElement( localName = "resultsFramework", namespace = DxfNamespaces.DXF_2_0 )
 public class ResultsFramework
-    extends BaseNameableObject
+    extends BaseIdentifiableObject
 {
 
     private String description;
