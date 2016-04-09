@@ -1,9 +1,9 @@
 <div class="modal-header">
-    <h3>{{'budget_forecast_breakdown'| translate}}</h3>
+    <h3>{{'budget_forecast'| translate}}</h3>
 </div>
 <div class="modal-body">
     <div class="alert alert-info">
-        {{$scope.selectedProject.budgetForecastDataSet.dataElements[0].name}}
+        {{selectedProject.name}}
     </div>
     <form name="budgetForecastForm" novalidate>
         <div class="table-responsive">
@@ -19,16 +19,19 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="item in selectedProject.budgetForecastData">
+                    <tr ng-repeat="bfd in budgetForecastData">
                         <td>
-                            {{item.year}}
+                            {{bfd.period}}
                         </td>
                         <td>
-                            <input type="text"
-                                   name="forecastYearCost"
-                                   class="form-control"
-                                   ng-model="selectedProject.budgetForecastData[$index].cost"
-                                   ng-required="true"/>
+                            <ng-form name="innerForm">
+                                <input type="number"
+                                    name="foo"
+                                    class="form-control"
+                                    ng-model="bfd.value"
+                                    ng-required="true"/>
+                                <div ng-messages="innerForm.foo.$error" ng-if="interacted(innerForm.foo, innerForm)" class="required hideInPrint" ng-messages-include="../dhis-web-commons/angular-forms/error-messages.html"></div>
+                            </ng-form>
                         </td>
                     </tr>
                 </tbody>

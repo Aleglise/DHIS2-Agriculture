@@ -539,14 +539,32 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
     };
 })
 
-.service('dataValuesService', function($http){
+.service('DataValueService', function($http){
     return {
         save: function(dv){
-            var promise = $http.post('../api/dataValues?de='+dv.de+'&ou='+dv.ou+'&pe='+dv.pe+'&value='+dv.value);
+            var promise = $http.post('../api/dataValues.json?de='+dv.de+'&ou='+dv.ou+'&pe='+dv.pe+'&value='+dv.value);
             return promise;
         },
-        get: function(){
-            var promise = $http.get('../api/dataValues');
+        get: function(dv){
+            var promise = $http.get('../api/dataValues.json?de='+dv.de+'&ou='+dv.ou+'&pe='+dv.pe);
+            return promise;
+        },
+        saveDataValueSet: function(dvs){
+            var promise = $http.post('../api/dataValueSets.json', dvs).then(function(response){
+                return response.data;
+            });
+            return promise;
+        },
+        getDataValueSet: function(params){
+            var promise = $http.get('../api/dataValueSets.json?'+params).then(function(response){                
+                var dvsByPe = [];
+                if( response.data.dataValues ){
+                    angular.forEach(response.data.dataValues, function(dv){
+                        dvsByPe[dv.period] = dv;
+                    });
+                }
+                return dvsByPe;
+            });
             return promise;
         }
     };

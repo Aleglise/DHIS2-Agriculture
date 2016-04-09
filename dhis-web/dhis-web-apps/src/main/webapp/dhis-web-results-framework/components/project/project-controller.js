@@ -50,11 +50,32 @@ resultsFramework.controller('ProjectController',
             });
 
             DataSetFactory.getAll().then(function(dss){
-                $scope.model.budgetExecutionDataSets = $filter('filter')(dss, {dataSetType: "BUDGETEXECUTION"});
-                $scope.model.budgetForecastDataSets = $filter('filter')(dss, {dataSetType: "BUDGETFORECAST"});
+                //$scope.model.budgetExecutionDataSets = $filter('filter')(dss, {dataSetType: "BUDGETEXECUTION"});
+                //$scope.model.budgetForecastDataSets = $filter('filter')(dss, {dataSetType: "BUDGETFORECAST"});
 
                 ProjectFactory.getAll().then(function(response){
                     $scope.model.projects = response.projects ? response.projects : [];
+                    
+                    var assignForecastDataSets = [], assignedExecutionDataSets = [];
+                    angular.forEach($scope.model.projects, function(pr){
+                        if( pr.budgetForecastDataSet ){
+                            assignForecastDataSets.push( pr.budgetForecastDataSet.id);
+                        }
+                        if( pr.budgetExecutionDataSet ){
+                            assignedExecutionDataSets.push( pr.budgetExecutionDataSet.id);
+                        }
+                    });
+
+                    angular.forEach(dss, function(ds){
+                        if( assignForecastDataSets.indexOf(ds.id) === -1 && assignedExecutionDataSets.indexOf(ds.id) === -1 ){
+                            if( ds.dataSetType === 'BUDGETEXECUTION'){
+                                $scope.model.budgetExecutionDataSets.push( ds );
+                            }
+                            else if( ds.dataSetType === 'BUDGETFORECAST'){
+                                $scope.model.budgetForecastDataSets.push( ds );
+                            }
+                        }
+                    });
                 });
             });
         });
@@ -79,46 +100,56 @@ resultsFramework.controller('ProjectController',
     };
 
     $scope.showBudgetForecast = function(){
-      $scope.model.selectedProject = ContextMenuSelectedItem.getSelectedItem();
+        
+        $scope.model.selectedProject = ContextMenuSelectedItem.getSelectedItem();
+        
+        if( $scope.model.selectedProject.budgetForecastDataSet && $scope.model.selectedProject.budgetForecastDataSet.id ){
+            
+            MetaDataFactory.get('dataSets', $scope.model.selectedProject.budgetForecastDataSet.id).then(function(ds){
 
-      if( !$scope.model.selectedProject.budgetForecastDataSet ) {
-        var dialogOptions = {
-          headerText: 'error',
-          bodyText: $translate.instant('budget_forecast_data_set_missing')
-        };
+                if( !ds.dataElements || ds.dataElements.length !== 1 ) {
+                    var dialogOptions = {
+                        headerText: 'error',
+                        bodyText: $translate.instant('buget_forecast_dataelement_error')
+                    };
+                    DialogService.showDialog({}, dialogOptions);
+                    return;
+                } 
 
-        DialogService.showDialog({}, dialogOptions);
+                if( !ds.organisationUnits || Object.keys(ds.organisationUnits).length !== 1 ) {
+                    var dialogOptions = {
+                        headerText: 'error',
+                        bodyText: $translate.instant('budget_forecast_orgunit_error')
+                    };
+                    DialogService.showDialog({}, dialogOptions);
+                    return;
+                }
 
-        return;
-      } else if( !$scope.model.selectedProject.budgetForecastDataSet.dataElements || $scope.model.selectedProject.budgetForecastDataSet.dataElements.length !== 1 ) {
-        var dialogOptions = {
-          headerText: 'error',
-          bodyText: $translate.instant('budget_forecast_data_element_error')
-        };
+                var modalInstance = $modal.open({
+                    templateUrl: 'components/project/project-budget-forecast.html',
+                    controller: 'ProjectBudgetForecastController',
+                    resolve: {
+                        selectedProject: function() {
+                            return $scope.model.selectedProject;
+                        },
+                        budgetForecastDataSet: function(){
+                            return ds;
+                        }
+                    }
+                });        
 
-        DialogService.showDialog({}, dialogOptions);
-
-        return;
-      } else if( !$scope.model.selectedProject.budgetForecastDataSet.organisationUnits || Object.keys($scope.model.selectedProject.budgetForecastDataSet.organisationUnits).length !== 1 ) {
-        var dialogOptions = {
-          headerText: 'error',
-          bodyText: $translate.instant('budget_forecast_organisation_unit_error')
-        };
-
-        DialogService.showDialog({}, dialogOptions);
-
-        return;
-      }
-
-      var modalInstance = $modal.open({
-        templateUrl: 'components/project/project-budget-forecast.html',
-        controller: 'ProjectBudgetForecastController',
-        resolve: {
-          selectedProject: function() {
-            return $scope.model.selectedProject;
-          }
+                modalInstance.result.then(function(){            
+                });
+            });
         }
-      });
+        else{
+            var dialogOptions = {
+                headerText: 'error',
+                bodyText: $translate.instant('budget_forecast_data_set_missing')
+            };
+            DialogService.showDialog({}, dialogOptions);
+            return;
+        }        
     };
 
     $scope.setSelectedProject = function(project){
@@ -171,8 +202,6 @@ resultsFramework.controller('ProjectController',
                 //add the new project to the grid
                 var pr = angular.copy($scope.model.selectedProject);
                 pr.id = $scope.model.selectedProject.id = data.response.lastImported;
-                
-                console.log('the project is:  ', $scope.model.selectedProject);
                 $scope.model.projects.splice(0,0,pr);
 
                 //reset form

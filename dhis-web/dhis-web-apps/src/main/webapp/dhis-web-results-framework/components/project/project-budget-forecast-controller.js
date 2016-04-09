@@ -1,52 +1,92 @@
-resultsFramework.controller('ProjectBudgetForecastController',
-							function ($scope,
-									  $modalInstance,
-									  $q,
-									  ResultsFrameworkFactory,
-									  ProjectFactory,
-									  DialogService,
-									  dataValuesService,
-									  selectedProject,
-									  DateUtils) {
+/* global resultsFramework */
 
+resultsFramework.controller('ProjectBudgetForecastController',
+                function ($scope,
+                        $modalInstance,
+                        $q,
+                        $translate,
+                        DialogService,
+                        DataValueService,
+                        selectedProject,
+                        budgetForecastDataSet,
+                        DateUtils) {
 	$scope.selectedProject = selectedProject;
-	$scope.selectedProject.budgetForecastData = [];
+        $scope.budgetForecastDataSet = budgetForecastDataSet;
+	$scope.budgetForecastData = [];
+        var dataValueSetUrl = "dataSet=" + $scope.budgetForecastDataSet.id + "&orgUnit=" + Object.getOwnPropertyNames($scope.budgetForecastDataSet.organisationUnits)[0];
 	
 	$scope.selectedProject.startYear = DateUtils.splitDate($scope.selectedProject.startDate).year;
 	$scope.selectedProject.endYear = DateUtils.splitDate($scope.selectedProject.endDate).year;
-
-	/* calculating years between projects' start year and end year */
+        
+	/* calculating years between projects' start year and end year */        
 	for (var i = 0; i+$scope.selectedProject.startYear <= $scope.selectedProject.endYear; i++) {
-		$scope.selectedProject.budgetForecastData[i] = {year: $scope.selectedProject.startYear + i};
+            $scope.budgetForecastData[i] = {period: $scope.selectedProject.startYear + i, 
+                                            dataElement: $scope.budgetForecastDataSet.dataElements[0].id,
+                                            orgUnit: Object.getOwnPropertyNames($scope.budgetForecastDataSet.organisationUnits)[0]
+                                        };
+            dataValueSetUrl += "&period=" + $scope.budgetForecastData[i].period;
 	}
-
+        
+        //fetch if forecast data is available
+        DataValueService.getDataValueSet(dataValueSetUrl).then(function(dvs){
+            angular.forEach($scope.budgetForecastData,function(bfd){
+                var dv = dvs[bfd.period];
+                if( dv && dv.dataElement === bfd.dataElement && dv.orgUnit === bfd.orgUnit){
+                    bfd.value = parseInt( dv.value );
+                }
+            });
+        });            
+            
 	$scope.save = function () {
-
-		$scope.promises = [];
-		
-		angular.forEach($scope.selectedProject.budgetForecastData,function(val, key){
-			var dataValue = {};
-			dataValue.de = $scope.selectedProject.budgetForecastDataSet.dataElements[0].id;
-			dataValue.ou = Object.getOwnPropertyNames($scope.selectedProject.budgetForecastDataSet.organisationUnits)[0];
-			dataValue.pe = $scope.selectedProject.budgetForecastData[key].year;
-			dataValue.value = $scope.selectedProject.budgetForecastData[key].cost;
-
-			$scope.promises.push(dataValuesService.save(dataValue));	
-		});
-
-		$q.all($scope.promises).then(function(response) {
-			if (response.status === 'ERROR') {
-				var dialogOptions = {
-					headerText: 'project_saving_error',
-					bodyText: data.message
-				};
-				DialogService.showDialog({}, dialogOptions);
-			}
-			$modalInstance.close();
-		});		
+            
+            //check for form validity
+            $scope.budgetForecastForm.submitted = true;
+            if( $scope.budgetForecastForm.$invalid ){
+                return false;
+            }
+            
+            var dataValueSet = {dataValues: []};
+            angular.forEach($scope.budgetForecastData,function(bfd){
+                    var dataValue = {};
+                    dataValue.dataElement = bfd.dataElement;
+                    dataValue.orgUnit = bfd.orgUnit;
+                    dataValue.period = bfd.period;
+                    dataValue.value = bfd.value;
+                    dataValueSet.dataValues.push( dataValue );
+            });
+            
+            DataValueService.saveDataValueSet(dataValueSet).then(function(response){
+                if( response.conflicts) {
+                    var dialogOptions = {
+                        headerText: 'budget_forecast_save_error',
+                        bodyText: response.conflicts[0].value
+                    };
+                    DialogService.showDialog({}, dialogOptions);
+                    return;
+                }
+                else{
+                    var dialogOptions = {
+                        headerText: 'success',
+                        bodyText: $translate.instant('budget_forecast_save_success')
+                    };
+                    DialogService.showDialog({}, dialogOptions);
+                    $scope.close();
+                }
+            });
 	};
 
 	$scope.close = function () {
-		$modalInstance.close();
+            $modalInstance.close();
 	};
+        
+        $scope.interacted = function(field, form) {
+            var status = false;
+            if(!form){
+                return status;
+            }
+            if(field){
+                status = form['submitted'] || field.$dirty;
+            }
+            return status;
+        };
     });
