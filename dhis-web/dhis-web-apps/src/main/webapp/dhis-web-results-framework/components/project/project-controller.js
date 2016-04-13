@@ -13,8 +13,12 @@ resultsFramework.controller('ProjectController',
                 DataSetFactory,
                 MetaAttributesFactory,
                 ContextMenuSelectedItem,
-                RfUtils) {
-
+                RfUtils,
+                Paginator) {
+    
+    //Paging
+    $scope.pager = {pageSize: 10, page: 1, toolBarDisplay: 5};
+    
     $scope.fileNames = [];
     $scope.maxOptionSize = 30;
     $scope.model = {    showAddProjectDiv: false,
@@ -29,6 +33,8 @@ resultsFramework.controller('ProjectController',
                         indicatorGroups: [],
                         metaAttributes: [],
                         metaAttributesById: [],
+                        gridColumns: ['name', 'code', 'description'],
+                        sortColumn: 'name',
                         metaAttributeValues: {}
                     };
 
@@ -52,42 +58,63 @@ resultsFramework.controller('ProjectController',
                 }
                 $scope.model.metaAttributesById[att.id] = att;
             });
-
-            DataSetFactory.getAll().then(function(dss){
-
-                ProjectFactory.getAll().then(function(response){
-                    $scope.model.projects = response.projects ? response.projects : [];
-                    
-                    var assignForecastDataSets = [], assignedExecutionDataSets = [];
-                    angular.forEach($scope.model.projects, function(pr){
-                        if( pr.budgetForecastDataSet ){
-                            assignForecastDataSets.push( pr.budgetForecastDataSet.id);
-                        }
-                        if( pr.budgetExecutionDataSet ){
-                            assignedExecutionDataSets.push( pr.budgetExecutionDataSet.id);
-                        }
-                        
-                        pr = RfUtils.convertToUserDate(pr, 'startDate');
-                        pr = RfUtils.convertToUserDate(pr, 'endDate');                        
-                        pr.extensionPossible = pr.extensionPossible === true ? "true" : pr.extensionPossible === false ? "false" : "unknown";
-                    });
-                    
-                    angular.forEach(dss, function(ds){
-                        if( assignForecastDataSets.indexOf(ds.id) === -1 && assignedExecutionDataSets.indexOf(ds.id) === -1 ){
-                            if( ds.dataSetType === 'BUDGETEXECUTION'){
-                                $scope.model.budgetExecutionDataSets.push( ds );
-                            }
-                            else if( ds.dataSetType === 'BUDGETFORECAST'){
-                                $scope.model.budgetForecastDataSets.push( ds );
-                            }
-                        }
-                    });
-                });
-            });
+            
+            $scope.loadProjects();
         });
     });
 
+    $scope.loadProjects = function(){
+        
+        $scope.model.budgetExecutionDataSets = [];
+        $scope.model.budgetForecastDataSets = [];
+        $scope.model.projects = [];
+        
+        DataSetFactory.getAll().then(function(dss){
+            
+            ProjectFactory.getAll( true, $scope.pager, $scope.model.searchText ).then(function(response){
+                if( response.pager ){
+                    response.pager.pageSize = response.pager.pageSize ? response.pager.pageSize : $scope.pager.pageSize;
+                    $scope.pager = response.pager;
+                    $scope.pager.toolBarDisplay = 5;
+
+                    Paginator.setPage($scope.pager.page);
+                    Paginator.setPageCount($scope.pager.pageCount);
+                    Paginator.setPageSize($scope.pager.pageSize);
+                    Paginator.setItemCount($scope.pager.total);                    
+                }
+
+                $scope.model.projects = response.projects ? response.projects : [];
+
+                var assignForecastDataSets = [], assignedExecutionDataSets = [];
+                angular.forEach($scope.model.projects, function(pr){
+                    if( pr.budgetForecastDataSet ){
+                        assignForecastDataSets.push( pr.budgetForecastDataSet.id);
+                    }
+                    if( pr.budgetExecutionDataSet ){
+                        assignedExecutionDataSets.push( pr.budgetExecutionDataSet.id);
+                    }
+
+                    pr = RfUtils.convertToUserDate(pr, 'startDate');
+                    pr = RfUtils.convertToUserDate(pr, 'endDate');                        
+                    pr.extensionPossible = pr.extensionPossible === true ? "true" : pr.extensionPossible === false ? "false" : "unknown";
+                });
+
+                angular.forEach(dss, function(ds){
+                    if( assignForecastDataSets.indexOf(ds.id) === -1 && assignedExecutionDataSets.indexOf(ds.id) === -1 ){
+                        if( ds.dataSetType === 'BUDGETEXECUTION'){
+                            $scope.model.budgetExecutionDataSets.push( ds );
+                        }
+                        else if( ds.dataSetType === 'BUDGETFORECAST'){
+                            $scope.model.budgetForecastDataSets.push( ds );
+                        }
+                    }
+                });
+            });        
+        });        
+    };
+    
     $scope.showAddProject = function(){
+        $scope.model.searchText = "";
         $scope.model.showAddProjectDiv = !$scope.model.showAddProjectDiv;
         $scope.model.metaAttributeValues = {};
     };
@@ -304,5 +331,22 @@ resultsFramework.controller('ProjectController',
     $scope.cancel = function(){
         $scope.projectForm.submitted = false;
         $scope.hideAddProject();
+    };
+    
+    $scope.jumpToPage = function(){        
+        if($scope.pager && $scope.pager.page && $scope.pager.pageCount && $scope.pager.page > $scope.pager.pageCount){
+            $scope.pager.page = $scope.pager.pageCount;
+        }
+        $scope.loadProjects();
+    };
+    
+    $scope.resetPageSize = function(){
+        $scope.pager.page = 1;        
+        $scope.loadProjects();
+    };
+    
+    $scope.getPage = function(page){    
+        $scope.pager.page = page;
+        $scope.loadProjects();
     };
 });

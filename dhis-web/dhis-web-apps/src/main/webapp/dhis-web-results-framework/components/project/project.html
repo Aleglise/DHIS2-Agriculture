@@ -4,15 +4,17 @@
 </div>
 
 <div class="page" id="mainPage">
-    <div class="row top-bar">        
-        <div class="col-sm-12">            
+    <div class="row top-bar">
+        <div class="col-sm-2">
             {{'project'| translate}}
-            <div class="pull-right">
-                <button type="button" class="btn btn-primary" ng-click="showAddProject()" ng-disabled="model.showEditProject || model.showAddProjectDiv">
-                    {{'add_new'| translate}}
-                </button>
-            </div>            
-        </div>        
+        </div>
+        <div class="input-group col-sm-10">
+            <input type="text" name="searchText" placeholder="{{'search' | translate}}" class="form-control" ng-disabled="model.showEditProject || model.showAddProjectDiv" ng-model="model.searchText" ng-blur="loadProjects()" d2-enter="loadProjects()"/>
+            <div class="input-group-btn">                
+                <button class="btn btn-success" type="button" title="{{'search'| translate}}" ng-disabled="model.showEditProject || model.showAddProjectDiv" ng-click="loadProjects()"><i class="fa fa-search"></i></button>
+                <button class="btn btn-primary" type="button" title="{{'add_new'| translate}}" ng-disabled="model.showEditProject || model.showAddProjectDiv" ng-click="showAddProject()"><i class="fa fa-plus"></i></button>
+            </div>                
+        </div>  
     </div>
     <hr>
     <div class="row">
@@ -49,7 +51,7 @@
                         <tbody>
                             <tr title="{{'edit'| translate}}" 
                                 ng-click="setSelectedProject(project)"
-                                ng-repeat="project in model.projects | orderBy: 'name'"
+                                ng-repeat="project in model.projects | filter: {name: model.searchText} | orderBy: 'name'"
                                 d2-context-menu 
                                 selected-item={{project}}>
                                 <td>
@@ -64,6 +66,7 @@
                             </tr>
                         </tbody>
                     </table>
+                    <serverside-paginator></serverside-paginator>
                 </div>
             </div>
         </div>

@@ -389,7 +389,7 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
     };
 })
 
-.factory('ProjectFactory', function($http, DateUtils, RfUtils) {
+.factory('ProjectFactory', function($http, RfUtils) {
 
     return {
 
@@ -401,8 +401,13 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
             });
             return promise;
         },
-        getAll: function(){
-            var promise = $http.get('../api/projects.json?fields=id,name,code,totalCost,costByGovernment,costByLeadDonor,costByOthers,leadDonor,startDate,endDate,extensionPossible,description,contactName,contactPhone,contactEmail,status,budgetForecastDataSet[id,name],budgetExecutionDataSet[id,name],subProgramms[id,name,code,description],attributeValues[value,attribute[id,name,code]]&paging=false').then(function(response){
+        getAll: function(paging, pager, filter){
+            
+            var url = '../api/projects.json?fields=id,name,code,totalCost,costByGovernment,costByLeadDonor,costByOthers,leadDonor,startDate,endDate,extensionPossible,description,contactName,contactPhone,contactEmail,status,budgetForecastDataSet[id,name],budgetExecutionDataSet[id,name],subProgramms[id,name,code,description],attributeValues[value,attribute[id,name,code]]';
+                        
+            url = RfUtils.applyPagingOnUrl( url, paging, pager, filter);
+            
+            var promise = $http.get( url ).then(function(response){
                 return response.data;
             }, function(response){
                 RfUtils.errorNotifier(response);
@@ -535,6 +540,24 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
                 obj[prop] = DateUtils.formatFromApiToUser( obj[prop] );
             }            
             return obj;
+        },
+        applyPagingOnUrl: function(url, paging, pager, filter){            
+            if( paging ){
+                var pgSize = pager.pageSize ? pager.pageSize : 50;
+                var pg = pager.page ? pager.page : 1;
+                pgSize = pgSize > 1 ? pgSize  : 1;
+                pg = pg > 1 ? pg : 1; 
+                url = url  + '&pageSize=' + pgSize + '&page=' + pg;
+            }
+            else{
+                url = url  + '&paging=false';
+            }
+            
+            if( filter && filter !== ""){
+                url = url + '&filter=name:like:' + filter;
+            }
+            
+            return url;            
         }
     };
 })
