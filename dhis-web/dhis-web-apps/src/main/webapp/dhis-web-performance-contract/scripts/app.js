@@ -38,6 +38,9 @@ var resultsFramework = angular.module('resultsFramework',
     
     $translateProvider.preferredLanguage('en');
     $translateProvider.useSanitizeValueStrategy('escaped');
-    $translateProvider.useLoader('i18nLoader');
-    
+    $translateProvider.useLoader('i18nLoader');    
+})
+
+.run(function($rootScope){    
+    $rootScope.maxOptionSize = 50;
 });

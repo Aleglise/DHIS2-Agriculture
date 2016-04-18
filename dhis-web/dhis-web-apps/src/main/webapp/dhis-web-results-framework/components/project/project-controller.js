@@ -20,7 +20,6 @@ resultsFramework.controller('ProjectController',
     $scope.pager = {pageSize: 10, page: 1, toolBarDisplay: 5};
     
     $scope.fileNames = [];
-    $scope.maxOptionSize = 30;
     $scope.model = {    showAddProjectDiv: false,
                         showEditProject: false,
                         selectSize: 20,

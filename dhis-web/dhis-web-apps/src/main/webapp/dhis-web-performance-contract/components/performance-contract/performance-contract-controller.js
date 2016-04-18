@@ -15,7 +15,6 @@ var resultsFrameworkControllers = angular.module('resultsFrameworkControllers', 
                 PeriodService,
                 GridService) {
                     
-    $scope.maxOptionSize = 30;
     $scope.periodOffset = 0;
     $scope.model = {};    
     
