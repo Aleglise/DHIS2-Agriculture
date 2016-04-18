@@ -345,10 +345,14 @@ public class UserController
         User userReplica = new User();
         userReplica.mergeWith( existingUser, MergeMode.MERGE_IF_NOT_NULL );
         userReplica.setUid( CodeGenerator.generateCode() );
+        userReplica.setCode( null );
         userReplica.setCreated( new Date() );
 
         UserCredentials credentialsReplica = new UserCredentials();
         credentialsReplica.mergeWith( existingUser.getUserCredentials(), MergeMode.MERGE_IF_NOT_NULL );
+        credentialsReplica.setUid( CodeGenerator.generateCode() );
+        credentialsReplica.setCode( null );
+        credentialsReplica.setCreated( new Date() );
 
         credentialsReplica.setUsername( username );
         userService.encodeAndSetPassword( credentialsReplica, password );
