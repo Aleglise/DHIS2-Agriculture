@@ -18,13 +18,13 @@
                         </td>
                     </tr>
                 </thead>
-                <tbody ng-repeat="program in model.activeResultsFramework.programms">
+                <tbody ng-repeat="program in model.activeResultsFramework.programms | orderBy: 'name'">
                     <tr>
                         <td colspan="2">
                             {{program.name}}
                         </td>
                     </tr>
-                    <tr ng-repeat="subProgram in program.subProgramms">
+                    <tr ng-repeat="subProgram in program.subProgramms | orderBy: 'name'">
                         <td>
                             <input type="checkbox"
                                    ng-model="model.selectedSubPrograms[subProgram.id]"

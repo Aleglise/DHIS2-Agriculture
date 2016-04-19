@@ -245,27 +245,13 @@ public class ResultsFramework
         {
             ResultsFramework resultsFramework = (ResultsFramework) other;
 
-            if ( mergeMode.isReplace() )
-            {                
-                description = resultsFramework.getDescription();
-                active = resultsFramework.isActive();
-                impacts = resultsFramework.getImpacts();
-                outcomes = resultsFramework.getOutcomes();
-                outputs = resultsFramework.getOutputs();
-                programms = resultsFramework.getProgramms();
-                dataSets = resultsFramework.getDataSets();
-            }
-            else if ( mergeMode.isMerge() )
-            {
-                description = resultsFramework.getDescription() == null ? description
-                    : resultsFramework.getDescription();
-                active = resultsFramework.isActive();
-                impacts = resultsFramework.getImpacts() == null ? impacts : resultsFramework.getImpacts();
-                outcomes = resultsFramework.getOutcomes() == null ? outcomes : resultsFramework.getOutcomes();
-                outputs = resultsFramework.getOutputs() == null ? outputs : resultsFramework.getOutputs();
-                programms = resultsFramework.getProgramms() == null ? programms : resultsFramework.getProgramms();
-                dataSets = resultsFramework.getOutputs() == null ? dataSets : resultsFramework.getDataSets();
-            }
+            description = resultsFramework.getDescription();
+            active = resultsFramework.isActive();
+            impacts = resultsFramework.getImpacts();
+            outcomes = resultsFramework.getOutcomes();
+            outputs = resultsFramework.getOutputs();
+            programms = resultsFramework.getProgramms();
+            dataSets = resultsFramework.getDataSets();
         }
     }
 }

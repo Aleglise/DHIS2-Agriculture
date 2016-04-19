@@ -175,20 +175,10 @@ public class Programm
         {
             Programm programm = (Programm) other;
 
-            if ( mergeMode.isReplace() )
-            {
-                description = programm.getDescription();
-                outcomes = programm.getOutcomes();
-                outputs = programm.getOutputs();
-                subProgramms = programm.getSubProgramms();
-            }
-            else if ( mergeMode.isMerge() )
-            {
-                description = programm.getDescription() == null ? description : programm.getDescription();
-                outcomes = programm.getOutcomes() == null ? outcomes : programm.getOutcomes();
-                outputs = programm.getOutputs() == null ? outputs : programm.getOutputs();
-                subProgramms = programm.getSubProgramms() == null ? subProgramms : programm.getSubProgramms();
-            }
+            description = programm.getDescription();
+            outcomes = programm.getOutcomes();
+            outputs = programm.getOutputs();
+            subProgramms = programm.getSubProgramms();
         }
     }
 }

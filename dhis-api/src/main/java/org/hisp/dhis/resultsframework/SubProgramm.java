@@ -189,20 +189,10 @@ public class SubProgramm
         {
             SubProgramm subProgramm = (SubProgramm) other;
 
-            if ( mergeMode.isReplace() )
-            {
-                description = subProgramm.getDescription();
-                outputs = subProgramm.getOutputs();
-                dataSets = subProgramm.getDataSets();
-                programm = subProgramm.getProgramm();
-            }
-            else if ( mergeMode.isMerge() )
-            {
-                description = subProgramm.getDescription() == null ? description : subProgramm.getDescription();
-                outputs = subProgramm.getOutputs() == null ? outputs : subProgramm.getOutputs();
-                dataSets = subProgramm.getOutputs() == null ? dataSets : subProgramm.getDataSets();
-                programm = subProgramm.getProgramm() == null ? programm : subProgramm.getProgramm();
-            }
+            description = subProgramm.getDescription();
+            outputs = subProgramm.getOutputs();
+            dataSets = subProgramm.getDataSets();
+            programm = subProgramm.getProgramm();
         }
     }
 }

@@ -404,45 +404,22 @@ public class Project
         {
             Project project = (Project) other;
 
-            if ( mergeMode.isReplace() )
-            {
-                description = project.getDescription();
-                contactName = project.getContactName();
-                contactPhone = project.getContactPhone();
-                contactEmail = project.getContactEmail();
-                totalCost = project.getTotalCost();
-                costByGovernment = project.getCostByGovernment();
-                costByLeadDonor = project.getCostByLeadDonor();
-                costByOthers = project.getCostByOthers();
-                leadDonor = project.getLeadDonor();
-                startDate = project.getStartDate();
-                endDate = project.getEndDate();
-                extensionPossible = project.getExtensionPossible();
-                status = project.getStatus();
-                subProgramms = project.getSubProgramms();
-                budgetExecutionDataSet = project.getBudgetExecutionDataSet();
-                budgetForecastDataSet = project.getBudgetForecastDataSet();
-            }
-            else if ( mergeMode.isMerge() )
-            {
-                description = project.getDescription() == null ? description : project.getDescription();
-                contactName = project.getContactName() == null ? contactName : project.getContactName();
-                contactPhone = project.getContactPhone() == null ? contactPhone : project.getContactPhone();
-                contactName = project.getContactName() == null ? contactName : project.getContactName();
-                contactEmail = project.getContactEmail() == null ? contactEmail : project.getContactEmail();
-                totalCost = project.getTotalCost() == null ? totalCost : project.getTotalCost();
-                costByGovernment = project.getCostByGovernment() == null ? costByGovernment : project.getCostByGovernment();
-                costByLeadDonor = project.getCostByLeadDonor() == null ? costByLeadDonor : project.getCostByLeadDonor();
-                costByOthers = project.getCostByOthers() == null ? costByOthers : project.getCostByOthers();
-                leadDonor = project.getLeadDonor() == null ? leadDonor : project.getLeadDonor();
-                startDate = project.getStartDate() == null ? startDate : project.getStartDate();
-                endDate = project.getEndDate() == null ? endDate : project.getEndDate();
-                extensionPossible = project.getExtensionPossible() == null ? extensionPossible : project.getExtensionPossible();
-                status = project.getStatus() == null ? status : project.getStatus();
-                subProgramms = project.getSubProgramms() == null ? subProgramms : project.getSubProgramms();
-                budgetExecutionDataSet = project.getBudgetExecutionDataSet() == null ? budgetExecutionDataSet : project.getBudgetExecutionDataSet();
-                budgetForecastDataSet = project.getBudgetForecastDataSet() == null ? budgetForecastDataSet : project.getBudgetForecastDataSet();
-            }
+            description = project.getDescription();
+            contactName = project.getContactName();
+            contactPhone = project.getContactPhone();
+            contactEmail = project.getContactEmail();
+            totalCost = project.getTotalCost();
+            costByGovernment = project.getCostByGovernment();
+            costByLeadDonor = project.getCostByLeadDonor();
+            costByOthers = project.getCostByOthers();
+            leadDonor = project.getLeadDonor();
+            startDate = project.getStartDate();
+            endDate = project.getEndDate();
+            extensionPossible = project.getExtensionPossible();
+            status = project.getStatus();
+            subProgramms = project.getSubProgramms();
+            budgetExecutionDataSet = project.getBudgetExecutionDataSet();
+            budgetForecastDataSet = project.getBudgetForecastDataSet();
         }
     }
 }
