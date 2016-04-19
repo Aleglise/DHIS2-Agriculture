@@ -128,8 +128,11 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
 .factory('DataSetFactory', function($q, $rootScope, SessionStorageService, RFStorageService, orderByFilter) {
 
     var userHasValidRole = function(dataSet, userRoles){
-        for(var i=0; i < userRoles.length; i++){
-            if( userRoles[i].dataSets && userRoles[i].dataSets.length > 0){
+        for(var i=0; i < userRoles.length; i++){            
+            if( userRoles.authorities && userRoles.authorities.indexOf('ALL') !== -1 ){
+                return true;
+            }            
+            if( userRoles[i].dataSets && userRoles[i].dataSets.length > 0 ){
                 for( var j=0; j< userRoles[i].dataSets.length; j++){
                     if( dataSet.id === userRoles[i].dataSets[j].id ){
                         return true;
