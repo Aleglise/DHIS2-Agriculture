@@ -1256,6 +1256,24 @@ function displayPeriods()
     periods = dhis2.period.generator.filterOpenPeriods( periodType, periods, openFuturePeriods );
     
     clearListById( 'selectedPeriodId' );
+    
+    if( dhis2.de.dataSets[dataSetId].attributeValues.length )
+    {
+        //baseLine
+        var isBaseline = false;
+        $.safeEach( dhis2.de.dataSets[dataSetId].attributeValues, function( idx, item ) 
+        {
+            if( item.hasOwnProperty( 'baseline') ){
+                isBaseline = true;
+                return false;
+            }
+        } );
+        
+        if( isBaseline ){
+            //console.log('baseline periods:  ', generateBaselinePeriods( periods ));
+            periods = generateBaselinePeriods( periods );
+        }        
+    }
 
     if ( periods.length > 0 )
     {
@@ -1273,6 +1291,22 @@ function displayPeriods()
         addOptionById( 'selectedPeriodId', item.iso, item.name );
         dhis2.de.periodChoices[ item.iso ] = item;
     } );
+}
+
+function generateBaselinePeriods(periods)
+{
+    var baselinePeriodIds = [], baselinePeriods = [];
+    $.safeEach( periods, function( idx, item ) 
+    {
+        var yr = item.iso ? item.iso.substring(0,4) : null;
+        if( yr && baselinePeriodIds.indexOf( yr ) === -1 ){
+            baselinePeriodIds.push(yr);
+            item.name = yr;
+            baselinePeriods.push( item );
+        }
+    } ); 
+    
+    return baselinePeriods;
 }
 
 //------------------------------------------------------------------------------

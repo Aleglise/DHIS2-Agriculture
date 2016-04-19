@@ -34,7 +34,7 @@
 #set( $size = $dataSets.size() )
 #foreach( $dataSet in $dataSets )
 "${dataSet.uid}":{"name":"$encoder.jsonEncode( ${dataSet.displayName} )","periodType":"$encoder.jsonEncode( ${dataSet.periodType.name} )","categoryCombo":"${dataSet.categoryCombo.uid}","version":"${dataSet.version}",
-"type":"${dataSet.getFormType()}","expiryDays":"${dataSet.expiryDays}","openFuturePeriods":${dataSet.openFuturePeriods},"fieldCombinationRequired":${dataSet.fieldCombinationRequired},
+"type":"${dataSet.getFormType()}","attributeValues":[#set( $size2 = $dataSet.attributeValues.size() ) #foreach($attributeValue in $dataSet.attributeValues) {"${attributeValue.attribute.code}":"$encoder.jsonEncode( $attributeValue.value )"}#if( $velocityCount < $size2 ),#end #end],"expiryDays":"${dataSet.expiryDays}","openFuturePeriods":${dataSet.openFuturePeriods},"fieldCombinationRequired":${dataSet.fieldCombinationRequired},
 "validCompleteOnly":${dataSet.validCompleteOnly},"skipOffline":${dataSet.skipOffline}, "renderAsTabs":${dataSet.renderAsTabs}, "renderHorizontally":${dataSet.renderHorizontally}}#if( $velocityCount < $size ),#end
 #end },
 
