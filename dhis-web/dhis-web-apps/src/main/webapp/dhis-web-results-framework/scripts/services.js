@@ -125,23 +125,7 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
 
 
 /* Factory to fetch programs */
-.factory('DataSetFactory', function($q, $rootScope, SessionStorageService, RFStorageService, orderByFilter) {
-
-    var userHasValidRole = function(dataSet, userRoles){
-        for(var i=0; i < userRoles.length; i++){            
-            if( userRoles.authorities && userRoles.authorities.indexOf('ALL') !== -1 ){
-                return true;
-            }            
-            if( userRoles[i].dataSets && userRoles[i].dataSets.length > 0 ){
-                for( var j=0; j< userRoles[i].dataSets.length; j++){
-                    if( dataSet.id === userRoles[i].dataSets[j].id ){
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    };
+.factory('DataSetFactory', function($q, $rootScope, SessionStorageService, RFStorageService, orderByFilter, CommonUtils) {
 
     return {
         getAll: function(){
@@ -153,7 +137,7 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
                 RFStorageService.currentStore.getAll('dataSets').done(function(dss){
                     var dataSets = [];
                     angular.forEach(dss, function(ds){
-                        if( userHasValidRole(ds, userRoles) ){
+                        if( CommonUtils.userHasValidRole(ds, 'dataSets', userRoles) ){
                             dataSets.push({id: ds.id, name: ds.name, dataSetType: ds.dataSetType});
                         }
                     });
@@ -186,7 +170,7 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
                 RFStorageService.currentStore.getAll('dataSets').done(function(dss){
                     var dataSets = [];
                     angular.forEach(dss, function(ds){
-                        if(ds.organisationUnits.hasOwnProperty( ou.id ) && userHasValidRole(ds, userRoles)){
+                        if(ds.organisationUnits.hasOwnProperty( ou.id ) && CommonUtils.userHasValidRole(ds, 'dataSets',userRoles)){
                             dataSets.push(ds);
                         }
                     });

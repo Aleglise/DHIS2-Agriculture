@@ -339,6 +339,24 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                     }
                 }
                 return value;
+            },
+            userHasValidRole: function(obj, prop, userRoles){
+            	if( !obj || !prop || !userRoles){
+                    return false;
+            	}
+            	for(var i=0; i < userRoles.length; i++){            
+                    if( userRoles[i].authorities && userRoles[i].authorities.indexOf('ALL') !== -1 ){
+                        return true;
+                    }
+                    if( userRoles[i][prop] && userRoles[i][prop].length > 0 ){
+                        for( var j=0; j< userRoles[i][prop].length; j++){
+                            if( obj.id === userRoles[i][prop][j].id ){
+                                return true;
+                            }
+                        }
+                    }
+                }
+                return false;            	
             }
         };
     })
