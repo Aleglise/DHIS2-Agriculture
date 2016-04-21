@@ -167,7 +167,9 @@ resultsFramework.controller('ProjectController',
                     }
                 });        
 
-                modalInstance.result.then(function(){            
+                modalInstance.result.then(function(){
+                    //reset form
+                    $scope.cancel();
                 });
             });
         }

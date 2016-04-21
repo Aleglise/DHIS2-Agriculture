@@ -229,6 +229,16 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                 dateAfterOffset = Date.parse(dateAfterOffset);
                 dateAfterOffset = $filter('date')(dateAfterOffset, calendarSetting.keyDateFormat);
                 return dateAfterOffset;
+            },
+            splitDate: function(dateValue){
+            	var calendarSetting = CalendarService.getSetting();
+                if(!dateValue){
+                    return;
+                }
+                return {year: moment(dateValue, calendarSetting.momentFormat).year(), month: moment(dateValue, calendarSetting.momentFormat).month(), week: moment(dateValue, calendarSetting.momentFormat).week(), day: moment(dateValue, calendarSetting.momentFormat).day()};
+            },
+            getCeilYears: function(startDate, endDate){
+            	return Math.ceil(moment(endDate).diff(startDate, 'years', true));        
             }
         };
     })
