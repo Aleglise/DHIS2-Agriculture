@@ -622,9 +622,10 @@ public class DefaultDataElementCategoryService
         // DataElementCategory
         // ---------------------------------------------------------------------
 
-        DataElementCategory category = new DataElementCategory( DataElementCategory.DEFAULT_NAME );
+        DataElementCategory category = new DataElementCategory( DataElementCategory.DEFAULT_NAME, DataDimensionType.DISAGGREGATION );
         category.setUid( "GLevLNI9wkl" );
         category.setCode( "default" );
+        category.setDataDimension( false );
 
         category.addCategoryOption( categoryOption );
         addDataElementCategory( category );
@@ -633,9 +634,10 @@ public class DefaultDataElementCategoryService
         // DataElementCategoryCombo
         // ---------------------------------------------------------------------
 
-        DataElementCategoryCombo categoryCombo = new DataElementCategoryCombo( DataElementCategoryCombo.DEFAULT_CATEGORY_COMBO_NAME );
+        DataElementCategoryCombo categoryCombo = new DataElementCategoryCombo( DataElementCategoryCombo.DEFAULT_CATEGORY_COMBO_NAME, DataDimensionType.DISAGGREGATION );
         categoryCombo.setUid( "bjDvmb4bfuf" );
         categoryCombo.setCode( "default" );
+        categoryCombo.setDataDimensionType( DataDimensionType.DISAGGREGATION );
 
         categoryCombo.addDataElementCategory( category );
         addDataElementCategoryCombo( categoryCombo );

@@ -31,7 +31,7 @@
     <async-supported>true</async-supported>
     <init-param>
       <param-name>excludeUriRegex</param-name>
-      <param-value>/api/dataValueSets|/api/dataValues|/api/dataValues/files|/api/fileResources</param-value>
+      <param-value>/api/dataValueSets|/api/dataValues|/api/dataValues/files|/api/fileResources|/api/analytics</param-value>
     </init-param>
   </filter>
   <filter>
@@ -137,10 +137,7 @@
   <listener>
     <listener-class>org.hisp.dhis.system.startup.StartupListener</listener-class>
   </listener>
-  <!-- add for Active user List -->
-  <listener>
-  	<listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
-  </listener>	
+
   <!-- Servlets -->
   <servlet>
     <servlet-name>webapi</servlet-name>

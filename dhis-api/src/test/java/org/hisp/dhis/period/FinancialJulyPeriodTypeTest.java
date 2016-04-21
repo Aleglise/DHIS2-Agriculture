@@ -55,10 +55,10 @@ public class FinancialJulyPeriodTypeTest
     @Test
     public void testCreatePeriod()
     {
-        testDate = new DateTime(  2009, 2, 15, 0, 0 );
+        testDate = new DateTime( 2009, 2, 15, 0, 0 );
 
-        startDate = new DateTime(  2008, 7, 1, 0, 0 );
-        endDate = new DateTime(  2009, 6, 30, 0, 0 );
+        startDate = new DateTime( 2008, 7, 1, 0, 0 );
+        endDate = new DateTime( 2009, 6, 30, 0, 0 );
         
         Period period = periodType.createPeriod( testDate.toDate() );
         
@@ -79,14 +79,14 @@ public class FinancialJulyPeriodTypeTest
     @Test
     public void testGetNextPeriod()
     {
-        testDate = new DateTime(  2009, 2, 15, 0, 0 );
+        testDate = new DateTime( 2009, 2, 15, 0, 0 );
 
         Period period = periodType.createPeriod( testDate.toDate() );
         
         period = periodType.getNextPeriod( period );
 
-        startDate = new DateTime(  2009, 7, 1, 0, 0 );
-        endDate = new DateTime(  2010, 6, 30, 0, 0 );
+        startDate = new DateTime( 2009, 7, 1, 0, 0 );
+        endDate = new DateTime( 2010, 6, 30, 0, 0 );
         
         assertEquals( startDate.toDate(), period.getStartDate() );
         assertEquals( endDate.toDate(), period.getEndDate() );
@@ -95,14 +95,14 @@ public class FinancialJulyPeriodTypeTest
     @Test
     public void testGetPreviousPeriod()
     {
-        testDate = new DateTime(  2009, 2, 15, 0, 0 );
+        testDate = new DateTime( 2009, 2, 15, 0, 0 );
 
         Period period = periodType.createPeriod( testDate.toDate() );
         
         period = periodType.getPreviousPeriod( period );
 
-        startDate = new DateTime(  2007, 7, 1, 0, 0 );
-        endDate = new DateTime(  2008, 6, 30, 0, 0 );
+        startDate = new DateTime( 2007, 7, 1, 0, 0 );
+        endDate = new DateTime( 2008, 6, 30, 0, 0 );
         
         assertEquals( startDate.toDate(), period.getStartDate() );
         assertEquals( endDate.toDate(), period.getEndDate() );
@@ -111,7 +111,7 @@ public class FinancialJulyPeriodTypeTest
     @Test
     public void testGeneratePeriods()
     {
-        testDate = new DateTime(  2009, 2, 15, 0, 0 );
+        testDate = new DateTime( 2009, 2, 15, 0, 0 );
         
         List<Period> periods = periodType.generatePeriods( testDate.toDate() );
         

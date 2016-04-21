@@ -290,6 +290,38 @@ public class DataValueSetServiceTest
     }
 
     @Test
+    public void testImportDataValueSetXmlPreheatCache()
+        throws Exception
+    {
+        in = new ClassPathResource( "datavalueset/dataValueSetA.xml" ).getInputStream();
+
+        ImportOptions importOptions = new ImportOptions().setPreheatCache( true );
+        
+        ImportSummary summary = dataValueSetService.saveDataValueSet( in, importOptions );
+
+        assertNotNull( summary );
+        assertNotNull( summary.getImportCount() );
+        assertEquals( ImportStatus.SUCCESS, summary.getStatus() );
+        assertEquals( summary.getConflicts().toString(), 0, summary.getConflicts().size() );
+
+        Collection<DataValue> dataValues = mockDataValueBatchHandler.getInserts();
+
+        assertNotNull( dataValues );
+        assertEquals( 3, dataValues.size() );
+        assertTrue( dataValues.contains( new DataValue( deA, peA, ouA, ocDef, ocDef ) ) );
+        assertTrue( dataValues.contains( new DataValue( deB, peA, ouA, ocDef, ocDef ) ) );
+        assertTrue( dataValues.contains( new DataValue( deC, peA, ouA, ocDef, ocDef ) ) );
+
+        CompleteDataSetRegistration registration = registrationService.getCompleteDataSetRegistration( dsA, peA, ouA, ocDef );
+
+        assertNotNull( registration );
+        assertEquals( dsA, registration.getDataSet() );
+        assertEquals( peA, registration.getPeriod() );
+        assertEquals( ouA, registration.getSource() );
+        assertEquals( getDate( 2012, 1, 9 ), registration.getDate() );
+    }
+
+    @Test
     public void testImportDataValuesXmlWithCodeA()
         throws Exception
     {
@@ -384,13 +416,37 @@ public class DataValueSetServiceTest
     }
 
     @Test
-    public void testImportDataValuesXmlWithCodePreheatCacheFalse()
+    public void testImportDataValuesXmlWithAttributePreheatCacheTrue()
+        throws Exception
+    {
+        in = new ClassPathResource( "datavalueset/dataValueSetBattribute.xml" ).getInputStream();
+
+        ImportOptions importOptions = new ImportOptions()
+            .setPreheatCache( true )
+            .setIdScheme( "ATTRIBUTE:" + attribute.getUid() )
+            .setDataElementIdScheme( "ATTRIBUTE:" + attribute.getUid() )
+            .setOrgUnitIdScheme( "ATTRIBUTE:" + attribute.getUid() );
+
+        ImportSummary summary = dataValueSetService.saveDataValueSet( in, importOptions );
+
+        assertEquals( summary.getConflicts().toString(), 0, summary.getConflicts().size() );
+        assertEquals( 12, summary.getImportCount().getImported() );
+        assertEquals( 0, summary.getImportCount().getUpdated() );
+        assertEquals( 0, summary.getImportCount().getDeleted() );
+        assertEquals( 0, summary.getImportCount().getIgnored() );
+        assertEquals( ImportStatus.SUCCESS, summary.getStatus() );
+
+        assertImportDataValues( summary );
+    }
+
+    @Test
+    public void testImportDataValuesXmlWithCodePreheatCacheTrue()
         throws Exception
     {
         in = new ClassPathResource( "datavalueset/dataValueSetBcode.xml" ).getInputStream();
 
         ImportOptions importOptions = new ImportOptions()
-            .setPreheatCache( false )
+            .setPreheatCache( true )
             .setIdScheme( "CODE" )
             .setDataElementIdScheme( "CODE" )
             .setOrgUnitIdScheme( "CODE" );

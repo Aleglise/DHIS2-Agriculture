@@ -29,8 +29,8 @@ package org.hisp.dhis.analytics;
  */
 
 import org.hisp.dhis.DhisConvenienceTest;
-import org.hisp.dhis.common.ValueType;
 import org.hisp.dhis.dataelement.DataElement;
+import org.hisp.dhis.dataelement.DataElementCategoryCombo;
 import org.hisp.dhis.organisationunit.OrganisationUnit;
 import org.junit.Before;
 import org.junit.Test;
@@ -72,13 +72,16 @@ public class DataQueryGroupsTest
     @Before
     public void before()
     {
-        deA = createDataElement( 'A', ValueType.INTEGER, AggregationType.SUM );
-        deB = createDataElement( 'B', ValueType.INTEGER, AggregationType.SUM );
-        deC = createDataElement( 'C', ValueType.INTEGER, AggregationType.SUM );
-        deD = createDataElement( 'D', ValueType.INTEGER, AggregationType.SUM );
-        deE = createDataElement( 'E', ValueType.INTEGER, AggregationType.SUM );
-        deF = createDataElement( 'F', ValueType.INTEGER, AggregationType.AVERAGE_SUM_ORG_UNIT );
-        deG = createDataElement( 'G', ValueType.INTEGER, AggregationType.AVERAGE_SUM_ORG_UNIT );
+        deA = createDataElement( 'A', new DataElementCategoryCombo() ); // INTEGER, SUM
+        deB = createDataElement( 'B', new DataElementCategoryCombo() );
+        deC = createDataElement( 'C', new DataElementCategoryCombo() );
+        deD = createDataElement( 'D', new DataElementCategoryCombo() );
+        deE = createDataElement( 'E', new DataElementCategoryCombo() );
+        deF = createDataElement( 'F', new DataElementCategoryCombo() );
+        deG = createDataElement( 'G', new DataElementCategoryCombo() );
+        
+        deF.setAggregationType( AggregationType.AVERAGE_SUM_ORG_UNIT );
+        deG.setAggregationType( AggregationType.AVERAGE_SUM_ORG_UNIT );
 
         ouA = createOrganisationUnit( 'A' );
         ouB = createOrganisationUnit( 'B' );

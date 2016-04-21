@@ -324,7 +324,7 @@
       <param name="requiredAuthorities">F_CONSTANT_MANAGEMENT</param>
     </action>
 
-    <action name="showAddConstantForm" class="org.hisp.dhis.dataadmin.action.NoAction">
+    <action name="showAddConstantForm" class="org.hisp.dhis.dataadmin.action.constant.ShowAddConstantAction">
       <result name="success" type="velocity">/main.vm</result>
       <param name="menu">/dhis-web-maintenance-dataadmin/menu.vm</param>
       <param name="page">

@@ -53,6 +53,7 @@ import org.hisp.dhis.common.DimensionalItemObject;
 import org.hisp.dhis.common.DimensionalObject;
 import org.hisp.dhis.common.DisplayProperty;
 import org.hisp.dhis.common.EventAnalyticalObject;
+import org.hisp.dhis.common.IdScheme;
 import org.hisp.dhis.common.IllegalQueryException;
 import org.hisp.dhis.common.OrganisationUnitSelectionMode;
 import org.hisp.dhis.common.QueryFilter;
@@ -88,8 +89,8 @@ public class DefaultEventDataQueryService
 {
     private static final String COL_NAME_EVENTDATE = "executiondate";
 
-    private static final List<String> SORTABLE_ITEMS = Lists.newArrayList( 
-        ITEM_EXECUTION_DATE, ITEM_ORG_UNIT_NAME, ITEM_ORG_UNIT_CODE );
+    private static final List<String> SORTABLE_ITEMS = Lists.newArrayList( ITEM_EXECUTION_DATE, ITEM_ORG_UNIT_NAME,
+        ITEM_ORG_UNIT_CODE );
 
     @Autowired
     private ProgramService programService;
@@ -102,25 +103,26 @@ public class DefaultEventDataQueryService
 
     @Autowired
     private TrackedEntityAttributeService attributeService;
-    
+
     @Autowired
     private ProgramIndicatorService programIndicatorService;
-    
+
     @Autowired
     private LegendService legendService;
 
     @Autowired
     private DataQueryService dataQueryService;
-    
+
     @Override
     public EventQueryParams getFromUrl( String program, String stage, String startDate, String endDate,
-        Set<String> dimension, Set<String> filter, String value, AggregationType aggregationType, boolean skipMeta, boolean skipData, boolean skipRounding, 
-        boolean completedOnly, boolean hierarchyMeta, boolean showHierarchy, SortOrder sortOrder, Integer limit, EventOutputType outputType, boolean collapseDataDimensions, 
+        Set<String> dimension, Set<String> filter, String value, AggregationType aggregationType, boolean skipMeta,
+        boolean skipData, boolean skipRounding, boolean completedOnly, boolean hierarchyMeta, boolean showHierarchy,
+        SortOrder sortOrder, Integer limit, EventOutputType outputType, boolean collapseDataDimensions,
         boolean aggregateData, DisplayProperty displayProperty, String userOrgUnit, I18nFormat format )
     {
         EventQueryParams params = getFromUrl( program, stage, startDate, endDate, dimension, filter, null, null, null,
             skipMeta, skipData, completedOnly, hierarchyMeta, false, displayProperty, userOrgUnit, null, null, format );
-                
+
         params.setValue( getValueDimension( value ) );
         params.setAggregationType( aggregationType );
         params.setSkipRounding( skipRounding );
@@ -136,12 +138,14 @@ public class DefaultEventDataQueryService
 
     @Override
     public EventQueryParams getFromUrl( String program, String stage, String startDate, String endDate,
-        Set<String> dimension, Set<String> filter, OrganisationUnitSelectionMode ouMode, Set<String> asc, Set<String> desc,
-        boolean skipMeta, boolean skipData, boolean completedOnly, boolean hierarchyMeta, boolean coordinatesOnly, 
-        DisplayProperty displayProperty, String userOrgUnit, Integer page, Integer pageSize, I18nFormat format )
+        Set<String> dimension, Set<String> filter, OrganisationUnitSelectionMode ouMode, Set<String> asc,
+        Set<String> desc, boolean skipMeta, boolean skipData, boolean completedOnly, boolean hierarchyMeta,
+        boolean coordinatesOnly, DisplayProperty displayProperty, String userOrgUnit, Integer page, Integer pageSize,
+        I18nFormat format )
     {
         EventQueryParams params = new EventQueryParams();
-        
+        IdScheme idScheme = IdScheme.UID;
+
         List<OrganisationUnit> userOrgUnits = dataQueryService.getUserOrgUnits( userOrgUnit );
 
         Program pr = programService.getProgram( program );
@@ -179,9 +183,10 @@ public class DefaultEventDataQueryService
             for ( String dim : dimension )
             {
                 String dimensionId = getDimensionFromParam( dim );
-                List<String> items = getDimensionItemsFromParam( dim );                
-                DimensionalObject dimObj = dataQueryService.getDimension( dimensionId, items, null, userOrgUnits, format, true );
-                
+                List<String> items = getDimensionItemsFromParam( dim );
+                DimensionalObject dimObj = dataQueryService.getDimension( dimensionId, items, null, userOrgUnits,
+                    format, true, idScheme );
+
                 if ( dimObj != null )
                 {
                     params.getDimensions().add( dimObj );
@@ -198,9 +203,10 @@ public class DefaultEventDataQueryService
             for ( String dim : filter )
             {
                 String dimensionId = getDimensionFromParam( dim );
-                List<String> items = getDimensionItemsFromParam( dim );                
-                DimensionalObject dimObj = dataQueryService.getDimension( dimensionId, items, null, userOrgUnits, format, true );
-                
+                List<String> items = getDimensionItemsFromParam( dim );
+                DimensionalObject dimObj = dataQueryService.getDimension( dimensionId, items, null, userOrgUnits,
+                    format, true, idScheme );
+
                 if ( dimObj != null )
                 {
                     params.getFilters().add( dimObj );
@@ -241,26 +247,27 @@ public class DefaultEventDataQueryService
         params.setDisplayProperty( displayProperty );
         params.setPage( page );
         params.setPageSize( pageSize );
-        
+
         return params;
     }
 
     @Override
     public EventQueryParams getFromAnalyticalObject( EventAnalyticalObject object, I18nFormat format )
-    {        
+    {
         EventQueryParams params = new EventQueryParams();
+        IdScheme idScheme = IdScheme.UID;
 
         if ( object != null )
         {
             Date date = object.getRelativePeriodDate();
-            
+
             object.populateAnalyticalProperties();
 
             for ( DimensionalObject dimension : ListUtils.union( object.getColumns(), object.getRows() ) )
             {
-                DimensionalObject dimObj = dataQueryService.
-                    getDimension( dimension.getDimension(), getDimensionalItemIds( dimension.getItems() ), date, null, format, true );
-                
+                DimensionalObject dimObj = dataQueryService.getDimension( dimension.getDimension(),
+                    getDimensionalItemIds( dimension.getItems() ), date, null, format, true, idScheme );
+
                 if ( dimObj != null )
                 {
                     params.getDimensions().add( dimObj );
@@ -270,12 +277,12 @@ public class DefaultEventDataQueryService
                     params.getItems().add( getQueryItem( dimension.getDimension(), dimension.getFilter() ) );
                 }
             }
-            
+
             for ( DimensionalObject filter : object.getFilters() )
             {
-                DimensionalObject dimObj = dataQueryService.
-                    getDimension( filter.getDimension(), getDimensionalItemIds( filter.getItems() ), date, null, format, true );
-                
+                DimensionalObject dimObj = dataQueryService.getDimension( filter.getDimension(),
+                    getDimensionalItemIds( filter.getItems() ), date, null, format, true, idScheme );
+
                 if ( dimObj != null )
                 {
                     params.getFilters().add( dimObj );
@@ -293,10 +300,10 @@ public class DefaultEventDataQueryService
             params.setValue( object.getValue() );
             params.setOutputType( object.getOutputType() );
         }
-        
+
         return params;
     }
-    
+
     // -------------------------------------------------------------------------
     // Supportive methods
     // -------------------------------------------------------------------------
@@ -307,34 +314,34 @@ public class DefaultEventDataQueryService
         {
             dimension += DIMENSION_NAME_SEP + filter;
         }
-                
+
         return getQueryItem( dimension );
     }
-    
+
     private QueryItem getQueryItem( String dimensionString )
     {
         String[] split = dimensionString.split( DIMENSION_NAME_SEP );
 
-        if ( split == null || ( split.length % 2 != 1 ) )
+        if ( split == null || (split.length % 2 != 1) )
         {
             throw new IllegalQueryException( "Query item or filter is invalid: " + dimensionString );
         }
-        
+
         QueryItem queryItem = getQueryItemFromDimension( split[0] );
-        
+
         if ( split.length > 1 ) // Filters specified
         {
             for ( int i = 1; i < split.length; i += 2 )
             {
                 QueryOperator operator = QueryOperator.fromString( split[i] );
-                QueryFilter filter = new QueryFilter( operator, split[i+1] );
+                QueryFilter filter = new QueryFilter( operator, split[i + 1] );
                 queryItem.getFilters().add( filter );
             }
         }
-        
+
         return queryItem;
     }
-    
+
     private String getSortItem( String item )
     {
         if ( !SORTABLE_ITEMS.contains( item.toLowerCase() ) && getQueryItem( item ) == null )
@@ -354,10 +361,10 @@ public class DefaultEventDataQueryService
         String item = split[0];
 
         LegendSet legendSet = split.length > 1 && split[1] != null ? legendService.getLegendSet( split[1] ) : null;
-        
+
         DataElement de = dataElementService.getDataElement( item );
 
-        if ( de != null ) //TODO check if part of program
+        if ( de != null ) // TODO check if part of program
         {
             return new QueryItem( de, legendSet, de.getValueType(), de.getAggregationType(), de.getOptionSet() );
         }
@@ -368,38 +375,40 @@ public class DefaultEventDataQueryService
         {
             return new QueryItem( at, legendSet, at.getValueType(), at.getAggregationType(), at.getOptionSet() );
         }
-        
+
         ProgramIndicator pi = programIndicatorService.getProgramIndicatorByUid( item );
-        
+
         if ( pi != null )
         {
             return new QueryItem( pi, legendSet, ValueType.NUMBER, pi.getAggregationType(), null );
         }
 
-        throw new IllegalQueryException( "Item identifier does not reference any data element or attribute part of the program: " + item );
+        throw new IllegalQueryException(
+            "Item identifier does not reference any data element or attribute part of the program: " + item );
     }
-    
+
     private DimensionalItemObject getValueDimension( String value )
     {
         if ( value == null )
         {
             return null;
         }
-        
+
         DataElement de = dataElementService.getDataElement( value );
-        
+
         if ( de != null && de.isNumericType() )
         {
             return de;
         }
-        
+
         TrackedEntityAttribute at = attributeService.getTrackedEntityAttribute( value );
-        
+
         if ( at != null && at.isNumericType() )
         {
             return at;
         }
-        
-        throw new IllegalQueryException( "Value identifier does not reference any data element or attribute which are numeric type and part of the program: " + value );        
+
+        throw new IllegalQueryException( "Value identifier does not reference any " +
+            "data element or attribute which are numeric type and part of the program: " + value );
     }
 }

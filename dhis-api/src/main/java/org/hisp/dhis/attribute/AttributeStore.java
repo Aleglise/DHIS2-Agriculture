@@ -30,6 +30,7 @@ package org.hisp.dhis.attribute;
 
 import com.google.common.collect.ImmutableMap;
 import org.hisp.dhis.common.GenericIdentifiableObjectStore;
+import org.hisp.dhis.constant.Constant;
 import org.hisp.dhis.dataelement.CategoryOptionGroup;
 import org.hisp.dhis.dataelement.DataElement;
 import org.hisp.dhis.dataelement.DataElementCategoryOption;
@@ -38,6 +39,7 @@ import org.hisp.dhis.dataset.DataSet;
 import org.hisp.dhis.document.Document;
 import org.hisp.dhis.indicator.Indicator;
 import org.hisp.dhis.indicator.IndicatorGroup;
+import org.hisp.dhis.legend.LegendSet;
 import org.hisp.dhis.option.Option;
 import org.hisp.dhis.option.OptionSet;
 import org.hisp.dhis.organisationunit.OrganisationUnit;
@@ -81,6 +83,8 @@ public interface AttributeStore
         .put( Document.class, "documentAttribute" )
         .put( Option.class, "optionAttribute" )
         .put( OptionSet.class, "optionSetAttribute" )
+        .put( Constant.class, "constantAttribute")
+        .put( LegendSet.class, "legendSetAttribute")
         .put( Project.class, "projectAttribute" )
         .build();
 

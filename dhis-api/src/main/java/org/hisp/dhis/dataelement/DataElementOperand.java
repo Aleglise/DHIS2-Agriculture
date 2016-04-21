@@ -38,6 +38,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hisp.dhis.analytics.AggregationType;
 import org.hisp.dhis.common.BaseDimensionalItemObject;
 import org.hisp.dhis.common.BaseIdentifiableObject;
+import org.hisp.dhis.common.DimensionItemType;
 import org.hisp.dhis.common.DxfNamespaces;
 import org.hisp.dhis.common.IdentifiableObject;
 import org.hisp.dhis.common.ValueType;
@@ -171,6 +172,12 @@ public class DataElementOperand
         }
         
         return item;
+    }
+
+    @Override
+    public DimensionItemType getDimensionItemType()
+    {
+        return DimensionItemType.DATA_ELEMENT_OPERAND;
     }
     
     // -------------------------------------------------------------------------

@@ -35,6 +35,7 @@ import org.hisp.dhis.dataelement.CategoryOptionGroup;
 import org.hisp.dhis.dataelement.DataElement;
 import org.hisp.dhis.dataset.DataSet;
 import org.hisp.dhis.indicator.Indicator;
+import org.hisp.dhis.legend.LegendSet;
 import org.hisp.dhis.organisationunit.OrganisationUnit;
 import org.hisp.dhis.period.Period;
 import org.hisp.dhis.program.ProgramIndicator;
@@ -86,7 +87,7 @@ public class HibernateAnalyticalObjectStore<T extends BaseAnalyticalObject>
     @SuppressWarnings("unchecked")
     public List<T> getAnalyticalObjects( DataSet dataSet )
     {
-        String hql = "select distinct c from " + clazz.getName() + " c join c.dataDimensionItems d where d.dataSet = :dataSet";
+        String hql = "select distinct c from " + clazz.getName() + " c join c.dataDimensionItems d where d.reportingRate.dataSet = :dataSet";
         return getQuery( hql ).setEntity( "dataSet", dataSet ).list(); 
     }
 
@@ -121,6 +122,14 @@ public class HibernateAnalyticalObjectStore<T extends BaseAnalyticalObject>
         String hql = "from " + clazz.getName() + " c where :categoryOptionGroup in elements(c.categoryOptionGroups)";
         return getQuery( hql ).setEntity( "categoryOptionGroup", categoryOptionGroup ).list(); 
     }
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<T> getAnalyticalObjects( LegendSet legendSet )
+    {
+        String hql = "from " + clazz.getName() + " c where c.legendSet = :legendSet";
+        return getQuery( hql ).setEntity( "legendSet", legendSet ).list();
+    }    
     
     @Override
     public int countAnalyticalObjects( Indicator indicator )

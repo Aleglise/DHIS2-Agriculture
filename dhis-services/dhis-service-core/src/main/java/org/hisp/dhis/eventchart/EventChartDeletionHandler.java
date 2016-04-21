@@ -38,6 +38,7 @@ import org.hisp.dhis.dataelement.DataElement;
 import org.hisp.dhis.dataset.DataSet;
 import org.hisp.dhis.indicator.Indicator;
 import org.hisp.dhis.program.Program;
+import org.hisp.dhis.program.ProgramIndicator;
 import org.hisp.dhis.program.ProgramStage;
 import org.hisp.dhis.trackedentity.TrackedEntityDataElementDimension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,6 +105,12 @@ public class EventChartDeletionHandler
         // Ignore default implementation
     }
 
+    @Override
+    public void deleteProgramIndicator( ProgramIndicator programIndicator )
+    {
+     // Ignore default implementation
+    }
+    
     @Override
     public void deleteProgramStage( ProgramStage programStage )
     {

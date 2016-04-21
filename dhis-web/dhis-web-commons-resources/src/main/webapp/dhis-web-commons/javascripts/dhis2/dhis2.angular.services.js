@@ -23,8 +23,6 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                 return tx;
             }, function () {
 
-                setHeaderDelayMessage('No translation file is found for the selected locale. Using default translation (English).');
-
                 var p = $http.get(defaultUrl).then(function (response) {
                     tx = {locale: locale, keys: dhis2.util.parseJavaProperties(response.data)};
                     return tx;
@@ -57,6 +55,7 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                     translations = response.keys;
                     deferred.resolve(translations);
                 });
+                return deferred.promise;
             }
             else {
                 getLocale().then(function (locale) {
@@ -65,9 +64,8 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                         deferred.resolve(translations);
                     });
                 });
+                return deferred.promise;
             }
-            
-            return deferred.promise;
         };
     })
 
@@ -195,6 +193,7 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                 }
                 return moment(dateValue).format(dateFormat);
             },
+
             getToday: function () {
                 var calendarSetting = CalendarService.getSetting();
                 var tdy = $.calendars.instance(calendarSetting.keyCalendar).newDate();
@@ -230,16 +229,6 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                 dateAfterOffset = Date.parse(dateAfterOffset);
                 dateAfterOffset = $filter('date')(dateAfterOffset, calendarSetting.keyDateFormat);
                 return dateAfterOffset;
-            },
-            splitDate: function(dateValue){
-            	var calendarSetting = CalendarService.getSetting();
-                if(!dateValue){
-                    return;
-                }
-                return {year: moment(dateValue, calendarSetting.momentFormat).year(), month: moment(dateValue, calendarSetting.momentFormat).month(), week: moment(dateValue, calendarSetting.momentFormat).week(), day: moment(dateValue, calendarSetting.momentFormat).day()};
-            },
-            getCeilYears: function(startDate, endDate){
-            	return Math.ceil(moment(endDate).diff(startDate, 'years', true));        
             }
         };
     })
@@ -435,7 +424,7 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                                     //check if dataelement has optionset
                                     if (prStDe.dataElement.optionSetValue) {
                                         var optionSetId = prStDe.dataElement.optionSet.id;
-                                        newInputField = '<span class="hideInPrint"><ui-select style="width: 90%;" theme="select2" ' + commonInputFieldProperty + ' on-select="saveDatavalue(prStDes.' + fieldId + ', outerForm.' + fieldId + ')" >' +
+                                        newInputField = '<span class="hideInPrint"><ui-select style="width: 100%;" theme="select2" ' + commonInputFieldProperty + ' on-select="saveDatavalue(prStDes.' + fieldId + ', outerForm.' + fieldId + ')" >' +
                                             '<ui-select-match ng-class="getInputNotifcationClass(prStDes.' + fieldId + '.dataElement.id, true)" allow-clear="true" placeholder="' + $translate.instant('select_or_search') + '">{{$select.selected.displayName || $select.selected}}</ui-select-match>' +
                                             '<ui-select-choices ' +
                                             ' repeat="option.displayName as option in optionSets.' + optionSetId + '.options | filter: $select.search | limitTo:maxOptionSize">' +
@@ -467,7 +456,7 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                                                                         ' dh-current-element="currentElement" ' +
                                                                         ' dh-event="currentEvent.event" ' +
                                                                         ' dh-id="prStDes.' + fieldId + '.dataElement.id" ' +
-                                                                        ' dh-click="saveDatavalue(prStDes.' + fieldId + ', currentEvent, value )"' +
+                                                                        ' dh-click="saveDatavalue(prStDes.' + fieldId + ', currentEvent, value )" >' +
                                                                 ' </d2-radio-button>';
                                         }
                                         else if (prStDe.dataElement.valueType === "DATE") {
@@ -499,7 +488,7 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                                                                 <a href ng-click="downloadFile(null, \'' + fieldId + '\', null)" title="fileNames[currentEvent.event][' + fieldId + ']" >{{fileNames[currentEvent.event][' + fieldId + '].length > 20 ? fileNames[currentEvent.event][' + fieldId + '].substring(0,20).concat(\'...\') : fileNames[currentEvent.event][' + fieldId + ']}}</a>\n\
                                                             </span>\n\
                                                             <span class="input-group-btn">\n\
-                                                                <span class="btn btn-primary btn-file">\n\
+                                                                <span class="btn btn-grp btn-file">\n\
                                                                     <span ng-if="currentEvent.' + fieldId + '" title="{{\'delete\' | translate}}" d2-file-input-name="fileNames[currentEvent.event][' + fieldId + ']" d2-file-input-delete="currentEvent.' + fieldId + '">\n\
                                                                         <a href ng-click="deleteFile(\'' + fieldId + '\')"><i class="fa fa-trash alert-danger"></i></a>\n\
                                                                     </span>\n\
@@ -518,13 +507,20 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                                                         </span>';
                                         }
                                         else if (prStDe.dataElement.valueType === "COORDINATE") {
-                                        	newInputField = '<span class="hideInPrint"><input type="text" ' +
-	                                            ' ng-class="{{getInputNotifcationClass(prStDes.' + fieldId + '.dataElement.id, true)}}" ' +
-	                                            ' ng-blur="saveDatavalue(prStDes.' + fieldId + ', outerForm.' + fieldId + ')"' +
-	                                            commonInputFieldProperty + '>' +
-	                                            '<span class="horizontal-spacing"><a href ng-click="showDataElementMap(currentEvent,\'' + fieldId + '\')" title="{{\'get_from_map\' | translate}}" ' +
-                                                '<i class="fa fa-map-marker fa-2x vertical-center"></i> ' +                     
-                                                '</a></span></span><span class="not-for-screen"><input type="text" value={{currentEvent.' + fieldId + '}}></span>';
+                                                newInputField = '<span class="input-group hideInPrint"> ' +
+                                                                ' <input type="text" ' +
+                                                                ' d2-custom-coordinate-validator ' +
+                                                                ' ng-class="{{getInputNotifcationClass(prStDes.' + fieldId + '.dataElement.id, true)}}" ' +
+                                                                ' placeholder="{{\'latitude_longitude_format\' | translate}}" ' +
+                                                                commonInputFieldProperty + '>' +
+                                                                '<span class="input-group-btn input-group-btn-no-width"> ' +
+                                                                    '<button class="btn btn-grp default-btn-height" type="button" title="{{\'get_from_map\' | translate}}" ' +
+                                                                        ' ng-class="{true: \'disable-clicks\'} [isHidden(prStDes.' + fieldId + '.dataElement.id) || selectedEnrollment.status===\'CANCELLED\' || selectedEnrollment.status===\'COMPLETED\' || currentEvent[uid]==\'uid\' || currentEvent.editingNotAllowed]" ' +
+                                                                        'ng-click="showDataElementMap(currentEvent,\'' + fieldId + '\', outerForm.' + fieldId + ')"> ' +
+                                                                        '<i class="fa fa-map-marker"></i> ' +
+                                                                    '</button> ' + 
+                                                                '</span>' +
+                                                                '</span><span class="not-for-screen"><input type="text" value={{currentEvent.' + fieldId + '}}></span>';
                                         }
                                         else {
                                             newInputField = '<span class="hideInPrint"><input type="text" ' +
@@ -602,7 +598,7 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                                     ' selected-program-id="selectedProgram.id" ' +
                                     ' selected-tei-id="selectedTei.trackedEntityInstance" ' +
                                     ' ng-disabled="editingDisabled || isHidden(attributesById.' + attId + '.id) || ' + isTrackerAssociate + '"' +
-                                    ' d2-validation ' +
+                                    ' d2-attribute-validator ' +
                                     ' ng-required=" ' + (att.mandatory || att.unique) + '" ';
 
                                 //check if attribute has optionset
@@ -618,7 +614,11 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                                 }
                                 else {
                                     //check attribute type and generate corresponding angular input field
-                                    if (att.valueType === "NUMBER" ) {
+                                    if (att.valueType === "NUMBER" ||
+                                    		att.valueType === "INTEGER" ||
+                                    		att.valueType === "INTEGER_POSITIVE" ||
+                                    		att.valueType === "INTEGER_NEGATIVE" ||
+                                    		att.valueType === "INTEGER_ZERO_OR_POSITIVE" ) {
                                         newInputField = '<input type="number"' +
                                             ' d2-number-validator ' +
                                             ' number-type="' + att.valueType + '" ' +
@@ -633,7 +633,7 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                                                                 ' dh-name="foo" ' +
                                                                 ' dh-current-element="currentElement" ' +
                                                                 ' dh-event="currentEvent.event" ' +
-                                                                ' dh-id="' + attId + '" ' +
+                                                                ' dh-id="' + attId + '" >' +
                                                         ' </d2-radio-button>';
                                     }
                                     else if (att.valueType === "DATE") {
@@ -655,23 +655,42 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                                             commonInputFieldProperty + ' >';
                                     }
                                     else if (att.valueType === "TRACKER_ASSOCIATE") {
-                                        newInputField = '<input type="text"' +
-                                            ' ng-blur="teiValueUpdated(selectedTei,\'' + attId + '\')" ' +
-                                            commonInputFieldProperty + ' ></span>' +
-                                            '<span class="hideInPrint"><a href ng-class="{true: \'disable-clicks\', false: \'\'} [editingDisabled]" ng-click="getTrackerAssociate(attributesById.' + attId + ', selectedTei.' + attId + ')" title="{{\'add\' | translate}} {{attributesById.' + attId + '.displayName}}" ' +
-                                            '<i class="fa fa-external-link fa-2x vertical-center"></i> ' +
-                                            '</a> ' +
-                                            '<a href ng-if="selectedTei.' + attId + '" ng-class="{true: \'disable-clicks\', false: \'\'} [editingDisabled]" ng-click="selectedTei.' + attId + ' = null" title="{{\'remove\' | translate}} {{attributesById.' + attId + '.displayName}}" ' +
-                                            '<i class="fa fa-trash-o fa-2x vertical-center"></i> ' +
-                                            '</a></span>';
+                                    	newInputField = '<span class="input-group"> ' +
+                                                                            ' <input type="text" ' +
+                                                                            ' ng-blur="teiValueUpdated(selectedTei,\'' + attId + '\')" ' +
+                                                                            commonInputFieldProperty + ' >' +
+                                                                            '<span class="input-group-btn input-group-btn-no-width"> ' +
+                                                                '<button class="btn btn-grp default-btn-height" type="button" ' + 
+                                                                    ' title="{{\'add\' | translate}} {{attributesById.' + attId + '.displayName}}" ' +
+                                                                    ' ng-if="!selectedTei.' + attId + '" ' +
+                                                                    ' ng-class="{true: \'disable-clicks\'} [editingDisabled]" ' +
+                                                                    ' ng-click="getTrackerAssociate(attributesById.' + attId + ', selectedTei.' + attId + ')" >' +
+                                                                    '<i class="fa fa-external-link"></i> ' +
+                                                                '</button> ' + 
+                                                                '<button class="btn btn-grp default-btn-height" type="button" ' + 
+                                                                    ' title="{{\'remove\' | translate}} {{attributesById.' + attId + '.displayName}}" ' +
+                                                                    ' ng-if="selectedTei.' + attId + '" ' +
+                                                                    ' ng-class="{true: \'disable-clicks\'} [editingDisabled]" ' +
+                                                                    ' ng-click="selectedTei.' + attId + ' = null" >' +
+                                                                    '<i class="fa fa-trash-o"></i> ' +
+                                                                '</button> ' + 
+                                                            '</span>'+
+                                                        '</span>';
                                     }
                                     else if (att.valueType === "COORDINATE") {
-                                        newInputField = '<input type="text"' +
-                                            ' ng-blur="teiValueUpdated(selectedTei,\'' + attId + '\')" ' +
-                                            commonInputFieldProperty + ' >' +
-                                            '<span class="horizontal-spacing hideInPrint"><a href ng-click="showAttributeMap(selectedTei,\'' + attId + '\')" title="{{\'get_from_map\' | translate}}" ' +
-                                            '<i class="fa fa-map-marker fa-2x vertical-center"></i> ' +                     
-                                            '</a></span>';
+                                        newInputField = '<span class="input-group"> ' +
+                                                            ' <input type="text" ' +
+                                                            ' placeholder="{{\'latitude_longitude_format\' | translate}}" ' +
+                                                            ' d2-custom-coordinate-validator ' +
+                                                            ' ng-blur="teiValueUpdated(selectedTei,\'' + attId + '\')" ' +
+                                                            commonInputFieldProperty + '>' +
+                                                            '<span class="input-group-btn input-group-btn-no-width"> ' +
+                                                                '<button class="btn btn-grp default-btn-height" type="button" title="{{\'get_from_map\' | translate}}" ' +
+                                                                    ' ng-class="{true: \'disable-clicks\'} [editingDisabled]" ' +
+                                                                    'ng-click="showAttributeMap(selectedTei,\'' + attId + '\')"> ' +
+                                                                    '<i class="fa fa-map-marker"></i> ' +
+                                                                '</button> ' + 
+                                                            '</span></span>';
                                     }
                                     else if (att.valueType === "LONG_TEXT") {
                                         newInputField = '<span><textarea row ="3" ' +
@@ -789,6 +808,7 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                 popOverSpanElement.attr("details","{{'details'| translate}}");
                 popOverSpanElement.attr("trigger","click");
                 popOverSpanElement.attr("placement","right");
+                popOverSpanElement.attr("class","popover-label");
 
                 if (attValue.indexOf("attributeId.") > -1) {
                     fieldId = attValue.split(".")[1];
@@ -1037,12 +1057,9 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                 });
                 return promise;
             },
-            upload: function(file, fileStore){
+            upload: function(file){
                 var formData = new FormData();
                 formData.append('file', file);
-                if( fileStore ){
-                	formData.append('fileStore', fileStore);
-                }
                 var headers = {transformRequest: angular.identity, headers: {'Content-Type': undefined}};
                 var promise = $http.post('../api/fileResources', formData, headers).then(function(response){
                     return response.data;
@@ -1373,6 +1390,7 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                             if(!valueFound) {
                                 if(attribute.attribute === trackedEntityAttributeId
                                         && angular.isDefined(attribute.value)
+                                        && attribute.value !== null
                                         && attribute.value !== "") {
                                     valueFound = true;
                                     //In registration, the attribute type is found in .type, while in data entry the same data is found in .valueType.
@@ -1571,11 +1589,17 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                     {name:"d2:lastEventDate",parameters:1},
                     {name:"d2:validatePattern",parameters:2},
                     {name:"d2:addControlDigits",parameters:1},
-                    {name:"d2:checkControlDigits",parameters:1}];
+                    {name:"d2:checkControlDigits",parameters:1},
+                    {name:"d2:left",parameters:2},
+                    {name:"d2:right",parameters:2},
+                    {name:"d2:substring",parameters:3},
+                    {name:"d2:split",parameters:3},
+                    {name:"d2:length",parameters:1}];
                 var continueLooping = true;
                 //Safety harness on 10 loops, in case of unanticipated syntax causing unintencontinued looping
                 for(var i = 0; i < 10 && continueLooping; i++ ) {
-                    var successfulExecution = false;
+                    var expressionUpdated = false;
+                    var brokenExecution = false;
                     angular.forEach(dhisFunctions, function(dhisFunction){
                         //Select the function call, with any number of parameters inside single quotations, or number parameters witout quotations
                         var regularExFunctionCall = new RegExp(dhisFunction.name + "\\( *(([\\d/\\*\\+\\-%\.]+)|( *'[^']*'))*( *, *(([\\d/\\*\\+\\-%\.]+)|'[^']*'))* *\\)",'g');
@@ -1590,28 +1614,37 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                             //or if the number of parameters is wrong.
                             if(angular.isDefined(dhisFunction.parameters)){
                                 //But we are only checking parameters where the dhisFunction actually has a defined set of parameters(concatenate, for example, does not have a fixed number);
-                                if((!angular.isDefined(parameters) && dhisFunction.parameters > 0)
-                                    || parameters.length !== dhisFunction.parameters){
+                                var numParameters = parameters ? parameters.length : 0;
+                                
+                                if(numParameters !== dhisFunction.parameters){
                                     $log.warn(dhisFunction.name + " was called with the incorrect number of parameters");
+                                    
+                                    //Mark this function call as broken:
+                                    brokenExecution = true;
                                 }
                             }
 
                             //In case the function call is nested, the parameter itself contains an expression, run the expression.
-                            if(angular.isDefined(parameters)) {
+                            if(!brokenExecution && angular.isDefined(parameters) && parameters !== null) {
                                 for (var i = 0; i < parameters.length; i++) {
                                     parameters[i] = runExpression(parameters[i],dhisFunction.name,"parameter:" + i, flag, variablesHash);
                                 }
                             }
 
                             //Special block for d2:weeksBetween(*,*) - add such a block for all other dhis functions.
-                            if(dhisFunction.name === "d2:daysBetween") {
+                            if(brokenExecution) {
+                                //Function call is not possible to evaluate, remove the call:
+                                expression = expression.replace(callToThisFunction, "false");
+                                expressionUpdated = true;
+                            }
+                            else if(dhisFunction.name === "d2:daysBetween") {
                                 var firstdate = $filter('trimquotes')(parameters[0]);
                                 var seconddate = $filter('trimquotes')(parameters[1]);
                                 firstdate = moment(firstdate);
                                 seconddate = moment(seconddate);
                                 //Replace the end evaluation of the dhis function:
                                 expression = expression.replace(callToThisFunction, seconddate.diff(firstdate,'days'));
-                                successfulExecution = true;
+                                expressionUpdated = true;
                             }
                             else if(dhisFunction.name === "d2:weeksBetween") {
                                 var firstdate = $filter('trimquotes')(parameters[0]);
@@ -1620,7 +1653,7 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                                 seconddate = moment(seconddate);
                                 //Replace the end evaluation of the dhis function:
                                 expression = expression.replace(callToThisFunction, seconddate.diff(firstdate,'weeks'));
-                                successfulExecution = true;
+                                expressionUpdated = true;
                             }
                             else if(dhisFunction.name === "d2:monthsBetween") {
                                 var firstdate = $filter('trimquotes')(parameters[0]);
@@ -1629,7 +1662,7 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                                 seconddate = moment(seconddate);
                                 //Replace the end evaluation of the dhis function:
                                 expression = expression.replace(callToThisFunction, seconddate.diff(firstdate,'months'));
-                                successfulExecution = true;
+                                expressionUpdated = true;
                             }
                             else if(dhisFunction.name === "d2:yearsBetween") {
                                 var firstdate = $filter('trimquotes')(parameters[0]);
@@ -1638,13 +1671,13 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                                 seconddate = moment(seconddate);
                                 //Replace the end evaluation of the dhis function:
                                 expression = expression.replace(callToThisFunction, seconddate.diff(firstdate,'years'));
-                                successfulExecution = true;
+                                expressionUpdated = true;
                             }
                             else if(dhisFunction.name === "d2:floor") {
                                 var floored = Math.floor(parameters[0]);
                                 //Replace the end evaluation of the dhis function:
                                 expression = expression.replace(callToThisFunction, floored);
-                                successfulExecution = true;
+                                expressionUpdated = true;
                             }
                             else if(dhisFunction.name === "d2:modulus") {
                                 var dividend = Number(parameters[0]);
@@ -1652,7 +1685,7 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                                 var rest = dividend % divisor;
                                 //Replace the end evaluation of the dhis function:
                                 expression = expression.replace(callToThisFunction, rest);
-                                successfulExecution = true;
+                                expressionUpdated = true;
                             }
                             else if(dhisFunction.name === "d2:concatenate") {
                                 var returnString = "'";
@@ -1661,7 +1694,7 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                                 }
                                 returnString += "'";
                                 expression = expression.replace(callToThisFunction, returnString);
-                                successfulExecution = true;
+                                expressionUpdated = true;
                             }
                             else if(dhisFunction.name === "d2:addDays") {
                                 var date = $filter('trimquotes')(parameters[0]);
@@ -1670,7 +1703,7 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                                 var newdatestring = "'" + newdate + "'";
                                 //Replace the end evaluation of the dhis function:
                                 expression = expression.replace(callToThisFunction, newdatestring);
-                                successfulExecution = true;
+                                expressionUpdated = true;
                             }
                             else if(dhisFunction.name === "d2:zing") {
                                 var number = parameters[0];
@@ -1680,7 +1713,7 @@ var d2Services = angular.module('d2Services', ['ngResource'])
 
                                 //Replace the end evaluation of the dhis function:
                                 expression = expression.replace(callToThisFunction, number);
-                                successfulExecution = true;
+                                expressionUpdated = true;
                             }
                             else if(dhisFunction.name === "d2:oizp") {
                                 var number = parameters[0];
@@ -1691,7 +1724,7 @@ var d2Services = angular.module('d2Services', ['ngResource'])
 
                                 //Replace the end evaluation of the dhis function:
                                 expression = expression.replace(callToThisFunction, output);
-                                successfulExecution = true;
+                                expressionUpdated = true;
                             }
                             else if(dhisFunction.name === "d2:count") {
                                 var variableName = parameters[0];
@@ -1717,7 +1750,7 @@ var d2Services = angular.module('d2Services', ['ngResource'])
 
                                 //Replace the end evaluation of the dhis function:
                                 expression = expression.replace(callToThisFunction, count);
-                                successfulExecution = true;
+                                expressionUpdated = true;
                             }
                             else if(dhisFunction.name === "d2:countIfZeroPos") {
                                 var variableName = $filter('trimvariablequalifiers') (parameters[0]);
@@ -1751,7 +1784,7 @@ var d2Services = angular.module('d2Services', ['ngResource'])
 
                                 //Replace the end evaluation of the dhis function:
                                 expression = expression.replace(callToThisFunction, count);
-                                successfulExecution = true;
+                                expressionUpdated = true;
                             }
                             else if(dhisFunction.name === "d2:countIfValue") {
                                 var variableName = parameters[0];
@@ -1788,19 +1821,19 @@ var d2Services = angular.module('d2Services', ['ngResource'])
 
                                 //Replace the end evaluation of the dhis function:
                                 expression = expression.replace(callToThisFunction, count);
-                                successfulExecution = true;
+                                expressionUpdated = true;
                             }
                             else if(dhisFunction.name === "d2:ceil") {
                                 var ceiled = Math.ceil(parameters[0]);
                                 //Replace the end evaluation of the dhis function:
                                 expression = expression.replace(callToThisFunction, ceiled);
-                                successfulExecution = true;
+                                expressionUpdated = true;
                             }
                             else if(dhisFunction.name === "d2:round") {
                                 var rounded = Math.round(parameters[0]);
                                 //Replace the end evaluation of the dhis function:
                                 expression = expression.replace(callToThisFunction, rounded);
-                                successfulExecution = true;
+                                expressionUpdated = true;
                             }
                             else if(dhisFunction.name === "d2:hasValue") {
                                 var variableName = parameters[0];
@@ -1819,7 +1852,7 @@ var d2Services = angular.module('d2Services', ['ngResource'])
 
                                 //Replace the end evaluation of the dhis function:
                                 expression = expression.replace(callToThisFunction, valueFound);
-                                successfulExecution = true;
+                                expressionUpdated = true;
                             }
                             else if(dhisFunction.name === "d2:lastEventDate") {
                                 var variableName = parameters[0];
@@ -1841,7 +1874,7 @@ var d2Services = angular.module('d2Services', ['ngResource'])
 
                                 //Replace the end evaluation of the dhis function:
                                 expression = expression.replace(callToThisFunction, valueFound);
-                                successfulExecution = true;
+                                expressionUpdated = true;
                             }
                             else if(dhisFunction.name === "d2:validatePattern") {
                                 var inputToValidate = parameters[0].toString();
@@ -1856,14 +1889,13 @@ var d2Services = angular.module('d2Services', ['ngResource'])
 
                                 //Replace the end evaluation of the dhis function:
                                 expression = expression.replace(callToThisFunction, matchFound);
-                                successfulExecution = true;
+                                expressionUpdated = true;
                             }
                             else if(dhisFunction.name === "d2:addControlDigits") {
 
                                 var baseNumber = parameters[0];
                                 var baseDigits = baseNumber.split('');
                                 var error = false;
-
 
                                 var firstDigit = 0;
                                 var secondDigit = 0;
@@ -1906,13 +1938,13 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                                 if(!error) {
                                     //Replace the end evaluation of the dhis function:
                                     expression = expression.replace(callToThisFunction, baseNumber + firstDigit + secondDigit);
-                                    successfulExecution = true;
+                                    expressionUpdated = true;
                                 }
                                 else
                                 {
                                     //Replace the end evaluation of the dhis function:
                                     expression = expression.replace(callToThisFunction, baseNumber);
-                                    successfulExecution = false;
+                                    expressionUpdated = true;
                                 }
                             }
                             else if(dhisFunction.name === "d2:checkControlDigits") {
@@ -1920,7 +1952,52 @@ var d2Services = angular.module('d2Services', ['ngResource'])
 
                                 //Replace the end evaluation of the dhis function:
                                 expression = expression.replace(callToThisFunction, parameters[0]);
-                                successfulExecution = false;
+                                expressionUpdated = true;
+                            }
+                            else if(dhisFunction.name === "d2:left") {
+                                var string = String(parameters[0]);
+                                var numChars = string.length < parameters[1] ? string.length : parameters[1];
+                                var returnString =  string.substring(0,numChars);
+                                returnString = VariableService.processValue(returnString, 'TEXT');
+                                expression = expression.replace(callToThisFunction, returnString);
+                                expressionUpdated = true;
+                            }
+                            else if(dhisFunction.name === "d2:right") {
+                                var string = String(parameters[0]);
+                                var numChars = string.length < parameters[1] ? string.length : parameters[1];
+                                var returnString =  string.substring(string.length - numChars, string.length);
+                                returnString = VariableService.processValue(returnString, 'TEXT');
+                                expression = expression.replace(callToThisFunction, returnString);
+                                expressionUpdated = true;
+                            }
+                            else if(dhisFunction.name === "d2:substring") {
+                                var string = String(parameters[0]);
+                                var startChar = string.length < parameters[1] - 1 ? -1 : parameters[1];
+                                var endChar = string.length < parameters[2] ? -1 : parameters[2];
+                                if(startChar < 0 || endChar < 0) {
+                                    expression = expression.replace(callToThisFunction, "''");
+                                    expressionUpdated = true;
+                                } else {
+                                    var returnString =  string.substring(startChar, endChar);
+                                    returnString = VariableService.processValue(returnString, 'TEXT');
+                                    expression = expression.replace(callToThisFunction, returnString);
+                                    expressionUpdated = true;
+                                }
+                            }
+                            else if(dhisFunction.name === "d2:split") {
+                                var string = String(parameters[0]);
+                                var splitArray = string.split(parameters[1]);
+                                var returnPart = "";
+                                if (splitArray.length >= parameters[2]) {
+                                    returnPart = splitArray[parameters[2]];
+                                }
+                                returnPart = VariableService.processValue(returnPart, 'TEXT');
+                                expression = expression.replace(callToThisFunction, returnPart);
+                                expressionUpdated = true;
+                            }
+                            else if(dhisFunction.name === "d2:length") {
+                                expression = expression.replace(callToThisFunction, String(parameters[0]).length);
+                                expressionUpdated = true;
                             }
                         });
                     });
@@ -1930,7 +2007,7 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                     //the expected d2: function calls, one unneccesary iteration will be done and the
                     //successfulExecution will be false coming back here, ending the loop. The last iteration
                     //should be zero to marginal performancewise.
-                    if(successfulExecution && expression.indexOf("d2:") !== -1) {
+                    if(expressionUpdated && expression.indexOf("d2:") !== -1) {
                         continueLooping = true;
                     } else {
                         continueLooping = false;
@@ -1966,9 +2043,6 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                 var dhisfunctionsevaluated = runDhisFunctions(expression, variablesHash, flag);
                 answer = eval(dhisfunctionsevaluated);
             }
-            if(dhis2.validation.isNumber(answer)){
-                answer = Math.round(answer*100)/100;
-            }
             return answer;
         };
 
@@ -1988,15 +2062,25 @@ var d2Services = angular.module('d2Services', ['ngResource'])
             return valueType;
         };
 
-        var performCreateEventAction = function(effect, selectedEntity, selectedEnrollment, currentEvents){
+        var performCreateEventAction = function(effect, selectedEntity, selectedEnrollment, currentEvents,executingEvent, programStage){
             var valArray = [];
             if(effect.data) {
                 valArray = effect.data.split(',');
-            	var newEventDataValues = [];
+                var newEventDataValues = [];
+                var idList = {active:false};
+
                 angular.forEach(valArray, function(value) {
-                    var valParts = value.split(':');
+                    var valParts = value.split(':');                
                     if(valParts && valParts.length >= 1) {
                         var valId = valParts[0];
+
+                        //Check wether one or more fields is marked as the id to use for comparison purposes:
+                        if(valId.trim().substring(0, 4) === "[id]") {
+                            valId = valId.substring(4,valId.length);
+                            idList[valId] = true;
+                            idList.active = true;
+                        }
+
                         var valVal = "";
                         if(valParts.length > 1) {
                             valVal = valParts[1];
@@ -2005,8 +2089,8 @@ var d2Services = angular.module('d2Services', ['ngResource'])
 
                         var processedValue = VariableService.processValue(valVal, valueType);
                         processedValue = $filter('trimquotes')(processedValue);
-                    	newEventDataValues.push({dataElement:valId,value:processedValue});
-                    	newEventDataValues[valId] = processedValue;
+                        newEventDataValues.push({dataElement:valId,value:processedValue});
+                        newEventDataValues[valId] = processedValue;
                     }
                 });
 
@@ -2014,11 +2098,23 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                 angular.forEach(currentEvents, function(currentEvent) {
                     var misMatch = false;
                     angular.forEach(newEventDataValues, function(value) {
+                        var valueFound = false;
                         angular.forEach(currentEvent.dataValues, function(currentDataValue) {
-                            if(currentDataValue.dataElement === value.dataElement && currentDataValue.value != newEventDataValues[value.dataElement]) {
-                                misMatch = true;
+                            //Only count as mismatch if there is no particular ID to use, or the current field is part of the same ID
+                            if(!idList.active || idList[currentDataValue.dataElement]){
+                                if(currentDataValue.dataElement === value.dataElement) {
+                                    valueFound = true;
+                                    //Truthy comparison is needed to avoid false negatives for differing variable types:
+                                    if( currentDataValue.value != newEventDataValues[value.dataElement] ) {
+                                        misMatch = true;
+                                    }
+                                }
                             }
                         });
+                        //Also treat no value found as a mismatch, but when ID fields is set, only concider ID fields
+                        if((!idList.active || idList[value.dataElement] ) && !valueFound) {
+                            misMatch = true;
+                        }
                     });
                     if(!misMatch) {
                         //if no mismatches on this point, the exact same event already exists, and we dont create it.
@@ -2039,14 +2135,21 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                         dueDate: dueDate,
                         eventDate: eventDate,
                         notes: [],
-                    	dataValues: newEventDataValues,
+                        dataValues: newEventDataValues,
                         status: 'ACTIVE',
-                        event: dhis2.util.uid()
+                        event: dhis2.util.uid(),
                     };
 
-                    DHIS2EventFactory.create(newEvent).then(function(result){
+                    if(programStage && programStage.dontPersistOnCreate){
+                        newEvent.notPersisted = true;
+                        newEvent.executingEvent = executingEvent;
                         $rootScope.$broadcast("eventcreated", { event:newEvent });
-                    });
+                    }
+                    else{
+                        DHIS2EventFactory.create(newEvent).then(function(result){
+                           $rootScope.$broadcast("eventcreated", { event:newEvent });
+                        }); 
+                    }
                     //1 event created
                     return 1;
                 }
@@ -2067,7 +2170,7 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                 //Concatenate rules produced by indicator definitions into the other rules:
                 var rules = $filter('filter')(allProgramRules.programRules, {programStageId: null});
 
-                if(executingEvent.programStage){
+                if(executingEvent && executingEvent.programStage){
                     if(!rules) {
                         rules = [];
                     }
@@ -2279,7 +2382,9 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                             //make a sorted list of all events to pass to rules execution service:
                             var allEventsInScope = eventScopeExceptCurrent.concat([currentEvent]);
                             allEventsInScope = orderByFilter(allEventsInScope, '-eventDate').reverse();
-                            return {all: allEventsInScope, byStage:{programStageId:allEventsInScope}};
+                            var byStage = {};
+                            byStage[currentEvent.programStage] = allEventsInScope;
+                            return {all: allEventsInScope, byStage:byStage};
                         });
                     });   
                 }
@@ -2288,13 +2393,17 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                     //make a sorted list of all events to pass to rules execution service:
                     var allEvents = eventScopeExceptCurrent.concat([currentEvent]);
                     allEvents = orderByFilter(allEvents, '-eventDate').reverse();
-                    return $q.when({all: allEvents, byStage:{programStageId:allEvents}});
+                    var byStage = {};
+                    byStage[currentEvent.programStage] = allEvents;
+                    return $q.when({all: allEvents, byStage:byStage});
                 }
             }
             else
             {
                 //return a scope containing only the current event
-                return $q.when({all: [currentEvent], byStage:{programStageId:[currentEvent]}});
+                var byStage = {};
+                byStage[currentEvent.programStage] = [currentEvent];
+                return $q.when({all: [currentEvent], byStage:byStage});
             }
         };
         var internalGetOrLoadRules = function(programId) {
@@ -2340,7 +2449,7 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                     });
                 });
             },
-            processRuleEffectAttribute: function(context, selectedTei, tei, attributesById, hiddenFields, warningMessages){
+            processRuleEffectAttribute: function(context, selectedTei, tei, currentEvent, currentEventOriginialValue, affectedEvent, attributesById, prStDes, hiddenFields, hiddenSections, warningMessages, assignedFields){
                 angular.forEach($rootScope.ruleeffects[context], function (effect) {
                     if (effect.trackedEntityAttribute) {
                         //in the data entry controller we only care about the "hidefield", showerror and showwarning actions
@@ -2393,9 +2502,58 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                             }
                         }
                     }
+                    
+                    if(effect.dataElement && effect.ineffect) {
+                        //in the data entry controller we only care about the "hidefield" actions
+                        if(effect.action === "HIDEFIELD") {
+                            if(effect.dataElement) {
+                                if(affectedEvent[effect.dataElement.id]) {
+                                    //If a field is going to be hidden, but contains a value, we need to take action;
+                                    if(effect.content) {
+                                        //TODO: Alerts is going to be replaced with a proper display mecanism.
+                                        alert(effect.content);
+                                    }
+                                    else {
+                                        //TODO: Alerts is going to be replaced with a proper display mecanism.
+                                        alert(prStDes[effect.dataElement.id].dataElement.formName + "Was blanked out and hidden by your last action");
+                                    }
+
+                                    //Blank out the value:
+                                    affectedEvent[effect.dataElement.id] = "";
+                                }
+                                hiddenFields[effect.dataElement.id] = effect.ineffect;
+                            }
+                            else {
+                                $log.warn("ProgramRuleAction " + effect.id + " is of type HIDEFIELD, bot does not have a dataelement defined");
+                            }
+                        }
+                        else if(effect.action === "HIDESECTION") {
+                            if(effect.programStageSection){
+                                hiddenSections[effect.programStageSection] = effect.programStageSection;
+                            }
+                        }
+                        else if(effect.action === "SHOWERROR" && effect.dataElement.id){
+                            var dialogOptions = {
+                                headerText: 'validation_error',
+                                bodyText: effect.content + (effect.data ? effect.data : "")
+                            };
+                            DialogService.showDialog({}, dialogOptions);
+
+                            currentEvent[effect.dataElement.id] = currentEventOriginialValue[effect.dataElement.id];
+                        }
+                        else if(effect.action === "SHOWWARNING"){
+                            warningMessages.push(effect.content + (effect.data ? effect.data : ""));
+                        }
+                        else if (effect.action === "ASSIGN") {
+
+                            //For "ASSIGN" actions where we have a dataelement, we save the calculated value to the dataelement:
+                            affectedEvent[effect.dataElement.id] = effect.data;
+                            assignedFields[effect.dataElement.id] = true;
+                        }
+                    }
                 });
                 
-                return {selectedTei: selectedTei, hiddenFields: hiddenFields, warningMessages: warningMessages};
+                return {selectedTei: selectedTei, currentEvent: currentEvent, hiddenFields: hiddenFields, hiddenSections: hiddenSections, warningMessages: warningMessages};
             }
         };
     })
@@ -2461,7 +2619,8 @@ var d2Services = angular.module('d2Services', ['ngResource'])
         this.relationshipOwner = {};
         this.selectedTeiEvents = [];
         this.fileNames = [];
-            this.location = null;
+        this.location = null;
+        this.dataElementTranslations = null;
 
         this.set = function(currentSelection){
             this.currentSelection = currentSelection;
@@ -2531,6 +2690,13 @@ var d2Services = angular.module('d2Services', ['ngResource'])
         };
         this.getLocation = function(){
             return this.location;
+        };
+        
+        this.setDataElementTranslations = function(dataElementTranslations){
+            this.dataElementTranslations = dataElementTranslations;
+        };
+        this.getDataElementTranslations = function(){
+            return this.dataElementTranslations;
         };
     })
 

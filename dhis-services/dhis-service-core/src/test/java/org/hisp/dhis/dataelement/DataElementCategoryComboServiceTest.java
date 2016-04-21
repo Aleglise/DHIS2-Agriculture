@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.hisp.dhis.DhisSpringTest;
+import org.hisp.dhis.common.DataDimensionType;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -94,9 +95,9 @@ public class DataElementCategoryComboServiceTest
         categoryService.addDataElementCategoryOption( categoryOptionF );
         categoryService.addDataElementCategoryOption( categoryOptionG );
         
-        categoryA = new DataElementCategory( "CategoryA" );
-        categoryB = new DataElementCategory( "CategoryB" );
-        categoryC = new DataElementCategory( "CategoryC" );
+        categoryA = new DataElementCategory( "CategoryA", DataDimensionType.DISAGGREGATION );
+        categoryB = new DataElementCategory( "CategoryB", DataDimensionType.DISAGGREGATION );
+        categoryC = new DataElementCategory( "CategoryC", DataDimensionType.DISAGGREGATION );
         
         categoryA.addCategoryOption( categoryOptionA );
         categoryA.addCategoryOption( categoryOptionB );
@@ -121,9 +122,9 @@ public class DataElementCategoryComboServiceTest
     @Test
     public void testAddGet()
     {        
-        categoryComboA = new DataElementCategoryCombo( "CategoryComboA", categories );
-        categoryComboB = new DataElementCategoryCombo( "CategoryComboB", categories );
-        categoryComboC = new DataElementCategoryCombo( "CategoryComboC", categories );
+        categoryComboA = new DataElementCategoryCombo( "CategoryComboA", DataDimensionType.DISAGGREGATION, categories );
+        categoryComboB = new DataElementCategoryCombo( "CategoryComboB", DataDimensionType.DISAGGREGATION, categories );
+        categoryComboC = new DataElementCategoryCombo( "CategoryComboC", DataDimensionType.DISAGGREGATION, categories );
         
         int idA = categoryService.addDataElementCategoryCombo( categoryComboA );
         int idB = categoryService.addDataElementCategoryCombo( categoryComboB );
@@ -141,9 +142,9 @@ public class DataElementCategoryComboServiceTest
     @Test
     public void testDelete()
     {
-        categoryComboA = new DataElementCategoryCombo( "CategoryComboA", categories );
-        categoryComboB = new DataElementCategoryCombo( "CategoryComboB", categories );
-        categoryComboC = new DataElementCategoryCombo( "CategoryComboC", categories );
+        categoryComboA = new DataElementCategoryCombo( "CategoryComboA", DataDimensionType.DISAGGREGATION, categories );
+        categoryComboB = new DataElementCategoryCombo( "CategoryComboB", DataDimensionType.DISAGGREGATION, categories );
+        categoryComboC = new DataElementCategoryCombo( "CategoryComboC", DataDimensionType.DISAGGREGATION, categories );
         
         int idA = categoryService.addDataElementCategoryCombo( categoryComboA );
         int idB = categoryService.addDataElementCategoryCombo( categoryComboB );
@@ -169,9 +170,9 @@ public class DataElementCategoryComboServiceTest
     @Test
     public void testGetAll()
     {
-        categoryComboA = new DataElementCategoryCombo( "CategoryComboA", categories );
-        categoryComboB = new DataElementCategoryCombo( "CategoryComboB", categories );
-        categoryComboC = new DataElementCategoryCombo( "CategoryComboC", categories );
+        categoryComboA = new DataElementCategoryCombo( "CategoryComboA", DataDimensionType.DISAGGREGATION, categories );
+        categoryComboB = new DataElementCategoryCombo( "CategoryComboB", DataDimensionType.DISAGGREGATION, categories );
+        categoryComboC = new DataElementCategoryCombo( "CategoryComboC", DataDimensionType.DISAGGREGATION, categories );
         
         categoryService.addDataElementCategoryCombo( categoryComboA );
         categoryService.addDataElementCategoryCombo( categoryComboB );
@@ -188,7 +189,7 @@ public class DataElementCategoryComboServiceTest
     @Test
     public void testGenerateCategoryOptionCombos()
     {        
-        categoryComboA = new DataElementCategoryCombo( "CategoryComboA", categories );
+        categoryComboA = new DataElementCategoryCombo( "CategoryComboA", DataDimensionType.DISAGGREGATION, categories );
         categoryService.addDataElementCategoryCombo( categoryComboA );
         
         categoryService.generateOptionCombos( categoryComboA );
@@ -203,7 +204,7 @@ public class DataElementCategoryComboServiceTest
     @Test
     public void testUpdateCategoryOptionCombosA()
     {
-        categoryComboA = new DataElementCategoryCombo( "CategoryComboA", categories );
+        categoryComboA = new DataElementCategoryCombo( "CategoryComboA", DataDimensionType.DISAGGREGATION, categories );
         categoryService.addDataElementCategoryCombo( categoryComboA );
         
         categoryService.generateOptionCombos( categoryComboA );
@@ -230,7 +231,7 @@ public class DataElementCategoryComboServiceTest
     @Test
     public void testUpdateCategoryOptionCombosB()
     {
-        categoryComboA = new DataElementCategoryCombo( "CategoryComboA", categories );
+        categoryComboA = new DataElementCategoryCombo( "CategoryComboA", DataDimensionType.DISAGGREGATION, categories );
         categoryService.addDataElementCategoryCombo( categoryComboA );
         
         categoryService.generateOptionCombos( categoryComboA );
@@ -249,7 +250,7 @@ public class DataElementCategoryComboServiceTest
     @Test
     public void testUpdateCategoryOptionCombosC()
     {
-        categoryComboA = new DataElementCategoryCombo( "CategoryComboA", categories );
+        categoryComboA = new DataElementCategoryCombo( "CategoryComboA", DataDimensionType.DISAGGREGATION, categories );
         categoryService.addDataElementCategoryCombo( categoryComboA );
         
         categoryService.generateOptionCombos( categoryComboA );

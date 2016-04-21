@@ -87,6 +87,8 @@ public class DashboardItem
 
     private Boolean messages;
 
+    private String appKey;
+
     private DashboardItemShape shape;
 
     // -------------------------------------------------------------------------
@@ -147,6 +149,10 @@ public class DashboardItem
         else if ( messages != null )
         {
             return DashboardItemType.MESSAGES;
+        }
+        else if ( appKey != null )
+        {
+            return DashboardItemType.APP;
         }
 
         return null;
@@ -218,6 +224,7 @@ public class DashboardItem
         count += reports.size();
         count += resources.size();
         count += messages != null ? 1 : 0;
+        count += appKey != null ? 1 : 0;
         return count;
     }
 
@@ -395,6 +402,19 @@ public class DashboardItem
     @JsonProperty
     @JsonView( { DetailedView.class, ExportView.class } )
     @JacksonXmlProperty( namespace = DxfNamespaces.DXF_2_0 )
+    public String getAppKey()
+    {
+        return appKey;
+    }
+
+    public void setAppKey( String appKey )
+    {
+        this.appKey = appKey;
+    }
+
+    @JsonProperty
+    @JsonView( { DetailedView.class, ExportView.class } )
+    @JacksonXmlProperty( namespace = DxfNamespaces.DXF_2_0 )
     public DashboardItemShape getShape()
     {
         return shape;
@@ -427,6 +447,7 @@ public class DashboardItem
                 reports = dashboardItem.getReports();
                 resources = dashboardItem.getResources();
                 messages = dashboardItem.getMessages();
+                appKey = dashboardItem.getAppKey();
                 shape = dashboardItem.getShape();
             }
             else if ( mergeMode.isMerge() )
@@ -438,6 +459,7 @@ public class DashboardItem
                 reports = dashboardItem.getReports() == null ? reports : dashboardItem.getReports();
                 resources = dashboardItem.getResources() == null ? resources : dashboardItem.getResources();
                 messages = dashboardItem.getMessages() == null ? messages : dashboardItem.getMessages();
+                appKey = dashboardItem.getAppKey() == null ? appKey : dashboardItem.getAppKey();
                 shape = dashboardItem.getShape() == null ? shape : dashboardItem.getShape();
             }
         }

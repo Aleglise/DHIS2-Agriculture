@@ -1,4 +1,4 @@
-package org.hisp.dhis.dxf2.metadata2.objectbundle;
+package org.hisp.dhis.dxf2.metadata2.objectbundle.feedback;
 
 /*
  * Copyright (c) 2004-2016, University of Oslo
@@ -43,11 +43,11 @@ import java.util.stream.Collectors;
 /**
  * @author Morten Olav Hansen <mortenoh@gmail.com>
  */
-public class ObjectBundleValidation
+public class ObjectBundleValidationReport
 {
     private Map<Class<?>, TypeReport> typeReportMap = new HashMap<>();
 
-    public ObjectBundleValidation()
+    public ObjectBundleValidationReport()
     {
     }
 

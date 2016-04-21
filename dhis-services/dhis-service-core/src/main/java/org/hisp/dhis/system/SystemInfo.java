@@ -77,8 +77,12 @@ public class SystemInfo
     private String revision;
 
     private Date buildTime;
+    
+    private String jasperReportsVersion;
 
     private String environmentVariable;
+
+    private String fileStoreProvider;
 
     private String javaVersion;
 
@@ -105,7 +109,7 @@ public class SystemInfo
     private Integer cpuCores;
     
     private String systemId;
-
+    
     public SystemInfo instance()
     {
         SystemInfo info = new SystemInfo();
@@ -119,6 +123,7 @@ public class SystemInfo
 
     public void clearSensitiveInfo()
     {
+        this.fileStoreProvider = null;
         this.javaVersion = null;
         this.javaVendor = null;
         this.javaHome = null;
@@ -272,6 +277,18 @@ public class SystemInfo
 
     @JsonProperty
     @JacksonXmlProperty( namespace = DxfNamespaces.DXF_2_0 )
+    public String getJasperReportsVersion()
+    {
+        return jasperReportsVersion;
+    }
+
+    public void setJasperReportsVersion( String jasperReportsVersion )
+    {
+        this.jasperReportsVersion = jasperReportsVersion;
+    }
+
+    @JsonProperty
+    @JacksonXmlProperty( namespace = DxfNamespaces.DXF_2_0 )
     public String getEnvironmentVariable()
     {
         return environmentVariable;
@@ -282,6 +299,18 @@ public class SystemInfo
         this.environmentVariable = environmentVariable;
     }
 
+    @JsonProperty
+    @JacksonXmlProperty( namespace = DxfNamespaces.DXF_2_0 )
+    public String getFileStoreProvider()
+    {
+        return fileStoreProvider;
+    }
+
+    public void setFileStoreProvider( String fileStoreProvider )
+    {
+        this.fileStoreProvider = fileStoreProvider;
+    }
+    
     @JsonProperty
     @JacksonXmlProperty( namespace = DxfNamespaces.DXF_2_0 )
     public String getJavaVersion()

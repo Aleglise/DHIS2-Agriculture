@@ -135,7 +135,7 @@
         </td>
     #elseif( $dataElement.valueType == "TIME" )
         <td>
-            <input type="time" name="entrytime" id="${dataentryId}" tabindex="${tabIndex}" />
+            <input type="text" name="entrytime" class="entryfield" id="${dataEntryId}" tabindex="${tabIndex}" />
         </td>
     #else
         #if( $dataElement.optionSet )

@@ -126,7 +126,7 @@ public class SixMonthlyAprilPeriodTypeTest
         Period period = periodType.createPeriod( "2015AprilS1" );
         
         startDate = new DateTime( 2015, 4, 1, 0 ,0 );
-        endDate = new DateTime(  2015, 9, 30, 0 ,0 );
+        endDate = new DateTime( 2015, 9, 30, 0 ,0 );
 
         assertEquals( startDate.toDate(), period.getStartDate() );
         assertEquals( endDate.toDate(), period.getEndDate() );
@@ -143,7 +143,7 @@ public class SixMonthlyAprilPeriodTypeTest
     @Test
     public void testGetNextPeriod()
     {
-        testDate = new DateTime(  2009, 8, 15, 0 ,0 );
+        testDate = new DateTime( 2009, 8, 15, 0 ,0 );
 
         Period period = periodType.createPeriod( testDate.toDate() );
 
@@ -155,7 +155,7 @@ public class SixMonthlyAprilPeriodTypeTest
         assertEquals( startDate.toDate(), period.getStartDate() );
         assertEquals( endDate.toDate(), period.getEndDate() );
 
-        testDate = new DateTime(  2009, 12, 15, 0 ,0 );
+        testDate = new DateTime( 2009, 12, 15, 0 ,0 );
 
         period = periodType.createPeriod( testDate.toDate() );
 
@@ -171,7 +171,7 @@ public class SixMonthlyAprilPeriodTypeTest
     @Test
     public void testGetPreviousPeriod()
     {
-        testDate = new DateTime(  2009, 8, 15, 0 ,0 );
+        testDate = new DateTime( 2009, 8, 15, 0 ,0 );
 
         Period period = periodType.createPeriod( testDate.toDate() );
 
@@ -183,7 +183,7 @@ public class SixMonthlyAprilPeriodTypeTest
         assertEquals( startDate.toDate(), period.getStartDate() );
         assertEquals( endDate.toDate(), period.getEndDate() );
 
-        testDate = new DateTime(  2009, 12, 15, 0 ,0 );
+        testDate = new DateTime( 2009, 12, 15, 0 ,0 );
 
         period = periodType.createPeriod( testDate.toDate() );
 
@@ -199,7 +199,7 @@ public class SixMonthlyAprilPeriodTypeTest
     @Test
     public void testGeneratePeriods()
     {
-        testDate = new DateTime(  2009, 8, 15, 0 ,0 );
+        testDate = new DateTime( 2009, 8, 15, 0 ,0 );
 
         List<Period> periods = periodType.generatePeriods( testDate.toDate() );
 
@@ -207,7 +207,7 @@ public class SixMonthlyAprilPeriodTypeTest
         assertEquals( periodType.createPeriod( new DateTime( 2009, 4, 1, 0 ,0 ).toDate() ), periods.get( 0 ) );
         assertEquals( periodType.createPeriod( new DateTime( 2009, 10, 1, 0 ,0 ).toDate() ), periods.get( 1 ) );
 
-        testDate = new DateTime(  2009, 12, 15, 0 ,0 );
+        testDate = new DateTime( 2009, 12, 15, 0 ,0 );
 
         periods = periodType.generatePeriods( testDate.toDate() );
 
@@ -219,7 +219,7 @@ public class SixMonthlyAprilPeriodTypeTest
     @Test
     public void testGenerateRollingPeriods()
     {
-        testDate = new DateTime(  2009, 8, 15, 0 ,0 );
+        testDate = new DateTime( 2009, 8, 15, 0 ,0 );
 
         List<Period> periods = periodType.generateRollingPeriods( testDate.toDate() );
 
@@ -227,7 +227,7 @@ public class SixMonthlyAprilPeriodTypeTest
         assertEquals( periodType.createPeriod( new DateTime( 2008, 10, 1, 0 ,0 ).toDate() ), periods.get( 0 ) );
         assertEquals( periodType.createPeriod( new DateTime( 2009, 4, 1, 0 ,0 ).toDate() ), periods.get( 1 ) );
 
-        testDate = new DateTime(  2009, 12, 15, 0 ,0 );
+        testDate = new DateTime( 2009, 12, 15, 0 ,0 );
 
         periods = periodType.generateRollingPeriods( testDate.toDate() );
 
@@ -239,7 +239,7 @@ public class SixMonthlyAprilPeriodTypeTest
     @Test
     public void testGenerateLast5Years()
     {
-        testDate = new DateTime(  2009, 8, 15, 0 ,0 );
+        testDate = new DateTime( 2009, 8, 15, 0 ,0 );
 
         List<Period> periods = periodType.generateLast5Years( testDate.toDate() );
 

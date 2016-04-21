@@ -306,10 +306,10 @@ public class DataElementServiceTest
     @Test
     public void testGetDataElementsByValueType()
     {
-        DataElement dataElementA = createDataElement( 'A', ValueType.NUMBER );
-        DataElement dataElementB = createDataElement( 'B', ValueType.NUMBER );
-        DataElement dataElementC = createDataElement( 'C', ValueType.BOOLEAN );
-        DataElement dataElementD = createDataElement( 'D', ValueType.TEXT );
+        DataElement dataElementA = createDataElement( 'A', ValueType.NUMBER, AggregationType.SUM );
+        DataElement dataElementB = createDataElement( 'B', ValueType.NUMBER, AggregationType.SUM );
+        DataElement dataElementC = createDataElement( 'C', ValueType.BOOLEAN, AggregationType.SUM );
+        DataElement dataElementD = createDataElement( 'D', ValueType.TEXT, AggregationType.SUM );
 
         dataElementService.addDataElement( dataElementA );
         dataElementService.addDataElement( dataElementB );
@@ -328,13 +328,13 @@ public class DataElementServiceTest
     @Test
     public void testGetDataElementsByValueTypes()
     {
-        DataElement dataElementA = createDataElement( 'A', ValueType.INTEGER );
-        DataElement dataElementB = createDataElement( 'B', ValueType.INTEGER_POSITIVE );
-        DataElement dataElementC = createDataElement( 'C', ValueType.INTEGER_ZERO_OR_POSITIVE );
-        DataElement dataElementD = createDataElement( 'D', ValueType.NUMBER );
-        DataElement dataElementE = createDataElement( 'E', ValueType.TEXT );
-        DataElement dataElementF = createDataElement( 'F', ValueType.LONG_TEXT );
-        DataElement dataElementG = createDataElement( 'G', ValueType.COORDINATE );
+        DataElement dataElementA = createDataElement( 'A', ValueType.INTEGER, AggregationType.SUM );
+        DataElement dataElementB = createDataElement( 'B', ValueType.INTEGER_POSITIVE, AggregationType.SUM );
+        DataElement dataElementC = createDataElement( 'C', ValueType.INTEGER_ZERO_OR_POSITIVE, AggregationType.SUM );
+        DataElement dataElementD = createDataElement( 'D', ValueType.NUMBER, AggregationType.SUM );
+        DataElement dataElementE = createDataElement( 'E', ValueType.TEXT, AggregationType.SUM );
+        DataElement dataElementF = createDataElement( 'F', ValueType.LONG_TEXT, AggregationType.SUM );
+        DataElement dataElementG = createDataElement( 'G', ValueType.COORDINATE, AggregationType.SUM );
 
         dataElementService.addDataElement( dataElementA );
         dataElementService.addDataElement( dataElementB );

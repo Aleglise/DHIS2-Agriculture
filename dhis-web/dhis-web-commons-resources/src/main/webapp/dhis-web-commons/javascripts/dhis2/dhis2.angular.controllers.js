@@ -33,7 +33,8 @@ var d2Controllers = angular.module('d2Controllers', [])
         function($scope, 
                 $modalInstance,
                 CurrentSelection,
-                DHIS2URL,                
+                DHIS2URL,
+                DialogService,
                 location) {
     
     $scope.home = function(){        
@@ -47,17 +48,40 @@ var d2Controllers = angular.module('d2Controllers', [])
     };
     
     $scope.captureCoordinate = function(){
-        $scope.location = CurrentSelection.getLocation();
-        $modalInstance.close($scope.location);
+    	if( $scope.location && $scope.location.lng && $scope.location.lat ){
+    		$scope.location = CurrentSelection.getLocation();
+            $modalInstance.close($scope.location);
+    	}
+    	else{
+    		//notify user
+            var dialogOptions = {
+                headerText: 'error',
+                bodyText: 'nothing_captured'
+            };
+            DialogService.showDialog({}, dialogOptions);
+            return;
+    	}
     };
 })
 
 //Controller for audit history
-.controller('AuditHistoryController', function ($scope, $modalInstance, $modal, AuditHistoryDataService, DateUtils, eventId, dataType, nameIdMap) {
+.controller('AuditHistoryController', 
+    function ($scope, 
+            $modalInstance,
+            $translate,
+            AuditHistoryDataService, 
+            DateUtils, 
+            eventId, 
+            dataType, 
+            nameIdMap,
+            optionSets,
+            CommonUtils) {
 
     $scope.itemList = [];
 
-    $scope.model = {type: dataType};
+    $scope.model = {type: dataType, 
+    				name: dataType === 'dataElement' ? $translate.instant('data_element') : $translate.instant('attribute'),
+    				searchPlaceholder: dataType === 'dataElement' ? $translate.instant('search_by_data_element') : $translate.instant('search_by_attribute')};
 
     $scope.close = function () {
         $modalInstance.close();
@@ -68,37 +92,52 @@ var d2Controllers = angular.module('d2Controllers', [])
     AuditHistoryDataService.getAuditHistoryData(eventId, dataType).then(function (data) {
 
         $scope.itemList = [];
-
+        $scope.uniqueRows = [];
+        
         var reponseData = data.trackedEntityDataValueAudits ? data.trackedEntityDataValueAudits :
             data.trackedEntityAttributeValueAudits ? data.trackedEntityAttributeValueAudits : null;
 
         if (reponseData) {
-            for (var index = 0; index < reponseData.length; index++) {
-                var dataValue = reponseData[index];
-                /*The true/false values are displayed as Yes/No*/
-                if (dataValue.value === "true") {
-                    dataValue.value = "Yes";
-                } else if (dataValue.value === "false") {
-                    dataValue.value = "No";
-                }
-                
-                var obj = {};                
-                obj.auditType = dataValue.auditType;                
-                obj.value = dataValue.value;
-                obj.modifiedBy = dataValue.modifiedBy;
-                obj.created = DateUtils.formatToHrsMinsSecs(dataValue.created);
-                
+            for (var index = 0; index < reponseData.length; index++) {                
+                var dataValue = reponseData[index];                
+                var audit = {}, obj = {};
                 if (dataType === "attribute") {
-                    if (nameIdMap[dataValue.trackedEntityAttribute.id] && nameIdMap[dataValue.trackedEntityAttribute.id].displayName) {                        
-                        obj.name = nameIdMap[dataValue.trackedEntityAttribute.id].displayName;
+                    if (nameIdMap[dataValue.trackedEntityAttribute.id]) {
+                        obj = nameIdMap[dataValue.trackedEntityAttribute.id];
+                        audit.name = obj.displayName;
                     }
                 } else if (dataType === "dataElement") {
-                    if (nameIdMap[dataValue.dataElement.id] && nameIdMap[dataValue.dataElement.id].dataElement) {                        
-                        obj.name = nameIdMap[dataValue.dataElement.id].dataElement.displayName;
+                    if (nameIdMap[dataValue.dataElement.id] && nameIdMap[dataValue.dataElement.id].dataElement) {
+                        obj = nameIdMap[dataValue.dataElement.id].dataElement;
+                        audit.name = obj.displayFormName;
                     }
-                }                
-                $scope.itemList.push(obj);
+                }
+                
+                dataValue.value = CommonUtils.formatDataValue(null, dataValue.value, obj, optionSets, 'USER');
+                audit.auditType = dataValue.auditType;                
+                audit.value = dataValue.value;
+                audit.modifiedBy = dataValue.modifiedBy;
+                audit.created = DateUtils.formatToHrsMinsSecs(dataValue.created);                
+                
+                $scope.itemList.push(audit);
+                if( $scope.uniqueRows.indexOf(audit.name) === -1){
+                	$scope.uniqueRows.push(audit.name);
+                }
+                
+                if($scope.uniqueRows.length > 0){
+                	$scope.uniqueRows = $scope.uniqueRows.sort();
+                }
             }
         }
     });
+})
+.controller('ExportController', function($scope, $modalInstance) {
+
+    $scope.export = function (format) {
+        $modalInstance.close(format);
+    };
+
+    $scope.close = function() {
+        $modalInstance.close();
+    }
 });

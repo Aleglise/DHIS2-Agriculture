@@ -39,6 +39,8 @@ public class AnalyticsTableColumn
     
     private String alias;
     
+    private boolean skipIndex = false;
+    
     private String indexType;
 
     // -------------------------------------------------------------------------
@@ -61,13 +63,29 @@ public class AnalyticsTableColumn
      * @param name column name.
      * @param dataType column data type.
      * @param alias column alias and name.
-     * @param indexType index type.
+     * @param skipIndex indicates whether to skip indexing this column.
      */
-    public AnalyticsTableColumn( String name, String dataType, String alias, String indexType )
+    public AnalyticsTableColumn( String name, String dataType, String alias, boolean skipIndex )
     {
         this.name = name;
         this.dataType = dataType;
         this.alias = alias;
+        this.skipIndex = skipIndex;
+    }
+
+    /**
+     * @param name column name.
+     * @param dataType column data type.
+     * @param alias column alias and name.
+     * @param skipIndex indicates whether to skip indexing this column.
+     * @param indexType index type.
+     */
+    public AnalyticsTableColumn( String name, String dataType, String alias, boolean skipIndex, String indexType )
+    {
+        this.name = name;
+        this.dataType = dataType;
+        this.alias = alias;
+        this.skipIndex = skipIndex;
         this.indexType = indexType;
     }
 
@@ -103,6 +121,16 @@ public class AnalyticsTableColumn
     public void setAlias( String alias )
     {
         this.alias = alias;
+    }
+
+    public boolean isSkipIndex()
+    {
+        return skipIndex;
+    }
+
+    public void setSkipIndex( boolean skipIndex )
+    {
+        this.skipIndex = skipIndex;
     }
 
     public String getIndexType()

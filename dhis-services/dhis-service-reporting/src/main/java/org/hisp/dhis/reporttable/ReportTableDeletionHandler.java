@@ -30,6 +30,9 @@ package org.hisp.dhis.reporttable;
 
 import org.hisp.dhis.common.AnalyticalObjectService;
 import org.hisp.dhis.common.GenericAnalyticalObjectDeletionHandler;
+import org.hisp.dhis.legend.LegendSet;
+
+import java.util.List;
 
 /**
  * @author Lars Helge Overland
@@ -62,5 +65,17 @@ public class ReportTableDeletionHandler
     public String getClassName()
     {
         return ReportTable.class.getSimpleName();
+    }
+    
+    @Override
+    public void deleteLegendSet( LegendSet legendSet )
+    {
+        List<ReportTable> reportTables = reportTableService.getAnalyticalObjects( legendSet );
+        
+        for ( ReportTable table : reportTables )
+        {
+            table.setLegendSet( null );
+            reportTableService.update( table );
+        }
     }
 }

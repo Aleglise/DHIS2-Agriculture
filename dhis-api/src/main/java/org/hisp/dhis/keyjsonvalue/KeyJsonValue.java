@@ -50,6 +50,22 @@ public class KeyJsonValue
     /**
      * A value referenced by a key and namespace, json-formatted data stored as a string.
      */
+    private String plainValue;
+
+    /**
+     * Whether or not this KeyJsonValue is encrypted or not. Default is false.
+     */
+    private Boolean encrypted = false;
+
+    /**
+     * Encrypted value if encrypted is set to true
+     */
+    private String encryptedValue;
+
+    /**
+     * Temporary variable to hold any new values set during session; Will be made into the corrent type
+     * when being persisted (encrypted or plain)
+     */
     private String value;
 
     @JsonProperty
@@ -77,11 +93,48 @@ public class KeyJsonValue
     @JsonProperty
     public String getValue()
     {
-        return value;
+        if ( this.encrypted )
+        {
+            return this.encryptedValue;
+        }
+        else
+        {
+            return this.plainValue;
+        }
     }
 
     public void setValue( String value )
     {
         this.value = value;
+    }
+
+    public boolean isEncrypted()
+    {
+        return encrypted;
+    }
+
+    public void setEncrypted( boolean encrypted )
+    {
+        this.encrypted = encrypted;
+    }
+
+    public String getPlainValue()
+    {
+        return (!this.encrypted && this.value != null ? this.value : this.plainValue);
+    }
+
+    public void setPlainValue( String plainValue )
+    {
+        this.plainValue = plainValue;
+    }
+
+    public String getEncryptedValue()
+    {
+        return (this.encrypted && this.value != null ? this.value : this.encryptedValue);
+    }
+
+    public void setEncryptedValue( String encryptedValue )
+    {
+        this.encryptedValue = encryptedValue;
     }
 }

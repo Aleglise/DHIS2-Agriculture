@@ -277,7 +277,6 @@ public class EventChart
         this.endDate = endDate;
     }
 
-    @Override
     @JsonProperty
     @JsonSerialize( as = BaseIdentifiableObject.class )
     @JsonView( { DetailedView.class, ExportView.class, DimensionalView.class } )
@@ -293,7 +292,6 @@ public class EventChart
         this.dataElementValueDimension = dataElementValueDimension;
     }
 
-    @Override
     @JsonProperty
     @JsonSerialize( as = BaseIdentifiableObject.class )
     @JsonView( { DetailedView.class, ExportView.class, DimensionalView.class } )
@@ -351,7 +349,6 @@ public class EventChart
         this.outputType = outputType;
     }
 
-    @Override
     @JsonProperty
     @JsonView( { DetailedView.class, ExportView.class, DimensionalView.class } )
     @JacksonXmlProperty( namespace = DxfNamespaces.DXF_2_0 )

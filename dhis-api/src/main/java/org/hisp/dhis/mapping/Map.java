@@ -59,6 +59,8 @@ public class Map
     private Double latitude;
 
     private Integer zoom;
+    
+    private String basemap;
 
     @Scanned
     private List<MapView> mapViews = new ArrayList<>();
@@ -127,6 +129,19 @@ public class Map
 
     @JsonProperty
     @JsonView( { DetailedView.class, ExportView.class, DimensionalView.class } )
+    @JacksonXmlProperty( namespace = DxfNamespaces.DXF_2_0 )
+    public String getBasemap()
+    {
+        return basemap;
+    }
+
+    public void setBasemap( String basemap )
+    {
+        this.basemap = basemap;
+    }
+
+    @JsonProperty
+    @JsonView( { DetailedView.class, ExportView.class, DimensionalView.class } )
     @JacksonXmlElementWrapper( localName = "mapViews", namespace = DxfNamespaces.DXF_2_0 )
     @JacksonXmlProperty( localName = "mapView", namespace = DxfNamespaces.DXF_2_0 )
     public List<MapView> getMapViews()
@@ -154,6 +169,7 @@ public class Map
                 longitude = map.getLongitude();
                 latitude = map.getLatitude();
                 zoom = map.getZoom();
+                basemap = map.getBasemap();
             }
             else if ( mergeMode.isMerge() )
             {
@@ -161,6 +177,7 @@ public class Map
                 longitude = map.getLongitude() == null ? longitude : map.getLongitude();
                 latitude = map.getLatitude() == null ? latitude : map.getLatitude();
                 zoom = map.getZoom() == null ? zoom : map.getZoom();
+                basemap = map.getBasemap() == null ? basemap : map.getBasemap();
             }
 
             mapViews.clear();

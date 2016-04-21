@@ -40,6 +40,7 @@ import javax.annotation.Resource;
 
 import org.hisp.dhis.DhisSpringTest;
 import org.hisp.dhis.common.GenericIdentifiableObjectStore;
+import org.hisp.dhis.common.ReportingRate;
 import org.hisp.dhis.dataelement.DataElement;
 import org.hisp.dhis.dataelement.DataElementService;
 import org.hisp.dhis.dataset.DataSet;
@@ -86,7 +87,7 @@ public class ReportTableStoreTest
 
     private List<DataElement> dataElements;
     private List<Indicator> indicators;
-    private List<DataSet> dataSets;
+    private List<ReportingRate> reportingRates;
     private List<Period> periods;
     private List<OrganisationUnit> units;
     
@@ -98,8 +99,8 @@ public class ReportTableStoreTest
     private Indicator indicatorA;
     private Indicator indicatorB;
     
-    private DataSet dataSetA;
-    private DataSet dataSetB;
+    private ReportingRate reportingRateA;
+    private ReportingRate reportingRateB;
     
     private Period periodA;
     private Period periodB;
@@ -117,7 +118,7 @@ public class ReportTableStoreTest
     {
         dataElements = new ArrayList<>();
         indicators = new ArrayList<>();
-        dataSets = new ArrayList<>();
+        reportingRates = new ArrayList<>();
         periods = new ArrayList<>();
         units = new ArrayList<>();
        
@@ -145,14 +146,17 @@ public class ReportTableStoreTest
         indicators.add( indicatorA );
         indicators.add( indicatorB );
         
-        dataSetA = createDataSet( 'A', periodType );
-        dataSetB = createDataSet( 'B', periodType );
-        
+        DataSet dataSetA = createDataSet( 'A', periodType );
+        DataSet dataSetB = createDataSet( 'B', periodType );
+
         dataSetService.addDataSet( dataSetA );
         dataSetService.addDataSet( dataSetB );
         
-        dataSets.add( dataSetA );
-        dataSets.add( dataSetB );
+        reportingRateA = new ReportingRate( dataSetA );
+        reportingRateB = new ReportingRate( dataSetB );
+        
+        reportingRates.add( reportingRateA );
+        reportingRates.add( reportingRateB );
         
         periodA = createPeriod( periodType, getDate( 2000, 1, 1 ), getDate( 2000, 1, 31 ) );
         periodB = createPeriod( periodType, getDate( 2000, 2, 1 ), getDate( 2000, 2, 28 ) );
@@ -195,7 +199,7 @@ public class ReportTableStoreTest
             dataElements, new ArrayList<>(), new ArrayList<>(), periods, units,
             false, false, true, relativesB, null, "january_2000" );
         ReportTable reportTableC = new ReportTable( "Assualt",
-            new ArrayList<>(), new ArrayList<>(), dataSets, periods, units,
+            new ArrayList<>(), new ArrayList<>(), reportingRates, periods, units,
             false, false, true, relativesC, null, "january_2000" );
         
         int idA = reportTableStore.save( reportTableA );

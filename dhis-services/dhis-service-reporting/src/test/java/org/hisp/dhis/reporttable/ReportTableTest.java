@@ -39,8 +39,10 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.hisp.dhis.DhisSpringTest;
+import org.hisp.dhis.common.DataDimensionType;
 import org.hisp.dhis.common.DimensionalItemObject;
 import org.hisp.dhis.common.DimensionalObject;
+import org.hisp.dhis.common.ReportingRate;
 import org.hisp.dhis.dataelement.DataElement;
 import org.hisp.dhis.dataelement.DataElementCategoryCombo;
 import org.hisp.dhis.dataelement.DataElementCategoryOptionCombo;
@@ -67,7 +69,7 @@ public class ReportTableTest
     private List<DataElement> dataElements;
     private List<DataElementCategoryOptionCombo> categoryOptionCombos;
     private List<Indicator> indicators;
-    private List<DataSet> dataSets;
+    private List<ReportingRate> reportingRates;
     private List<Period> periods;
     private List<OrganisationUnit> units;
     private List<OrganisationUnit> relativeUnits;
@@ -88,8 +90,8 @@ public class ReportTableTest
     private Indicator indicatorA;
     private Indicator indicatorB;
 
-    private DataSet dataSetA;
-    private DataSet dataSetB;
+    private ReportingRate reportingRateA;
+    private ReportingRate reportingRateB;
     
     private Period periodA;
     private Period periodB;
@@ -119,7 +121,7 @@ public class ReportTableTest
         dataElements = new ArrayList<>();
         categoryOptionCombos = new ArrayList<>();
         indicators = new ArrayList<>();
-        dataSets = new ArrayList<>();
+        reportingRates = new ArrayList<>();
         periods = new ArrayList<>();
         units = new ArrayList<>();
         relativeUnits = new ArrayList<>();
@@ -145,7 +147,7 @@ public class ReportTableTest
         categoryOptionCombos.add( categoryOptionComboA );
         categoryOptionCombos.add( categoryOptionComboB );
 
-        categoryCombo = new DataElementCategoryCombo( "CategoryComboA" );
+        categoryCombo = new DataElementCategoryCombo( "CategoryComboA", DataDimensionType.DISAGGREGATION );
         categoryCombo.setId( 'A' );
         categoryCombo.setOptionCombos( new HashSet<>( categoryOptionCombos ) );
         
@@ -160,14 +162,17 @@ public class ReportTableTest
         indicators.add( indicatorA );
         indicators.add( indicatorB );
         
-        dataSetA = createDataSet( 'A', montlyPeriodType );
-        dataSetB = createDataSet( 'B', montlyPeriodType );
+        DataSet dataSetA = createDataSet( 'A', montlyPeriodType );
+        DataSet dataSetB = createDataSet( 'B', montlyPeriodType );
         
         dataSetA.setId( 'A' );
         dataSetB.setId( 'B' );
         
-        dataSets.add( dataSetA );
-        dataSets.add( dataSetB );        
+        reportingRateA = new ReportingRate( dataSetA );
+        reportingRateB = new ReportingRate( dataSetB );
+        
+        reportingRates.add( reportingRateA );
+        reportingRates.add( reportingRateB );
         
         periodA = createPeriod( montlyPeriodType, getDate( 2008, 1, 1 ), getDate( 2008, 1, 31 ) );
         periodB = createPeriod( montlyPeriodType, getDate( 2008, 2, 1 ), getDate( 2008, 2, 28 ) );
@@ -589,7 +594,7 @@ public class ReportTableTest
     public void testDataSetReportTableA()
     {
         ReportTable reportTable = new ReportTable( "Embezzlement",
-            new ArrayList<>(), new ArrayList<>(), dataSets, periods, units,
+            new ArrayList<>(), new ArrayList<>(), reportingRates, periods, units,
             true, true, false, relatives, null, "january_2000" );
 
         reportTable.init( null, null, null,  null, null, i18nFormat );
@@ -614,10 +619,10 @@ public class ReportTableTest
         assertNotNull( columnNames );
         assertEquals( 8, columnNames.size() );
         
-        assertTrue( columnNames.contains( "datasetshorta_year" ) );
-        assertTrue( columnNames.contains( "datasetshorta_reporting_month" ) );
-        assertTrue( columnNames.contains( "datasetshortb_year" ) );
-        assertTrue( columnNames.contains( "datasetshortb_reporting_month" ) );
+        assertTrue( columnNames.contains( "datasetshorta reporting rate_year" ) );
+        assertTrue( columnNames.contains( "datasetshorta reporting rate_reporting_month" ) );
+        assertTrue( columnNames.contains( "datasetshortb reporting rate_year" ) );
+        assertTrue( columnNames.contains( "datasetshortb reporting rate_reporting_month" ) );
         
         List<List<DimensionalItemObject>> rows = reportTable.getGridRows();
         
@@ -629,7 +634,7 @@ public class ReportTableTest
     public void testDataSetReportTableB()
     {
         ReportTable reportTable = new ReportTable( "Embezzlement",
-            new ArrayList<>(), new ArrayList<>(), dataSets, periods, units,
+            new ArrayList<>(), new ArrayList<>(), reportingRates, periods, units,
             false, false, true, relatives, null, "january_2000" );
 
         reportTable.init( null, null, null,  null, null, i18nFormat );
@@ -667,7 +672,7 @@ public class ReportTableTest
     public void testDataSetReportTableC()
     {        
         ReportTable reportTable = new ReportTable( "Embezzlement",
-            new ArrayList<>(), new ArrayList<>(), dataSets, periods, units,
+            new ArrayList<>(), new ArrayList<>(), reportingRates, periods, units,
             true, false, true, relatives, null, "january_2000" );
 
         reportTable.init( null, null, null,  null, null, i18nFormat );
@@ -692,10 +697,10 @@ public class ReportTableTest
         assertNotNull( columnNames );
         assertEquals( 4, columnNames.size() );
         
-        assertTrue( columnNames.contains( "datasetshorta_organisationunitshorta" ) );
-        assertTrue( columnNames.contains( "datasetshorta_organisationunitshortb" ) );
-        assertTrue( columnNames.contains( "datasetshortb_organisationunitshorta" ) );
-        assertTrue( columnNames.contains( "datasetshortb_organisationunitshortb" ) );
+        assertTrue( columnNames.contains( "datasetshorta reporting rate_organisationunitshorta" ) );
+        assertTrue( columnNames.contains( "datasetshorta reporting rate_organisationunitshortb" ) );
+        assertTrue( columnNames.contains( "datasetshortb reporting rate_organisationunitshorta" ) );
+        assertTrue( columnNames.contains( "datasetshortb reporting rate_organisationunitshortb" ) );
         
         List<List<DimensionalItemObject>> rows = reportTable.getGridRows();
         

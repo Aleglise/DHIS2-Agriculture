@@ -273,7 +273,7 @@ public class TrackedEntityInstanceQueryParams
     {
         if ( user != null && isOrganisationUnitMode( OrganisationUnitSelectionMode.ACCESSIBLE ) )
         {
-            setOrganisationUnits( user.getOrganisationUnits() );
+            setOrganisationUnits( user.getTeiSearchOrganisationUnitsWithFallback() );
             setOrganisationUnitMode( OrganisationUnitSelectionMode.DESCENDANTS );
         }
         else if ( isOrganisationUnitMode( CHILDREN ) )
@@ -288,6 +288,11 @@ public class TrackedEntityInstanceQueryParams
             setOrganisationUnits( organisationUnits );
             setOrganisationUnitMode( OrganisationUnitSelectionMode.SELECTED );
         }
+    }
+    
+    public void addAttributes( List<QueryItem> attrs )
+    {
+        attributes.addAll( attrs );
     }
     
     /**

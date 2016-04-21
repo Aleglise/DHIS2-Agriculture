@@ -55,12 +55,12 @@ import org.hisp.dhis.common.GridHeader;
 import org.hisp.dhis.common.IdentifiableObject;
 import org.hisp.dhis.common.IdentifiableObjectUtils;
 import org.hisp.dhis.common.MergeMode;
+import org.hisp.dhis.common.ReportingRate;
 import org.hisp.dhis.common.view.DetailedView;
 import org.hisp.dhis.common.view.DimensionalView;
 import org.hisp.dhis.common.view.ExportView;
 import org.hisp.dhis.dataelement.DataElement;
 import org.hisp.dhis.dataelement.DataElementCategoryCombo;
-import org.hisp.dhis.dataset.DataSet;
 import org.hisp.dhis.i18n.I18nFormat;
 import org.hisp.dhis.indicator.Indicator;
 import org.hisp.dhis.legend.LegendSet;
@@ -238,7 +238,7 @@ public class ReportTable
      * @param name              the name.
      * @param dataElements      the data elements.
      * @param indicators        the indicators.
-     * @param dataSets          the data sets.
+     * @param reportingRates    the reporting rates.
      * @param periods           the periods. Cannot have the name property set.
      * @param relativePeriods   the relative periods. These periods must have the
      *                          name property set. Not persisted.
@@ -251,7 +251,7 @@ public class ReportTable
      * @param i18nFormat        the i18n format. Not persisted.
      */
     public ReportTable( String name, List<DataElement> dataElements, List<Indicator> indicators,
-        List<DataSet> dataSets, List<Period> periods,
+        List<ReportingRate> reportingRates, List<Period> periods,
         List<OrganisationUnit> organisationUnits,
         boolean doIndicators, boolean doPeriods, boolean doUnits, RelativePeriods relatives, ReportParams reportParams,
         String reportingPeriodName )
@@ -259,7 +259,7 @@ public class ReportTable
         this.name = name;
         addAllDataDimensionItems( dataElements );
         addAllDataDimensionItems( indicators );
-        addAllDataDimensionItems( dataSets );
+        addAllDataDimensionItems( reportingRates );
         this.periods = periods;
         this.organisationUnits = organisationUnits;
         this.relatives = relatives;

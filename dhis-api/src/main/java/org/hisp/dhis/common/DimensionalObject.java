@@ -28,7 +28,6 @@ package org.hisp.dhis.common;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,9 +43,9 @@ import org.hisp.dhis.legend.LegendSet;
 import org.hisp.dhis.organisationunit.OrganisationUnitGroup;
 import org.hisp.dhis.organisationunit.OrganisationUnitGroupSet;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 
 /**
 * @author Lars Helge Overland
@@ -72,8 +71,8 @@ public interface DimensionalObject
     String OPTION_SEP = ";";
     String ITEM_SEP = "-";
         
-    List<String> STATIC_DIMS = Arrays.asList( 
-        LONGITUDE_DIM_ID, LATITUDE_DIM_ID );
+    List<String> STATIC_DIMS = ImmutableList.<String>builder().add( 
+        LONGITUDE_DIM_ID, LATITUDE_DIM_ID ).build();
     
     Map<String, String> PRETTY_NAMES = DimensionalObjectUtils.asMap( 
         DATA_X_DIM_ID, "Data",
@@ -93,11 +92,10 @@ public interface DimensionalObject
         put( OrganisationUnitGroupSet.class, OrganisationUnitGroup.class ).
         put( CategoryOptionGroupSet.class, CategoryOptionGroup.class ).build();
     
-    Set<ValueType> ARITHMETIC_VALUE_TYPES = Sets.newHashSet(
+    Set<ValueType> ARITHMETIC_VALUE_TYPES = ImmutableSet.<ValueType>builder().add(
         ValueType.BOOLEAN, ValueType.TRUE_ONLY, ValueType.NUMBER, ValueType.INTEGER, 
         ValueType.INTEGER_POSITIVE, ValueType.INTEGER_NEGATIVE, ValueType.INTEGER_ZERO_OR_POSITIVE, 
-        ValueType.UNIT_INTERVAL, ValueType.PERCENTAGE
-    );
+        ValueType.UNIT_INTERVAL, ValueType.PERCENTAGE ).build();
     
     /**
      * Gets the dimension identifier.

@@ -41,13 +41,11 @@ import org.hisp.dhis.dataelement.DataElementOperand;
 import org.hisp.dhis.dataset.DataSet;
 import org.hisp.dhis.datavalue.DataValue;
 import org.hisp.dhis.datavalue.DataValueService;
-import org.hisp.dhis.expression.ExpressionService;
 import org.hisp.dhis.i18n.I18nFormat;
 import org.hisp.dhis.i18n.I18nService;
 import org.hisp.dhis.message.MessageService;
 import org.hisp.dhis.organisationunit.OrganisationUnit;
 import org.hisp.dhis.organisationunit.OrganisationUnitService;
-import org.hisp.dhis.period.CalendarPeriodType;
 import org.hisp.dhis.period.Period;
 import org.hisp.dhis.period.PeriodService;
 import org.hisp.dhis.period.PeriodType;
@@ -56,6 +54,8 @@ import org.hisp.dhis.setting.SystemSettingManager;
 import org.hisp.dhis.user.CurrentUserService;
 import org.hisp.dhis.user.User;
 import org.hisp.dhis.user.UserGroup;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
@@ -102,13 +102,6 @@ public class DefaultValidationRuleService
         this.validationRuleGroupStore = validationRuleGroupStore;
     }
 
-    private ExpressionService expressionService;
-
-    public void setExpressionService( ExpressionService expressionService )
-    {
-        this.expressionService = expressionService;
-    }
-
     private PeriodService periodService;
 
     public void setPeriodService( PeriodService periodService )
@@ -123,11 +116,11 @@ public class DefaultValidationRuleService
         this.dataValueService = dataValueService;
     }
 
-    private DataElementCategoryService dataElementCategoryService;
+    private DataElementCategoryService categoryService;
 
-    public void setDataElementCategoryService( DataElementCategoryService dataElementCategoryService )
+    public void setCategoryService( DataElementCategoryService categoryService )
     {
-        this.dataElementCategoryService = dataElementCategoryService;
+        this.categoryService = categoryService;
     }
 
     private ConstantService constantService;
@@ -171,6 +164,9 @@ public class DefaultValidationRuleService
     {
         this.systemSettingManager = systemSettingManager;
     }
+    
+    @Autowired
+    private ApplicationContext applicationContext;
 
     // -------------------------------------------------------------------------
     // ValidationRule business logic
@@ -185,8 +181,13 @@ public class DefaultValidationRuleService
         List<Period> periods = periodService.getPeriodsBetweenDates( startDate, endDate );
         Collection<ValidationRule> rules = group != null ? group.getMembers() : getAllValidationRules();
 
-        Collection<ValidationResult> results = Validator.validate( sources, periods, rules, attributeCombo, null,
-            constantService, expressionService, periodService, dataValueService, dataElementCategoryService, currentUserService );
+        User user = currentUserService.getCurrentUser();
+        
+        Collection<ValidationResult> results = Validator.validate( ValidationRunContext.getNewContext( 
+            sources, periods, rules, attributeCombo, 
+            null, ValidationRunType.SCHEDULED, constantService.getConstantMap(), 
+            categoryService.getCogDimensionConstraints( user.getUserCredentials() ),
+            categoryService.getCoDimensionConstraints( user.getUserCredentials() ) ), applicationContext );
 
         formatPeriods( results, format );
 
@@ -210,17 +211,22 @@ public class DefaultValidationRuleService
         Collection<OrganisationUnit> sources = new HashSet<>();
         sources.add( source );
 
-        return Validator.validate( sources, periods, rules, null, null,
-            constantService, expressionService, periodService, dataValueService, dataElementCategoryService, currentUserService );
+        User user = currentUserService.getCurrentUser();
+        
+        return Validator.validate( ValidationRunContext.getNewContext( 
+            sources, periods, rules, null, null,
+            ValidationRunType.SCHEDULED, constantService.getConstantMap(), 
+            categoryService.getCogDimensionConstraints( user.getUserCredentials() ),
+            categoryService.getCoDimensionConstraints( user.getUserCredentials() ) ), applicationContext );
     }
 
     @Override
     public Collection<ValidationResult> validate( DataSet dataSet, Period period, OrganisationUnit source,
         DataElementCategoryOptionCombo attributeCombo )
     {
-        log.info( "Validate data set: " + dataSet.getName() + " period: " + period.getPeriodType().getName() + " "
+        log.debug( "Validate data set: " + dataSet.getName() + " period: " + period.getPeriodType().getName() + " "
             + period.getStartDate() + " " + period.getEndDate() + " source: " + source.getName()
-            + " attribute combo: " + (attributeCombo == null ? "[none]" : attributeCombo.getName()) );
+            + " attribute combo: " + ( attributeCombo == null ? "[none]" : attributeCombo.getName() ) );
 
         Collection<Period> periods = new ArrayList<>();
         periods.add( period );
@@ -232,8 +238,13 @@ public class DefaultValidationRuleService
         Collection<OrganisationUnit> sources = new HashSet<>();
         sources.add( source );
 
-        return Validator.validate( sources, periods, rules, attributeCombo, null,
-            constantService, expressionService, periodService, dataValueService, dataElementCategoryService, currentUserService );
+        User user = currentUserService.getCurrentUser();
+        
+        return Validator.validate( ValidationRunContext.getNewContext( 
+            sources, periods, rules, attributeCombo, null,
+            ValidationRunType.SCHEDULED, constantService.getConstantMap(), 
+            categoryService.getCogDimensionConstraints( user.getUserCredentials() ),
+            categoryService.getCoDimensionConstraints( user.getUserCredentials() ) ), applicationContext );
     }
 
     @Override
@@ -258,8 +269,13 @@ public class DefaultValidationRuleService
         log.info( "Scheduled monitoring run sources: " + sources.size() + ", periods: " + periods.size() + ", rules:" + rules.size()
             + ", last run: " + (lastScheduledRun == null ? "[none]" : lastScheduledRun) );
 
-        Collection<ValidationResult> results = Validator.validate( sources, periods, rules, null, lastScheduledRun,
-            constantService, expressionService, periodService, dataValueService, dataElementCategoryService, currentUserService );
+        User user = currentUserService.getCurrentUser();
+        
+        Collection<ValidationResult> results = Validator.validate( ValidationRunContext.getNewContext( 
+            sources, periods, rules, null, lastScheduledRun,
+            ValidationRunType.SCHEDULED, constantService.getConstantMap(), 
+            categoryService.getCogDimensionConstraints( user.getUserCredentials() ),
+            categoryService.getCoDimensionConstraints( user.getUserCredentials() ) ), applicationContext );
 
         log.info( "Validation run result count: " + results.size() );
 
@@ -370,9 +386,8 @@ public class DefaultValidationRuleService
 
         for ( PeriodType periodType : rulePeriodTypes )
         {
-            CalendarPeriodType calendarPeriodType = (CalendarPeriodType) periodType;
-            Period currentPeriod = calendarPeriodType.createPeriod();
-            Period previousPeriod = calendarPeriodType.getPreviousPeriod( currentPeriod );
+            Period currentPeriod = periodType.createPeriod();
+            Period previousPeriod = periodType.getPreviousPeriod( currentPeriod );
             periods.addAll( periodService.getIntersectingPeriodsByPeriodType( periodType,
                 previousPeriod.getStartDate(), currentPeriod.getEndDate() ) );
         }

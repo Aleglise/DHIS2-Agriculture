@@ -82,14 +82,15 @@ public class DataElementCategory
 
     }
 
-    public DataElementCategory( String name )
+    public DataElementCategory( String name, DataDimensionType dataDimensionType )
     {
+        this.dataDimensionType = dataDimensionType;
         this.name = name;
     }
 
-    public DataElementCategory( String name, List<DataElementCategoryOption> categoryOptions )
+    public DataElementCategory( String name, DataDimensionType dataDimensionType, List<DataElementCategoryOption> categoryOptions )
     {
-        this( name );
+        this( name, dataDimensionType );
         this.categoryOptions = categoryOptions;
     }
 

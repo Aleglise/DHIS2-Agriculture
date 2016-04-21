@@ -282,7 +282,7 @@ public class DefaultGmlImportService
     private Map<String, OrganisationUnit> getMatchingPersistedOrgUnits( Collection<String> identifiers, final IdentifiableProperty property )
     {
         List<OrganisationUnit> orgUnits = idObjectManager.getObjects( OrganisationUnit.class, property, identifiers );
-        return IdentifiableObjectUtils.getMap( orgUnits, IdScheme.from( property ) );
+        return IdentifiableObjectUtils.getIdMap( orgUnits, IdScheme.from( property ) );
     }
 
     private void mergeNonGeoData( OrganisationUnit source, OrganisationUnit target )

@@ -902,7 +902,7 @@ function organisationUnitSelected( orgUnits, orgUnitNames, children )
 	dhis2.de.currentOrganisationUnitId = orgUnits[0];
     var organisationUnitName = orgUnitNames[0];
 
-    $( '#selectedOrganisationUnit' ).val( organisationUnitName );
+    $( '#selectedOrganisationUnit' ).val( $( '<div/>' ).html( organisationUnitName ).text() ); // unescape
     $( '#currentOrganisationUnit' ).html( organisationUnitName );
 
     dhis2.de.getOrFetchDataSetList().then(function(data) {

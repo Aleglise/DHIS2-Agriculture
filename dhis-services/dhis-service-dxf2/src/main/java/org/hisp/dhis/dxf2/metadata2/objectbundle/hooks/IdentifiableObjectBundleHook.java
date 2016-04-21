@@ -37,22 +37,20 @@ import org.hisp.dhis.schema.Schema;
 import org.hisp.dhis.user.UserGroup;
 import org.hisp.dhis.user.UserGroupAccess;
 import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Morten Olav Hansen <mortenoh@gmail.com>
  */
 @Order( 0 )
-@Component
 public class IdentifiableObjectBundleHook extends AbstractObjectBundleHook
 {
     @Override
-    public void preCreate( IdentifiableObject identifiableObject, ObjectBundle objectBundle )
+    public void preCreate( IdentifiableObject identifiableObject, ObjectBundle bundle )
     {
         Schema schema = schemaService.getDynamicSchema( identifiableObject.getClass() );
         Session session = sessionFactory.getCurrentSession();
-        handleAttributeValues( session, identifiableObject, objectBundle, schema );
-        handleUserGroupAccesses( session, identifiableObject, objectBundle, schema );
+        handleAttributeValues( session, identifiableObject, bundle, schema );
+        handleUserGroupAccesses( session, identifiableObject, bundle, schema );
     }
 
     @Override
@@ -79,6 +77,12 @@ public class IdentifiableObjectBundleHook extends AbstractObjectBundleHook
     public void handleUserGroupAccesses( Session session, IdentifiableObject identifiableObject, ObjectBundle bundle, Schema schema )
     {
         if ( !schema.havePersistedProperty( "userGroupAccesses" ) ) return;
+
+        if ( bundle.isSkipSharing() )
+        {
+            identifiableObject.getUserGroupAccesses().clear();
+            return;
+        }
 
         for ( UserGroupAccess userGroupAccess : identifiableObject.getUserGroupAccesses() )
         {

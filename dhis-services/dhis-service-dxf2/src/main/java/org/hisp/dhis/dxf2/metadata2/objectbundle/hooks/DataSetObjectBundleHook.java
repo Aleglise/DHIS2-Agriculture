@@ -34,7 +34,7 @@ import org.hisp.dhis.dataelement.DataElementOperand;
 import org.hisp.dhis.dataset.DataSet;
 import org.hisp.dhis.dataset.Section;
 import org.hisp.dhis.dxf2.metadata2.objectbundle.ObjectBundle;
-import org.springframework.stereotype.Component;
+import org.hisp.dhis.period.PeriodType;
 
 import java.util.Map;
 import java.util.Set;
@@ -42,41 +42,52 @@ import java.util.Set;
 /**
  * @author Morten Olav Hansen <mortenoh@gmail.com>
  */
-@Component
 public class DataSetObjectBundleHook extends AbstractObjectBundleHook
 {
     @Override
-    public void preCreate( IdentifiableObject identifiableObject, ObjectBundle objectBundle )
+    public void preCreate( IdentifiableObject object, ObjectBundle bundle )
     {
-        if ( !DataSet.class.isInstance( identifiableObject ) ) return;
-        DataSet dataSet = (DataSet) identifiableObject;
+        if ( !DataSet.class.isInstance( object ) ) return;
+        DataSet dataSet = (DataSet) object;
 
         Session session = sessionFactory.getCurrentSession();
 
         for ( DataElementOperand dataElementOperand : dataSet.getCompulsoryDataElementOperands() )
         {
-            preheatService.connectReferences( dataElementOperand, objectBundle.getPreheat(), objectBundle.getPreheatIdentifier() );
+            preheatService.connectReferences( dataElementOperand, bundle.getPreheat(), bundle.getPreheatIdentifier() );
             session.save( dataElementOperand );
+        }
+
+        if ( dataSet.getPeriodType() != null )
+        {
+            PeriodType periodType = bundle.getPreheat().getPeriodTypeMap().get( dataSet.getPeriodType().getName() );
+            dataSet.setPeriodType( periodType );
         }
     }
 
     @Override
-    public void preUpdate( IdentifiableObject identifiableObject, ObjectBundle objectBundle )
+    public void preUpdate( IdentifiableObject object, ObjectBundle bundle )
     {
-        if ( !DataSet.class.isInstance( identifiableObject ) ) return;
-        DataSet dataSet = (DataSet) identifiableObject;
+        if ( !DataSet.class.isInstance( object ) ) return;
+        DataSet dataSet = (DataSet) object;
         dataSet.getCompulsoryDataElementOperands().clear();
+
+        if ( dataSet.getPeriodType() != null )
+        {
+            PeriodType periodType = bundle.getPreheat().getPeriodTypeMap().get( dataSet.getPeriodType().getName() );
+            dataSet.setPeriodType( periodType );
+        }
     }
 
     @Override
     @SuppressWarnings( "unchecked" )
-    public void postUpdate( IdentifiableObject identifiableObject, ObjectBundle objectBundle )
+    public void postUpdate( IdentifiableObject object, ObjectBundle bundle )
     {
-        if ( !DataSet.class.isInstance( identifiableObject ) ) return;
-        if ( !objectBundle.getObjectReferences().containsKey( Section.class ) ) return;
-        DataSet dataSet = (DataSet) identifiableObject;
+        if ( !DataSet.class.isInstance( object ) ) return;
+        if ( !bundle.getObjectReferences().containsKey( Section.class ) ) return;
+        DataSet dataSet = (DataSet) object;
 
-        Map<String, Object> references = objectBundle.getObjectReferences( Section.class ).get( dataSet.getUid() );
+        Map<String, Object> references = bundle.getObjectReferences( Section.class ).get( dataSet.getUid() );
         if ( references == null ) return;
 
         Set<DataElementOperand> dataElementOperands = (Set<DataElementOperand>) references.get( "compulsoryDataElementOperands" );
@@ -84,7 +95,7 @@ public class DataSetObjectBundleHook extends AbstractObjectBundleHook
 
         for ( DataElementOperand dataElementOperand : dataElementOperands )
         {
-            preheatService.connectReferences( dataElementOperand, objectBundle.getPreheat(), objectBundle.getPreheatIdentifier() );
+            preheatService.connectReferences( dataElementOperand, bundle.getPreheat(), bundle.getPreheatIdentifier() );
             sessionFactory.getCurrentSession().save( dataElementOperand );
             dataSet.getCompulsoryDataElementOperands().add( dataElementOperand );
         }

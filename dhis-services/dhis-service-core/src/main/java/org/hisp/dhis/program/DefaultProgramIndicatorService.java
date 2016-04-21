@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 
+import org.apache.commons.lang.StringUtils;
 import org.hisp.dhis.commons.sqlfunc.ConditionalSqlFunction;
 import org.hisp.dhis.commons.sqlfunc.DaysBetweenSqlFunction;
 import org.hisp.dhis.commons.sqlfunc.OneIfZeroOrPositiveSqlFunction;
@@ -405,7 +406,7 @@ public class DefaultProgramIndicatorService
             return null;
         }
         
-        String sql = "";
+        String sql = StringUtils.EMPTY;
         
         for ( String uid : uids )
         {

@@ -131,10 +131,13 @@ public class ObjectReport
         return errorReportsByCode.size();
     }
 
+
     @Override
     public String toString()
     {
         return MoreObjects.toStringHelper( this )
+            .add( "klass", klass )
+            .add( "index", index )
             .add( "errorReports", getErrorReports() )
             .toString();
     }

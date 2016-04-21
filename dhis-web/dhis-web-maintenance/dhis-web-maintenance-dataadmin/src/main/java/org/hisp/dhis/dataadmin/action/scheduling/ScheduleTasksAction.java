@@ -175,6 +175,18 @@ public class ScheduleTasksAction
         this.smsSchedulerStrategy = smsSchedulerStrategy;
     }
 
+    private String dataStatisticsStrategy;
+
+    public String getDataStatisticsStrategy()
+    {
+        return dataStatisticsStrategy;
+    }
+
+    public void setDataStatisticsStrategy( String dataStatisticsStrategy )
+    {
+        this.dataStatisticsStrategy = dataStatisticsStrategy;
+    }
+
     // -------------------------------------------------------------------------
     // Output
     // -------------------------------------------------------------------------
@@ -235,6 +247,10 @@ public class ScheduleTasksAction
         return lastSmsSchedulerSuccess;
     }
 
+    private Date lastDataStatisticSuccess;
+
+    public Date getLastDataStatisticSuccess() { return lastDataStatisticSuccess; }
+
     // -------------------------------------------------------------------------
     // Action implementation
     // -------------------------------------------------------------------------
@@ -258,14 +274,14 @@ public class ScheduleTasksAction
             else
             {
                 ListMap<String, String> cronKeyMap = new ListMap<>();
-
+                
                 // -------------------------------------------------------------
                 // Resource tables
                 // -------------------------------------------------------------
 
                 if ( STRATEGY_ALL_DAILY.equals( resourceTableStrategy ) )
                 {
-                    cronKeyMap.putValue( CRON_DAILY_0AM, TASK_RESOURCE_TABLE );
+                    cronKeyMap.putValue( CRON_DAILY_11PM, TASK_RESOURCE_TABLE );
                 }
                 else if ( STRATEGY_ALL_15_MIN.equals( resourceTableStrategy ) )
                 {
@@ -307,9 +323,9 @@ public class ScheduleTasksAction
                 // SMS Scheduler
                 // -------------------------------------------------------------
                 
-                if(STRATEGY_EVERY_MIDNIGHT.equals( smsSchedulerStrategy ))
+                if ( STRATEGY_EVERY_MIDNIGHT.equals( smsSchedulerStrategy ) )
                 {
-                    cronKeyMap.putValue(CRON_DAILY_11PM, TASK_SMS_SCHEDULER);
+                    cronKeyMap.putValue( CRON_DAILY_11PM, TASK_SMS_SCHEDULER );
                     cronKeyMap.putValue( CRON_DAILY_8AM, TASK_SEND_SCHEDULED_SMS );
                 }
 
@@ -363,7 +379,7 @@ public class ScheduleTasksAction
             {
                 dataSynchStrategy = STRATEGY_ENABLED;
             }
-            
+
             // -------------------------------------------------------------
             // SMS Scheduler
             // -------------------------------------------------------------
@@ -383,6 +399,7 @@ public class ScheduleTasksAction
         lastAnalyticsTableSuccess = (Date) systemSettingManager.getSystemSetting( SettingKey.LAST_SUCCESSFUL_ANALYTICS_TABLES_UPDATE );
         lastMonitoringSuccess = (Date) systemSettingManager.getSystemSetting( SettingKey.LAST_SUCCESSFUL_MONITORING );
         lastSmsSchedulerSuccess = (Date) systemSettingManager.getSystemSetting( SettingKey.LAST_SUCCESSFUL_SMS_SCHEDULING );
+        lastDataStatisticSuccess = (Date) systemSettingManager.getSystemSetting( SettingKey.LAST_SUCCESSFUL_DATA_STATISTIC );
         lastDataSyncSuccess = synchronizationManager.getLastSynchSuccess();
 
         log.info( "Status: " + status );

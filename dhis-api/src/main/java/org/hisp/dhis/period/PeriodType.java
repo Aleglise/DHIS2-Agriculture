@@ -539,6 +539,85 @@ public abstract class PeriodType
     public abstract String getIsoFormat();
 
     // -------------------------------------------------------------------------
+    // CalendarPeriodType
+    // -------------------------------------------------------------------------
+
+    /**
+     * Returns a Period which is the next of the given Period. Only valid
+     * Periods are returned. If the given Period is of different PeriodType than
+     * the executing PeriodType, or the given Period is invalid, the returned
+     * Period might overlap the given Period.
+     *
+     * @param period the Period to base the next Period on.
+     * @return a Period which is the next of the given Period.
+     */
+    public final Period getNextPeriod( Period period )
+    {
+        return getNextPeriod( period, getCalendar() );
+    }
+
+    /**
+     * Returns the next period determined by the given number of periods.
+     * 
+     * @param period the Period to base the next Period on.
+     * @param periods the number of periods into the future.
+     * @return the next period.
+     */
+    public Period getNextPeriod( Period period, int periods )
+    {
+        Period nextPeriod = period;
+        
+        if ( periods > 0 )
+        {
+            org.hisp.dhis.calendar.Calendar calendar = getCalendar();
+                    
+            for ( int i = 0; i < periods; i++ )
+            {
+                nextPeriod = getNextPeriod( nextPeriod, calendar );
+            }
+        }
+        
+        return nextPeriod;
+    }
+    
+    /**
+     * Returns a Period which is the next of the given Period. Only valid
+     * Periods are returned. If the given Period is of different PeriodType than
+     * the executing PeriodType, or the given Period is invalid, the returned
+     * Period might overlap the given Period.
+     *
+     * @param period the Period to base the next Period on.
+     * @param calendar the Calendar to use.
+     * @return a Period which is the next of the given Period.
+     */
+    public abstract Period getNextPeriod( Period period, org.hisp.dhis.calendar.Calendar calendar );
+
+    /**
+     * Returns a Period which is the previous of the given Period. Only valid
+     * Periods are returned. If the given Period is of different PeriodType than
+     * the executing PeriodType, or the given Period is invalid, the returned
+     * Period might overlap the given Period.
+     *
+     * @param period the Period to base the previous Period on.
+     * @return a Period which is the previous of the given Period.
+     */
+    public final Period getPreviousPeriod( Period period )
+    {
+        return getPreviousPeriod( period, getCalendar() );
+    }
+
+    /**
+     * Returns a Period which is the previous of the given Period. Only valid
+     * Periods are returned. If the given Period is of different PeriodType than
+     * the executing PeriodType, or the given Period is invalid, the returned
+     * Period might overlap the given Period.
+     *
+     * @param period the Period to base the previous Period on.
+     * @return a Period which is the previous of the given Period.
+     */
+    public abstract Period getPreviousPeriod( Period period, org.hisp.dhis.calendar.Calendar calendar );
+
+    // -------------------------------------------------------------------------
     // hashCode and equals
     // -------------------------------------------------------------------------
 

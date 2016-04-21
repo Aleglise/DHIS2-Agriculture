@@ -381,7 +381,7 @@
      *
      * @returns {Menu}
      */
-    defaultMenuUi = function (name, data, icon, container) {
+    defaultMenuUi = function (name, data, icon, container,label) {
         var defaultMenu = createMenu(),
             currentSelectedId = undefined;
 
@@ -391,6 +391,7 @@
         defaultMenu.ajax = false;
         defaultMenu.icon = icon;
         defaultMenu.container = container;
+        defaultMenu.label = label;
 
         if (typeof data === "string") {
             //TODO: Implement this
@@ -524,7 +525,7 @@
             linkItem = defaultMenu.template.parse('linkItem', {
                 "id": defaultMenu.name,
                 "iconName": defaultMenu.icon,
-                "menuItemName": menuData.name,
+                "menuItemName": defaultMenu.label ? defaultMenu.label : menuData.name,
                 "classes": cssDefaults.aMenuLinkClasses,
                 "menuItems": menuItems
             });
@@ -897,7 +898,7 @@
      * just creates an instance of the dhis2.menu object for each of the menus that are created.
      */
     dhis2menu.ui = {};
-    dhis2menu.ui.createMenu = function (menuName, menuData, options) {
+    dhis2menu.ui.createMenu = function (menuName, menuData, options,label) {
         var menu;
 
         if (typeof menuName !== "string")
@@ -916,7 +917,8 @@
                 menuName,
                 menuData,
                 options['icon'] || 'th', //th is the default font-awesome icon we use for menus
-                options['container'] || 'dhisDropDownMenu'); //dhisDropDownMenu is the default container for the menu
+                options['container'] || 'dhisDropDownMenu',
+                label);//dhisDropDownMenu is the default container for the menu
 
         if ( !! options['shortCut'] && keys[options['shortCut']]) {
             menu.shortCutKey = keys[options['shortCut']];
@@ -946,18 +948,29 @@
  */
 (function () {
     var helpPageLink = "";
-
+    var userProfile;
     dhis2.menu.ui.initMenu = function () {
         try {
-            dhis2.menu.ui.loadingStatus = jQuery.ajax({
+
+            var helpPagePromise = jQuery.ajax({
                 type : "GET",
                 url : dhis2.settings.getBaseUrl() + "/dhis-web-commons/menu/getHelpPageLinkModule.action",
-                dataType : "json",
-                success : function(json) {
-                    helpPageLink = json;
+                dataType : "json"
+            });
+            var userProfilePromise = jQuery.ajax({
+                type: "GET",
+                url: dhis2.settings.getBaseUrl() + "/api/me/profile.json",
+                dataType: "json"
+            });
+
+            dhis2.menu.ui.loadingStatus = $.when(helpPagePromise, userProfilePromise).then(function(helpPageResponse, userProfileResponse){
+                if(userProfileResponse && userProfileResponse.length >= 2 && userProfileResponse[1] === "success"){
+                    userProfile = userProfileResponse[0];
+                }
+                if(helpPageResponse && helpPageResponse.length >= 2 && helpPageResponse[1] === "success"){
+                    helpPageLink = helpPageResponse[0];
                     bootstrapMenu();
-                },
-                error: function () {
+                }else{
                     bootstrapMenu();
                 }
             });
@@ -968,9 +981,17 @@
         }
     };
 
+    function getProfileMenuName(){
+        var userProfileName = "profile";
+        if(userProfile && userProfile.firstName && userProfile.surname){
+            userProfileName = userProfile.firstName + " "+userProfile.surname;
+        }
+        return userProfileName;
+    }
+
     function bootstrapMenu() {
         var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
+        var profileMenuName = getProfileMenuName();
         dhis2.menu.ui.createMenu("profile", [
                 {
                     name: "settings",
@@ -993,20 +1014,11 @@
                     icon: "../icons/function-account.png",
                     description: ""
                 },
-                // add for Active user List 
-                {
-                    name: "active_user_list",
-                    namespace: "/dhis-web-commons-about",
-                    defaultAction: "../dhis-web-commons-about/activeUserList.action",
-                    icon: "../icons/active-user-list.png",
-                    description: ""
-                },
-                
                 {
                     name: "help",
                     namespace: "/dhis-web-commons-about",
                     defaultAction: helpPageLink.defaultAction || "", //FIXME: This sets the help url to an empty string when the ajax call failed. We should find an alternative.
-                    icon: "../icons/function-account.png",
+                    icon: "../icons/function-help.png",
                     description: ""
                 },
                 {
@@ -1027,7 +1039,8 @@
             {
                 icon: "user",
                 shortCut: "comma"
-            }
+            },
+            profileMenuName
         );
 
         dhis2.menu.mainAppMenu = dhis2.menu.ui.createMenu("applications",

@@ -42,9 +42,9 @@ import org.hisp.dhis.sms.SmsSender;
 import org.hisp.dhis.sms.incoming.IncomingSms;
 import org.hisp.dhis.sms.incoming.IncomingSmsService;
 import org.hisp.dhis.sms.outbound.OutboundSms;
+import org.hisp.dhis.sms.outbound.SmsBatch;
 import org.hisp.dhis.webapi.service.WebMessageService;
 import org.hisp.dhis.webapi.utils.WebMessageUtils;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,6 +55,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * Zubair <rajazubair.asghar@gmail.com>
  */
+
 @RestController
 @RequestMapping( value = "/sms" )
 public class SmsController
@@ -105,12 +106,11 @@ public class SmsController
 
     @PreAuthorize( "hasRole('ALL') or hasRole(' F_MOBILE_SENDSMS')" )
     @RequestMapping( value = "/outbound", method = RequestMethod.POST, consumes = "application/json" )
-    public void sendSMSMessage( @RequestParam( required = false ) boolean async, HttpServletResponse response,
-        HttpServletRequest request)
-            throws WebMessageException, IOException
+    public void sendSMSMessage( HttpServletResponse response, HttpServletRequest request )
+        throws WebMessageException, IOException
     {
         OutboundSms sms = renderService.fromJson( request.getInputStream(), OutboundSms.class );
-
+        
         String result = smsSender.sendMessage( sms );
 
         if ( result.equals( "success" ) )
@@ -121,7 +121,25 @@ public class SmsController
         {
             throw new WebMessageException( WebMessageUtils.error( result ) );
         }
+    }
 
+    @PreAuthorize( "hasRole('ALL') or hasRole(' F_MOBILE_SENDSMS')" )
+    @RequestMapping( value = "/outbound/batch", method = RequestMethod.POST, consumes = "application/json" )
+    public void sendSMSBatch( HttpServletResponse response, HttpServletRequest request )
+        throws WebMessageException, IOException
+    {
+        SmsBatch smsBatch = renderService.fromJson( request.getInputStream(), SmsBatch.class );
+
+        String result = smsSender.sendMessage( smsBatch.getSmsBatch() );
+
+        if ( result.equals( "success" ) )
+        {
+            webMessageService.send( WebMessageUtils.ok( "SENT" ), response, request );
+        }
+        else
+        {
+            throw new WebMessageException( WebMessageUtils.error( result ) );
+        }
     }
 
     @RequestMapping( value = "/inbound", method = RequestMethod.POST )
@@ -144,7 +162,6 @@ public class SmsController
         int smsId = incomingSMSService.save( message, originator, gateway, receivedTime );
 
         webMessageService.send( WebMessageUtils.ok( "Received SMS: " + smsId ), response, request );
-
     }
 
     @RequestMapping( value = "/inbound", method = RequestMethod.POST, consumes = "application/json" )

@@ -9,29 +9,12 @@ $( document ).ready( function()
 	{
 		$( '.scheduling' ).removeAttr( 'disabled' );
 	}
-	
-	if ( $( '#dataMartStrategy' ).val() == 'disabled' )
-	{
-		$( '.dataMart' ).attr( 'disabled', 'disabled' );
-	}
 } );
 
 function submitSchedulingForm()
 {
 	$( '.scheduling' ).removeAttr( 'disabled' );
 	$( '#schedulingForm' ).submit();
-}
-
-function toggleDataMart()
-{
-	if ( $( '#dataMartStrategy' ).val() == 'never' )
-	{
-		$( '.dataMart' ).attr( 'disabled', 'disabled' );
-	}
-	else
-	{
-		$( '.dataMart' ).removeAttr( 'disabled' );
-	}
 }
 
 function toggleMoreOptions()

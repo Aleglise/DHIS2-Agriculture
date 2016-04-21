@@ -105,7 +105,11 @@ public class DefaultMaintenanceService
     @Override
     public int deleteZeroDataValues()
     {
-        return maintenanceStore.deleteZeroDataValues();
+        int result = maintenanceStore.deleteZeroDataValues();
+        
+        log.info( "Deleted zero data values: " + result );
+        
+        return result;
     }
     
     @Override
@@ -144,18 +148,21 @@ public class DefaultMaintenanceService
         dataValueAuditService.deleteDataValueAudits( organisationUnit );
         dataValueService.deleteDataValues( organisationUnit );
         
+        log.info( "Pruned data for organisation unit: " + organisationUnit );
+        
         return true;
     }
 
     @Override
-    public void removeExpiredInvitations()
+    public int removeExpiredInvitations()
     {
         UserQueryParams params = new UserQueryParams();
         params.setInvitationStatus( UserInvitationStatus.EXPIRED );
         
-        int count = userService.getUserCount( params );
+        int userCount = userService.getUserCount( params );
+        int removeCount = 0;
         
-        PageRange range = new PageRange( count ).setPageSize( 200 );
+        PageRange range = new PageRange( userCount ).setPageSize( 200 );
         List<int[]> pages = range.getPages();
         Collections.reverse( pages ); // Iterate from end since users are deleted
         
@@ -171,7 +178,8 @@ public class DefaultMaintenanceService
             {
                 try
                 {
-                    userService.deleteUser( user );
+                    userService.deleteUser( user );                    
+                    removeCount++;
                 }
                 catch ( DeleteNotAllowedException ex )
                 {
@@ -179,5 +187,9 @@ public class DefaultMaintenanceService
                 }
             }
         }
+        
+        log.info( "Removed expired invitations: " + removeCount );
+        
+        return removeCount;
     }
 }

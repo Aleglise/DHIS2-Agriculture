@@ -23,6 +23,15 @@
 
 	<bean id="org.hisp.dhis.mobile.action.NoAction" class="org.hisp.dhis.mobile.action.NoAction"
 		scope="prototype" />
+		
+	<bean id="org.hisp.dhis.mobile.action.incoming.ReceivingSMSAction"
+		class="org.hisp.dhis.mobile.action.incoming.ReceivingSMSAction" 
+		scope="prototype">
+		<property name="incomingSmsService"
+			ref="org.hisp.dhis.sms.incoming.IncomingSmsService" />
+		<property name="userService" ref="org.hisp.dhis.user.UserService" />
+		<property name="currentUserService" ref="org.hisp.dhis.user.CurrentUserService" />
+	</bean>
 
 	<bean id="org.hisp.dhis.mobile.action.incoming.DeleteReceiveSMSAction"
 		class="org.hisp.dhis.mobile.action.incoming.DeleteReceiveSMSAction"

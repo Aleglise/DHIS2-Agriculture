@@ -109,7 +109,7 @@ public class JdbcOrgUnitTargetTableManager
     @Async
     public Future<?> populateTableAsync( ConcurrentLinkedQueue<AnalyticsTable> tables )
     {
-        taskLoop : while ( true )
+        taskLoop: while ( true )
         {
             AnalyticsTable table = tables.poll();
                 
@@ -156,7 +156,7 @@ public class JdbcOrgUnitTargetTableManager
     {
         List<AnalyticsTableColumn> columns = new ArrayList<>();
 
-        Collection<OrganisationUnitLevel> levels =
+        List<OrganisationUnitLevel> levels =
             organisationUnitService.getFilledOrganisationUnitLevels();
                 
         for ( OrganisationUnitLevel level : levels )

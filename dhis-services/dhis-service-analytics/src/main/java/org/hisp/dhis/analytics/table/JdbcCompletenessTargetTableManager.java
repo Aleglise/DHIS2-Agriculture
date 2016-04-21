@@ -110,7 +110,7 @@ public class JdbcCompletenessTargetTableManager
     @Async
     public Future<?> populateTableAsync( ConcurrentLinkedQueue<AnalyticsTable> tables )
     {
-        taskLoop : while ( true )
+        taskLoop: while ( true )
         {
             AnalyticsTable table = tables.poll();
                 
@@ -118,49 +118,72 @@ public class JdbcCompletenessTargetTableManager
             {
                 break taskLoop;
             }
-
-            final String tableName = table.getTempTableName();
-
-            String sql = "insert into " + table.getTempTableName() + " (";
-
-            List<AnalyticsTableColumn> columns = getDimensionColumns( table );
             
-            validateDimensionColumns( columns );
-
-            for ( AnalyticsTableColumn col : columns )
-            {
-                sql += col.getName() + ",";
-            }
-    
-            sql += "value) select ";
-    
-            for ( AnalyticsTableColumn col : columns )
-            {
-                sql += col.getAlias() + ",";
-            }
-                        
-            sql +=
-                "1 as value " +
-                "from datasetsource dss " +
-                "inner join dataset ds on dss.datasetid=ds.datasetid " +
-                "left join _orgunitstructure ous on dss.sourceid=ous.organisationunitid " +
-                "left join _organisationunitgroupsetstructure ougs on dss.sourceid=ougs.organisationunitid";            
-    
-            populateAndLog( sql, tableName );
+            populateTable( table, 
+                "1 as value", 
+                "cc.name = 'default'" );
+            
+            populateTable( table, 
+                "(select count(*) from categoryoption_organisationunits coou " +
+                "inner join categories_categoryoptions cco on coou.categoryoptionid=cco.categoryoptionid " +
+                "inner join categorycombos_categories ccco on cco.categoryid=ccco.categoryid " +
+                "where ds.categorycomboid=ccco.categorycomboid " +
+                "and dss.sourceid=coou.organisationunitid) as value", 
+                "cc.name != 'default'" );
         }
         
         return null;
     }
+    
+    /**
+     * Populates the given analytics table.
+     * 
+     * @param table the analytics table.
+     * @param valueClause the value part of the select clause.
+     * @param categoryComboWhereClause the category condition for the where clause.
+     */
+    private void populateTable( AnalyticsTable table, String valueClause, String categoryComboWhereClause )
+    {
+        final String tableName = table.getTempTableName();
 
+        String sql = "insert into " + table.getTempTableName() + " (";
+
+        List<AnalyticsTableColumn> columns = getDimensionColumns( table );
+        
+        validateDimensionColumns( columns );
+
+        for ( AnalyticsTableColumn col : columns )
+        {
+            sql += col.getName() + ",";
+        }
+
+        sql += "value) select ";
+
+        for ( AnalyticsTableColumn col : columns )
+        {
+            sql += col.getAlias() + ",";
+        }
+                    
+        sql += valueClause + " " +
+            "from datasetsource dss " +
+            "inner join dataset ds on dss.datasetid=ds.datasetid " +
+            "inner join categorycombo cc on ds.categorycomboid=cc.categorycomboid " +
+            "left join _orgunitstructure ous on dss.sourceid=ous.organisationunitid " +
+            "left join _organisationunitgroupsetstructure ougs on dss.sourceid=ougs.organisationunitid " +
+            "where " + categoryComboWhereClause;
+
+        populateAndLog( sql, tableName );
+    }
+    
     @Override
     public List<AnalyticsTableColumn> getDimensionColumns( AnalyticsTable table )
     {
         List<AnalyticsTableColumn> columns = new ArrayList<>();
 
-        Collection<OrganisationUnitGroupSet> orgUnitGroupSets = 
+        List<OrganisationUnitGroupSet> orgUnitGroupSets = 
             idObjectManager.getDataDimensionsNoAcl( OrganisationUnitGroupSet.class );
         
-        Collection<OrganisationUnitLevel> levels =
+        List<OrganisationUnitLevel> levels =
             organisationUnitService.getFilledOrganisationUnitLevels();
         
         for ( OrganisationUnitGroupSet groupSet : orgUnitGroupSets )

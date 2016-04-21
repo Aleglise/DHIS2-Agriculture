@@ -34,12 +34,10 @@ import org.hisp.dhis.schema.Schema;
 import org.hisp.dhis.schema.SchemaDescriptor;
 import org.hisp.dhis.security.Authority;
 import org.hisp.dhis.security.AuthorityType;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Morten Olav Hansen <mortenoh@gmail.com>
  */
-@Component
 public class ProgramTrackedEntityAttributeSchemaDescriptor implements SchemaDescriptor
 {
     public static final String SINGULAR = "programTrackedEntityAttribute";
@@ -53,7 +51,6 @@ public class ProgramTrackedEntityAttributeSchemaDescriptor implements SchemaDesc
     {
         Schema schema = new Schema( ProgramTrackedEntityAttribute.class, SINGULAR, PLURAL );
         schema.setRelativeApiEndpoint( API_ENDPOINT );
-        schema.setShareable( true );
         schema.setOrder( 1420 );
 
         schema.getAuthorities().add( new Authority( AuthorityType.CREATE_PUBLIC, Lists.newArrayList( "F_PROGRAM_PUBLIC_ADD" ) ) );

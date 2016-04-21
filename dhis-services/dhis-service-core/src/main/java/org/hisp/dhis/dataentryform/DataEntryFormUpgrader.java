@@ -34,15 +34,14 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hisp.dhis.system.startup.AbstractStartupRoutine;
-import org.springframework.transaction.annotation.Transactional;
+import org.hisp.dhis.system.startup.TransactionContextStartupRoutine;
 
 /**
  * Upgrades the format of the input field identifiers from the legacy
  * "value[12].value:value[34].value" to the new "12-34-val"
  */
 public class DataEntryFormUpgrader
-    extends AbstractStartupRoutine
+    extends TransactionContextStartupRoutine
 {
     private static final Log log = LogFactory.getLog( DataEntryFormUpgrader.class );
 
@@ -65,9 +64,8 @@ public class DataEntryFormUpgrader
     // Implementation method
     // -------------------------------------------------------------------------
 
-    @Transactional
     @Override
-    public void execute()
+    public void executeInTransaction()
     {
         Collection<DataEntryForm> dataEntryForms = dataEntryFormService.getAllDataEntryForms();
 

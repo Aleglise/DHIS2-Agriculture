@@ -29,16 +29,23 @@ package org.hisp.dhis.sms.outbound;
  */
 
 import java.util.List;
+import java.util.Set;
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.hisp.dhis.sms.config.BulkSmsGatewayConfig;
-import org.hisp.dhis.sms.config.ClickatellGatewayConfig;
 import org.hisp.dhis.sms.config.GatewayAdministrationService;
 import org.hisp.dhis.sms.config.SmsGatewayConfig;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.google.common.collect.Sets;
+
+/**
+ * Zubair <rajazubair.asghar@gmail.com>
+ */
 public class DefaultOutboundSmsTransportService
     implements OutboundSmsTransportService
 {
@@ -59,10 +66,7 @@ public class DefaultOutboundSmsTransportService
     private GatewayAdministrationService gatewayAdminService;
 
     @Autowired
-    private BulkSmsGateway bulkSmsGateway;
-
-    @Autowired
-    private ClickatellGateway clickatellGateway;
+    private List<SmsGateway> smsGateways;
 
     // -------------------------------------------------------------------------
     // OutboundSmsTransportService implementation
@@ -75,7 +79,7 @@ public class DefaultOutboundSmsTransportService
 
         if ( gatewayConfiguration == null )
         {
-            return GatewayResponse.FAILED;
+            return GatewayResponse.NO_GATWAY_CONFIGURATION;
         }
 
         return sendMessage( sms, gatewayConfiguration );
@@ -88,7 +92,7 @@ public class DefaultOutboundSmsTransportService
 
         if ( gatewayConfiguration == null )
         {
-            return GatewayResponse.FAILED;
+            return GatewayResponse.NO_GATWAY_CONFIGURATION;
         }
 
         return sendMessage( sms, gatewayConfiguration );
@@ -109,7 +113,7 @@ public class DefaultOutboundSmsTransportService
 
         if ( gatewayConfiguration == null )
         {
-            return GatewayResponse.FAILED;
+            return GatewayResponse.NO_GATWAY_CONFIGURATION;
         }
 
         return sendMessage( smsBatch, gatewayConfiguration );
@@ -122,8 +126,9 @@ public class DefaultOutboundSmsTransportService
 
         if ( gatewayConfiguration == null )
         {
-            return GatewayResponse.FAILED;
+            return GatewayResponse.NO_GATWAY_CONFIGURATION;
         }
+
         return sendMessage( smsBatch, gatewayConfiguration );
     }
 
@@ -131,72 +136,49 @@ public class DefaultOutboundSmsTransportService
     // Supportive methods
     // -------------------------------------------------------------------------
 
-    private GatewayResponse sendMessage( OutboundSms sms, SmsGatewayConfig gatewayConfiguration )
+    private GatewayResponse sendMessage( OutboundSms sms, SmsGatewayConfig gatewayConfig )
     {
-        GatewayResponse gatewayResponse = null;
-
-        if ( gatewayConfiguration instanceof BulkSmsGatewayConfig )
+        for ( SmsGateway smsGateway : smsGateways )
         {
-            BulkSmsGatewayConfig bulkSmsConfiguration = (BulkSmsGatewayConfig) gatewayConfiguration;
+            if ( smsGateway.accept( gatewayConfig ) )
+            {
+                GatewayResponse gatewayResponse = smsGateway.send( sms, gatewayConfig );
 
-            gatewayResponse = bulkSmsGateway.send( sms, bulkSmsConfiguration );
+                return responseHandler( Arrays.asList( sms ), gatewayResponse );
+            }
         }
 
-        if ( gatewayConfiguration instanceof ClickatellGatewayConfig )
-        {
-            ClickatellGatewayConfig clickatellConfiguration = (ClickatellGatewayConfig) gatewayConfiguration;
-
-            gatewayResponse = clickatellGateway.send( sms, clickatellConfiguration );
-        }
-
-        if ( GatewayResponse.RESULT_CODE_0 == gatewayResponse || GatewayResponse.RESULT_CODE_200 == gatewayResponse
-            || GatewayResponse.RESULT_CODE_202 == gatewayResponse )
-        {
-            sms.setStatus( OutboundSmsStatus.SENT );
-            saveMessage( sms );
-
-            log.info( "Message Sent:" + sms );
-
-            return GatewayResponse.SENT;
-        }
-        else
-        {
-            sms.setStatus( OutboundSmsStatus.ERROR );
-            saveMessage( sms );
-
-            log.info( "Message Failed:" + sms );
-            log.info( "Failure cause : " + gatewayResponse );
-
-            return gatewayResponse;
-        }
+        return GatewayResponse.NO_GATWAY_CONFIGURATION;
     }
 
-    private GatewayResponse sendMessage( List<OutboundSms> smsBatch, SmsGatewayConfig gatewayConfiguration )
+    private GatewayResponse sendMessage( List<OutboundSms> smsBatch, SmsGatewayConfig gatewayConfig )
     {
-        GatewayResponse gatewayResponse = null;
-
-        if ( gatewayConfiguration instanceof BulkSmsGatewayConfig )
+        for ( SmsGateway smsGateway : smsGateways )
         {
-            BulkSmsGatewayConfig bulkSmsConfiguration = (BulkSmsGatewayConfig) gatewayConfiguration;
+            if ( smsGateway.accept( gatewayConfig ) )
+            {
+                GatewayResponse gatewayResponse = smsGateway.send( smsBatch, gatewayConfig );
 
-            gatewayResponse = bulkSmsGateway.send( smsBatch, bulkSmsConfiguration );
+                return responseHandler( smsBatch, gatewayResponse );
+            }
         }
 
-        if ( gatewayConfiguration instanceof ClickatellGatewayConfig )
-        {
-            ClickatellGatewayConfig clickatellConfiguration = (ClickatellGatewayConfig) gatewayConfiguration;
+        return GatewayResponse.NO_GATWAY_CONFIGURATION;
+    }
 
-            gatewayResponse = clickatellGateway.send( smsBatch, clickatellConfiguration );
-        }
-
-        if ( GatewayResponse.RESULT_CODE_0 == gatewayResponse )
+    private GatewayResponse responseHandler( Collection<OutboundSms> smsBatch, GatewayResponse gatewayResponse )
+    {
+        Set<GatewayResponse> okCodes = Sets.newHashSet( GatewayResponse.RESULT_CODE_0, 
+            GatewayResponse.RESULT_CODE_200, GatewayResponse.RESULT_CODE_202 );
+        
+        if ( okCodes.contains( gatewayResponse ) )
         {
             for ( OutboundSms sms : smsBatch )
             {
                 sms.setStatus( OutboundSmsStatus.SENT );
                 saveMessage( sms );
 
-                log.info( "Following Message Sent:" + sms );
+                log.info( "Message sent: " + sms );
             }
 
             return GatewayResponse.SENT;
@@ -208,8 +190,8 @@ public class DefaultOutboundSmsTransportService
                 sms.setStatus( OutboundSmsStatus.ERROR );
                 saveMessage( sms );
 
-                log.info( "Following Message Failed:" + sms );
-                log.info( "Failure cause : " + gatewayResponse );
+                log.info( "Message failed: " + sms );
+                log.info( "Failure cause: " + gatewayResponse );
             }
 
             return gatewayResponse;

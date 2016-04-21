@@ -69,6 +69,7 @@ import org.hisp.dhis.period.PeriodType;
 import org.hisp.dhis.program.ProgramStage;
 import org.hisp.dhis.program.ProgramStageDataElement;
 import org.hisp.dhis.program.ProgramValidation;
+import org.hisp.dhis.programrule.ProgramRuleAction;
 import org.hisp.dhis.schema.Schema;
 import org.hisp.dhis.schema.SchemaService;
 import org.hisp.dhis.schema.validation.SchemaValidator;
@@ -612,6 +613,7 @@ public class DefaultIdentifiableObjectImporter<T extends BaseIdentifiableObject>
 
         if ( (object.getName() == null || object.getName().length() == 0)
             && !DashboardItem.class.isInstance( object ) && !Translation.class.isInstance( object )
+            && !ProgramRuleAction.class.isAssignableFrom( object.getClass() )
             && !ProgramStageDataElement.class.isInstance( object ) )
         {
             conflict = new ImportConflict( IdentifiableObjectUtils.getDisplayName( object ), "Empty name for object " + object );
@@ -629,6 +631,7 @@ public class DefaultIdentifiableObjectImporter<T extends BaseIdentifiableObject>
                 && !CategoryOptionGroupSet.class.isAssignableFrom( object.getClass() )
                 && !DashboardItem.class.isAssignableFrom( object.getClass() )
                 && !ProgramStageDataElement.class.isAssignableFrom( object.getClass() )
+                && !ProgramRuleAction.class.isAssignableFrom( object.getClass() )
                 && !Constant.class.isAssignableFrom( object.getClass() ) )
             {
                 conflict = new ImportConflict( IdentifiableObjectUtils.getDisplayName( object ), "Empty shortName for object " + object );
@@ -1208,6 +1211,8 @@ public class DefaultIdentifiableObjectImporter<T extends BaseIdentifiableObject>
 
         private void saveUserGroupAccess( T object, Set<UserGroupAccess> userGroupAccesses )
         {
+            object.getUserGroupAccesses().clear();
+
             for ( UserGroupAccess uga : userGroupAccesses )
             {
                 UserGroup userGroup = objectBridge.getObject( uga.getUserGroup() );

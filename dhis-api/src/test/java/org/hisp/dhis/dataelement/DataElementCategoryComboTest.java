@@ -33,6 +33,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
+import org.hisp.dhis.common.DataDimensionType;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -68,9 +69,9 @@ public class DataElementCategoryComboTest
         categoryOptionE = new DataElementCategoryOption( "OptionE" );
         categoryOptionF = new DataElementCategoryOption( "OptionF" );
         
-        categoryA = new DataElementCategory( "CategoryA" );
-        categoryB = new DataElementCategory( "CategoryB" );
-        categoryC = new DataElementCategory( "CategoryC" );
+        categoryA = new DataElementCategory( "CategoryA", DataDimensionType.DISAGGREGATION );
+        categoryB = new DataElementCategory( "CategoryB", DataDimensionType.DISAGGREGATION );
+        categoryC = new DataElementCategory( "CategoryC", DataDimensionType.DISAGGREGATION );
         
         categoryA.getCategoryOptions().add( categoryOptionA );
         categoryA.getCategoryOptions().add( categoryOptionB );
@@ -86,7 +87,7 @@ public class DataElementCategoryComboTest
         categoryOptionE.getCategories().add( categoryC );
         categoryOptionF.getCategories().add( categoryC );
         
-        categoryCombo = new DataElementCategoryCombo( "CategoryCombo" );
+        categoryCombo = new DataElementCategoryCombo( "CategoryCombo", DataDimensionType.DISAGGREGATION );
         
         categoryCombo.getCategories().add( categoryA );
         categoryCombo.getCategories().add( categoryB );

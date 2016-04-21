@@ -113,6 +113,7 @@ public class DefaultQueryService
         log.debug( "Doing in-memory for " + query.getCriterions().size() + " criterions and " + query.getOrders().size() + " orders." );
 
         query.setObjects( objects );
+
         return inMemoryQueryEngine.query( query );
     }
 }

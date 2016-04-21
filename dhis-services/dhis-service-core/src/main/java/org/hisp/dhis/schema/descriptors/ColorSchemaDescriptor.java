@@ -35,12 +35,10 @@ import org.hisp.dhis.security.Authority;
 import org.hisp.dhis.security.AuthorityType;
 
 import com.google.common.collect.Lists;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Lars Helge Overland
  */
-@Component
 public class ColorSchemaDescriptor implements SchemaDescriptor
 {
     public static final String SINGULAR = "color";

@@ -76,6 +76,7 @@ public class ProgramInstance
 
     private Set<ProgramStageInstance> programStageInstances = new HashSet<>();
 
+    @Deprecated
     private List<OutboundSms> outboundSms = new ArrayList<>();
 
     private List<MessageConversation> messageConversations = new ArrayList<>();

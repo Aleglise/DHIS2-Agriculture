@@ -399,9 +399,9 @@ public class JdbcAnalyticsManager
     {
         Map<String, Object> map = new HashMap<>();
 
-        SqlRowSet rowSet = jdbcTemplate.queryForRowSet( sql );
-
         log.debug( "Analytics SQL: " + sql );
+
+        SqlRowSet rowSet = jdbcTemplate.queryForRowSet( sql );
 
         int counter = 0;
         

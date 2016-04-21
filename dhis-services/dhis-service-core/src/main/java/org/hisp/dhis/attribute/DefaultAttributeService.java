@@ -250,6 +250,12 @@ public class DefaultAttributeService
     }
 
     @Override
+    public List<AttributeValue> getAllAttributeValuesByAttributes( List<Attribute> attributes )
+    {
+        return attributeValueStore.getAllByAttributes( attributes );
+    }
+
+    @Override
     public List<AttributeValue> getAllAttributeValuesByAttribute( Attribute attribute )
     {
         return attributeValueStore.getAllByAttribute( attribute );

@@ -32,15 +32,15 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Timer implementation which uses system time.
- * 
+ *
  * @author Morten Olav Hansen
  */
-public class SystemTimer 
+public class SystemTimer
     implements Timer
 {
     private long internalStart = 0;
 
-    private long internalEnd = 0;
+    private Long internalEnd;
 
     @Override
     public Timer start()
@@ -59,7 +59,7 @@ public class SystemTimer
     @Override
     public Long duration()
     {
-        return internalEnd - internalStart;
+        return internalEnd != null ? internalEnd - internalStart : System.nanoTime() - internalStart;
     }
 
     @Override

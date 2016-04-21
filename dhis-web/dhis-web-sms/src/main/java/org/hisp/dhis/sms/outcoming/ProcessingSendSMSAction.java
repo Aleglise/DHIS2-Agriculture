@@ -40,7 +40,6 @@ import org.hisp.dhis.oust.manager.SelectionTreeManager;
 import org.hisp.dhis.scheduling.TaskCategory;
 import org.hisp.dhis.scheduling.TaskId;
 import org.hisp.dhis.sms.config.GatewayAdministrationService;
-import org.hisp.dhis.sms.outbound.OutboundSmsTransportService;
 import org.hisp.dhis.sms.task.SendSmsTask;
 import org.hisp.dhis.system.notification.Notifier;
 import org.hisp.dhis.system.scheduling.Scheduler;
@@ -75,9 +74,6 @@ public class ProcessingSendSMSAction
     @Autowired
     private UserGroupService userGroupService;
 
-    @Autowired
-    private OutboundSmsTransportService transportService;
-    
     @Autowired
     private GatewayAdministrationService gatewayAdminService;
     

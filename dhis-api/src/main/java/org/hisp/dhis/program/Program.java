@@ -143,6 +143,12 @@ public class Program
     private DataApprovalWorkflow workflow;
 
     private Boolean displayFrontPageList = false;
+    
+    /**
+     * Property indicating whether first stage can appear for data entry on the 
+     * same page with registration 
+     */
+    private Boolean useFirstStageDuringRegistration = false;
 
     // -------------------------------------------------------------------------
     // Constructors
@@ -707,6 +713,19 @@ public class Program
         this.displayFrontPageList = displayFrontPageList;
     }
 
+    @JsonProperty
+    @JsonView( { DetailedView.class, ExportView.class } )
+    @JacksonXmlProperty( namespace = DxfNamespaces.DXF_2_0 )
+    public Boolean getUseFirstStageDuringRegistration()
+    {
+        return useFirstStageDuringRegistration;
+    }
+
+    public void setUseFirstStageDuringRegistration( Boolean useFirstStageDuringRegistration )
+    {
+        this.useFirstStageDuringRegistration = useFirstStageDuringRegistration;
+    }
+
     @Override
     public void mergeWith( IdentifiableObject other, MergeMode mergeMode )
     {
@@ -735,6 +754,7 @@ public class Program
                 relatedProgram = program.getRelatedProgram();
                 dataEntryMethod = program.getDataEntryMethod();
                 trackedEntity = program.getTrackedEntity();
+                useFirstStageDuringRegistration = program.getUseFirstStageDuringRegistration();
             }
             else if ( mergeMode.isMerge() )
             {
@@ -753,6 +773,7 @@ public class Program
                 relatedProgram = program.getRelatedProgram() == null ? relatedProgram : program.getRelatedProgram();
                 dataEntryMethod = program.getDataEntryMethod() == null ? dataEntryMethod : program.getDataEntryMethod();
                 trackedEntity = program.getTrackedEntity() == null ? trackedEntity : program.getTrackedEntity();
+                useFirstStageDuringRegistration = program.getUseFirstStageDuringRegistration() == null ? useFirstStageDuringRegistration : program.getUseFirstStageDuringRegistration();
             }
 
             organisationUnits.clear();

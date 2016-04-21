@@ -55,17 +55,17 @@ public class YearlyPeriodTypeTest
     @Test
     public void testCreatePeriod()
     {
-        testDate = new DateTime(  2009, 8, 15, 0, 0 );
+        testDate = new DateTime( 2009, 8, 15, 0, 0 );
         
-        startDate = new DateTime(  2009, 1, 1, 0, 0 );
-        endDate = new DateTime(  2009, 12, 31, 0, 0 );
+        startDate = new DateTime( 2009, 1, 1, 0, 0 );
+        endDate = new DateTime( 2009, 12, 31, 0, 0 );
 
         Period period = periodType.createPeriod( testDate.toDate() );
         
         assertEquals( startDate.toDate(), period.getStartDate() );
         assertEquals( endDate.toDate(), period.getEndDate() );
         
-        testDate = new DateTime(  2009, 4, 15, 0, 0 );
+        testDate = new DateTime( 2009, 4, 15, 0, 0 );
         
         period = periodType.createPeriod( testDate.toDate() );
         
@@ -76,14 +76,14 @@ public class YearlyPeriodTypeTest
     @Test
     public void testGetNextPeriod()
     {
-        testDate = new DateTime(  2009, 8, 15, 0, 0 );
+        testDate = new DateTime( 2009, 8, 15, 0, 0 );
 
         Period period = periodType.createPeriod( testDate.toDate() );
         
         period = periodType.getNextPeriod( period );
 
-        startDate = new DateTime(  2010, 1, 1, 0, 0 );
-        endDate = new DateTime(  2010, 12, 31, 0, 0 );
+        startDate = new DateTime( 2010, 1, 1, 0, 0 );
+        endDate = new DateTime( 2010, 12, 31, 0, 0 );
 
         assertEquals( startDate.toDate(), period.getStartDate() );
         assertEquals( endDate.toDate(), period.getEndDate() );
@@ -98,8 +98,8 @@ public class YearlyPeriodTypeTest
         
         period = periodType.getPreviousPeriod( period );
 
-        startDate = new DateTime(  2008, 1, 1, 0, 0 );
-        endDate = new DateTime(  2008, 12, 31, 0, 0 );
+        startDate = new DateTime( 2008, 1, 1, 0, 0 );
+        endDate = new DateTime( 2008, 12, 31, 0, 0 );
 
         assertEquals( startDate.toDate(), period.getStartDate() );
         assertEquals( endDate.toDate(), period.getEndDate() );
@@ -108,7 +108,7 @@ public class YearlyPeriodTypeTest
     @Test
     public void testGeneratePeriods()
     {
-        testDate = new DateTime(  2009, 8, 15, 0, 0 );
+        testDate = new DateTime( 2009, 8, 15, 0, 0 );
         
         List<Period> periods = periodType.generatePeriods( testDate.toDate() );
         
@@ -129,7 +129,7 @@ public class YearlyPeriodTypeTest
     @Test
     public void testGenerateLast5Years()
     {
-        testDate = new DateTime(  2009, 8, 15, 0, 0 );
+        testDate = new DateTime( 2009, 8, 15, 0, 0 );
         
         List<Period> periods = new YearlyPeriodType().generateLast5Years( testDate.toDate() );
 

@@ -75,6 +75,8 @@ public class DatabaseAutomaticAccessProvider
         userService.addUserAuthorityGroup( userAuthorityGroup );
 
         UserCredentials userCredentials = new UserCredentials();
+        userCredentials.setUid( "KvMx6c1eoYo" );
+        userCredentials.setCode( username );
         userCredentials.setUsername( username );
         userCredentials.setUserInfo( user );
         userCredentials.getUserAuthorityGroups().add( userAuthorityGroup );

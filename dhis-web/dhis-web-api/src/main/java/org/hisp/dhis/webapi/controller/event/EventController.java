@@ -31,11 +31,11 @@ package org.hisp.dhis.webapi.controller.event;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.ByteSource;
-
 import org.apache.commons.io.IOUtils;
 import org.hisp.dhis.common.IdSchemes;
 import org.hisp.dhis.common.OrganisationUnitSelectionMode;
 import org.hisp.dhis.commons.util.StreamUtils;
+import org.hisp.dhis.commons.util.TextUtils;
 import org.hisp.dhis.dataelement.DataElement;
 import org.hisp.dhis.dataelement.DataElementCategoryOptionCombo;
 import org.hisp.dhis.dataelement.DataElementService;
@@ -51,11 +51,10 @@ import org.hisp.dhis.dxf2.events.event.ImportEventsTask;
 import org.hisp.dhis.dxf2.events.event.csv.CsvEventService;
 import org.hisp.dhis.dxf2.events.report.EventRowService;
 import org.hisp.dhis.dxf2.events.report.EventRows;
+import org.hisp.dhis.dxf2.events.trackedentity.TrackedEntityInstanceService;
 import org.hisp.dhis.dxf2.importsummary.ImportStatus;
 import org.hisp.dhis.dxf2.importsummary.ImportSummaries;
 import org.hisp.dhis.dxf2.importsummary.ImportSummary;
-import org.hisp.dhis.query.Order;
-import org.hisp.dhis.render.RenderService;
 import org.hisp.dhis.dxf2.utils.InputUtils;
 import org.hisp.dhis.dxf2.webmessage.WebMessage;
 import org.hisp.dhis.dxf2.webmessage.WebMessageException;
@@ -73,6 +72,8 @@ import org.hisp.dhis.node.types.RootNode;
 import org.hisp.dhis.program.Program;
 import org.hisp.dhis.program.ProgramStageInstanceService;
 import org.hisp.dhis.program.ProgramStatus;
+import org.hisp.dhis.query.Order;
+import org.hisp.dhis.render.RenderService;
 import org.hisp.dhis.scheduling.TaskCategory;
 import org.hisp.dhis.scheduling.TaskId;
 import org.hisp.dhis.schema.Schema;
@@ -98,7 +99,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -108,6 +108,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -163,10 +164,13 @@ public class EventController
 
     @Autowired
     private ContextService contextService;
-    
+
     @Autowired
     private SchemaService schemaService;
     
+    @Autowired
+    protected TrackedEntityInstanceService entityInstanceService;
+
     private Schema schema;
 
     protected Schema getSchema()
@@ -178,7 +182,7 @@ public class EventController
 
         return schema;
     }
-        
+
     // -------------------------------------------------------------------------
     // READ
     // -------------------------------------------------------------------------
@@ -206,33 +210,38 @@ public class EventController
         @RequestParam( required = false ) boolean skipPaging,
         @RequestParam( required = false ) String order,
         @RequestParam( required = false ) String attachment,
+        @RequestParam( required = false ) String event,
         @RequestParam Map<String, String> parameters, IdSchemes idSchemes, Model model, HttpServletResponse response, HttpServletRequest request )
         throws WebMessageException
     {
         WebOptions options = new WebOptions( parameters );
         List<String> fields = Lists.newArrayList( contextService.getParameterValues( "fields" ) );
-            
+
         if ( fields.isEmpty() )
         {
             fields.addAll( Preset.ALL.getFields() );
         }
-        
-        DataElementCategoryOptionCombo attributeOptionCombo = inputUtils.getAttributeOptionCombo( attributeCc, attributeCos );
 
-        if ( attributeOptionCombo == null )
+        boolean allowNoAttrOptionCombo = trackedEntityInstance != null && entityInstanceService.getTrackedEntityInstance( trackedEntityInstance ) != null;
+        
+        DataElementCategoryOptionCombo attributeOptionCombo = inputUtils.getAttributeOptionCombo( attributeCc, attributeCos, allowNoAttrOptionCombo );
+
+        if ( attributeOptionCombo == null && !allowNoAttrOptionCombo )
         {
             throw new WebMessageException( WebMessageUtils.conflict( "Illegal attribute option combo identifier: " + attributeCc + " " + attributeCos ) );
         }
 
-        EventSearchParams params = eventService.getFromUrl( program, programStage, programStatus, followUp, 
-            orgUnit, ouMode, trackedEntityInstance, startDate, endDate, status, lastUpdated, attributeOptionCombo, 
-            idSchemes, page, pageSize, totalPages, skipPaging, getOrderParams( order ), false );
+        Set<String> eventIds = TextUtils.splitToArray( event, TextUtils.SEMICOLON );
+
+        EventSearchParams params = eventService.getFromUrl( program, programStage, programStatus, followUp,
+            orgUnit, ouMode, trackedEntityInstance, startDate, endDate, status, lastUpdated, attributeOptionCombo,
+            idSchemes, page, pageSize, totalPages, skipPaging, getOrderParams( order ), false, eventIds );
 
         Events events = eventService.getEvents( params );
 
-        for ( Event event : events.getEvents() )
+        if ( hasHref( fields ) )
         {
-            event.setHref( ContextUtils.getRootPath( request ) + RESOURCE_PATH + "/" + event.getEvent() );
+            events.getEvents().forEach( e -> e.setHref( ContextUtils.getRootPath( request ) + RESOURCE_PATH + "/" + e.getEvent() ) );
         }
 
         if ( !skipMeta && params.getProgram() != null )
@@ -285,16 +294,19 @@ public class EventController
         @RequestParam( required = false, defaultValue = "false" ) boolean skipHeader,
         IdSchemes idSchemes, HttpServletResponse response, HttpServletRequest request ) throws IOException, WebMessageException
     {
-        DataElementCategoryOptionCombo attributeOptionCombo = inputUtils.getAttributeOptionCombo( attributeCc, attributeCos );
+        
+        boolean allowNoAttrOptionCombo = trackedEntityInstance != null && entityInstanceService.getTrackedEntityInstance( trackedEntityInstance ) != null;
+        
+        DataElementCategoryOptionCombo attributeOptionCombo = inputUtils.getAttributeOptionCombo( attributeCc, attributeCos, allowNoAttrOptionCombo );
 
-        if ( attributeOptionCombo == null )
+        if ( attributeOptionCombo == null && !allowNoAttrOptionCombo )
         {
             throw new WebMessageException( WebMessageUtils.conflict( "Illegal attribute option combo identifier: " + attributeCc + " " + attributeCos ) );
         }
 
-        EventSearchParams params = eventService.getFromUrl( program, programStage, programStatus, followUp, 
-            orgUnit, ouMode, trackedEntityInstance, startDate, endDate, status, lastUpdated, attributeOptionCombo, 
-            idSchemes, page, pageSize, totalPages, skipPaging, getOrderParams( order ), false );
+        EventSearchParams params = eventService.getFromUrl( program, programStage, programStatus, followUp,
+            orgUnit, ouMode, trackedEntityInstance, startDate, endDate, status, lastUpdated, attributeOptionCombo,
+            idSchemes, page, pageSize, totalPages, skipPaging, getOrderParams( order ), false, null );
 
         Events events = eventService.getEvents( params );
 
@@ -337,16 +349,11 @@ public class EventController
     {
         WebOptions options = new WebOptions( parameters );
 
-        DataElementCategoryOptionCombo attributeOptionCombo = inputUtils.getAttributeOptionCombo( attributeCc, attributeCos );
-
-        if ( attributeOptionCombo == null )
-        {
-            throw new WebMessageException( WebMessageUtils.conflict( "Illegal attribute option combo identifier: " + attributeCc + " " + attributeCos ) );
-        }
+        DataElementCategoryOptionCombo attributeOptionCombo = inputUtils.getAttributeOptionCombo( attributeCc, attributeCos, true );
 
         EventSearchParams params = eventService.getFromUrl( program, null, programStatus, null,
-            orgUnit, ouMode, null, startDate, endDate, eventStatus, null, attributeOptionCombo, 
-            null, null, null, totalPages, skipPaging, getOrderParams( order ), true );
+            orgUnit, ouMode, null, startDate, endDate, eventStatus, null, attributeOptionCombo,
+            null, null, null, totalPages, skipPaging, getOrderParams( order ), true, null );
 
         EventRows eventRows = eventRowService.getEventRows( params );
 
@@ -376,15 +383,15 @@ public class EventController
 
         return "event";
     }
-    
+
     private List<Order> getOrderParams( String order )
     {
-        if ( order != null && !StringUtils.isEmpty( order ) ) 
+        if ( order != null && !StringUtils.isEmpty( order ) )
         {
             OrderParams op = new OrderParams( Sets.newLinkedHashSet( Arrays.asList( order.split( "," ) ) ) );
             return op.getOrders( getSchema() );
         }
-        
+
         return null;
     }
 
@@ -409,7 +416,7 @@ public class EventController
 
     @RequestMapping( value = "/files", method = RequestMethod.GET )
     @PreAuthorize( "hasRole('ALL') or hasRole('F_TRACKED_ENTITY_DATAVALUE_ADD')" )
-    public void getEventDataValueFile( @RequestParam String eventUid, @RequestParam String dataElementUid, 
+    public void getEventDataValueFile( @RequestParam String eventUid, @RequestParam String dataElementUid,
         HttpServletResponse response, HttpServletRequest request ) throws Exception
     {
         Event event = eventService.getEvent( eventUid );
@@ -465,10 +472,10 @@ public class EventController
             // The FileResource exists and is tied to DataValue, however the 
             // underlying file content still not stored to external file store
             // -----------------------------------------------------------------
-            
+
             WebMessage webMessage = WebMessageUtils.conflict( "The content is being processed and is not available yet. Try again later.",
                 "The content requested is in transit to the file store and will be available at a later time." );
-            
+
             webMessage.setResponse( new FileResourceWebMessageResponse( fileResource ) );
 
             throw new WebMessageException( webMessage );
@@ -518,7 +525,7 @@ public class EventController
         {
             throw new WebMessageException( WebMessageUtils.error( "Failed fetching the file from storage",
                 "There was an exception when trying to fetch the file from the storage backend. " +
-                "Depending on the provider the root cause could be network or file system related." ) );
+                    "Depending on the provider the root cause could be network or file system related." ) );
         }
         finally
         {
@@ -533,7 +540,7 @@ public class EventController
 
     @RequestMapping( method = RequestMethod.POST, consumes = "application/xml" )
     @PreAuthorize( "hasRole('ALL') or hasRole('F_TRACKED_ENTITY_DATAVALUE_ADD')" )
-    public void postXmlEvent( @RequestParam( defaultValue = "CREATE" ) ImportStrategy strategy, 
+    public void postXmlEvent( @RequestParam( defaultValue = "CREATE" ) ImportStrategy strategy,
         HttpServletResponse response, HttpServletRequest request, ImportOptions importOptions ) throws Exception
     {
         importOptions.setImportStrategy( strategy );
@@ -544,9 +551,9 @@ public class EventController
             ImportSummaries importSummaries = eventService.addEventsXml( inputStream, importOptions );
 
             importSummaries.getImportSummaries().stream()
-                .filter( importSummary -> !importOptions.isDryRun() && !importSummary.getStatus().equals( ImportStatus.ERROR ) && 
+                .filter( importSummary -> !importOptions.isDryRun() && !importSummary.getStatus().equals( ImportStatus.ERROR ) &&
                     !importOptions.getImportStrategy().isDelete() )
-                .forEach( importSummary -> importSummary.setHref( 
+                .forEach( importSummary -> importSummary.setHref(
                     ContextUtils.getRootPath( request ) + RESOURCE_PATH + "/" + importSummary.getReference() ) );
 
             if ( importSummaries.getImportSummaries().size() == 1 )
@@ -576,7 +583,7 @@ public class EventController
 
     @RequestMapping( method = RequestMethod.POST, consumes = "application/json" )
     @PreAuthorize( "hasRole('ALL') or hasRole('F_TRACKED_ENTITY_DATAVALUE_ADD')" )
-    public void postJsonEvent( @RequestParam( defaultValue = "CREATE" ) ImportStrategy strategy, 
+    public void postJsonEvent( @RequestParam( defaultValue = "CREATE" ) ImportStrategy strategy,
         HttpServletResponse response, HttpServletRequest request, ImportOptions importOptions ) throws Exception
     {
         importOptions.setImportStrategy( strategy );
@@ -587,9 +594,9 @@ public class EventController
             ImportSummaries importSummaries = eventService.addEventsJson( inputStream, importOptions );
 
             importSummaries.getImportSummaries().stream()
-                .filter( importSummary -> !importOptions.isDryRun() && !importSummary.getStatus().equals( ImportStatus.ERROR ) && 
+                .filter( importSummary -> !importOptions.isDryRun() && !importSummary.getStatus().equals( ImportStatus.ERROR ) &&
                     !importOptions.getImportStrategy().isDelete() )
-                .forEach( importSummary -> importSummary.setHref( 
+                .forEach( importSummary -> importSummary.setHref(
                     ContextUtils.getRootPath( request ) + RESOURCE_PATH + "/" + importSummary.getReference() ) );
 
             if ( importSummaries.getImportSummaries().size() == 1 )
@@ -619,7 +626,7 @@ public class EventController
 
     @RequestMapping( value = "/{uid}/note", method = RequestMethod.POST, consumes = "application/json" )
     @PreAuthorize( "hasRole('ALL') or hasRole('F_TRACKED_ENTITY_DATAVALUE_ADD')" )
-    public void postJsonEventForNote( @PathVariable( "uid" ) String uid, 
+    public void postJsonEventForNote( @PathVariable( "uid" ) String uid,
         HttpServletResponse response, HttpServletRequest request, ImportOptions importOptions ) throws IOException, WebMessageException
     {
         if ( !programStageInstanceService.programStageInstanceExists( uid ) )
@@ -636,7 +643,7 @@ public class EventController
 
     @RequestMapping( method = RequestMethod.POST, consumes = { "application/csv", "text/csv" } )
     @PreAuthorize( "hasRole('ALL') or hasRole('F_TRACKED_ENTITY_DATAVALUE_ADD')" )
-    public void postCsvEvents( @RequestParam( required = false, defaultValue = "false" ) boolean skipFirst, 
+    public void postCsvEvents( @RequestParam( required = false, defaultValue = "false" ) boolean skipFirst,
         HttpServletResponse response, HttpServletRequest request, ImportOptions importOptions ) throws IOException
     {
         InputStream inputStream = ContextUtils.isAcceptGzip( request ) ? new GZIPInputStream( request.getInputStream() ) : request.getInputStream();
@@ -663,7 +670,7 @@ public class EventController
 
     @RequestMapping( value = "/{uid}", method = RequestMethod.PUT, consumes = { "application/xml", "text/xml" } )
     @PreAuthorize( "hasRole('ALL') or hasRole('F_TRACKED_ENTITY_DATAVALUE_ADD')" )
-    public void putXmlEvent( HttpServletResponse response, HttpServletRequest request, 
+    public void putXmlEvent( HttpServletResponse response, HttpServletRequest request,
         @PathVariable( "uid" ) String uid, ImportOptions importOptions ) throws IOException, WebMessageException
     {
         if ( !programStageInstanceService.programStageInstanceExists( uid ) )
@@ -680,7 +687,7 @@ public class EventController
 
     @RequestMapping( value = "/{uid}", method = RequestMethod.PUT, consumes = "application/json" )
     @PreAuthorize( "hasRole('ALL') or hasRole('F_TRACKED_ENTITY_DATAVALUE_ADD')" )
-    public void putJsonEvent( HttpServletResponse response, HttpServletRequest request, 
+    public void putJsonEvent( HttpServletResponse response, HttpServletRequest request,
         @PathVariable( "uid" ) String uid, ImportOptions importOptions ) throws IOException, WebMessageException
     {
         if ( !programStageInstanceService.programStageInstanceExists( uid ) )
@@ -697,7 +704,7 @@ public class EventController
 
     @RequestMapping( value = "/{uid}/{dataElementUid}", method = RequestMethod.PUT, consumes = "application/json" )
     @PreAuthorize( "hasRole('ALL') or hasRole('F_TRACKED_ENTITY_DATAVALUE_ADD')" )
-    public void putJsonEventSingleValue( HttpServletResponse response, HttpServletRequest request, 
+    public void putJsonEventSingleValue( HttpServletResponse response, HttpServletRequest request,
         @PathVariable( "uid" ) String uid, @PathVariable( "dataElementUid" ) String dataElementUid ) throws IOException, WebMessageException
     {
         if ( !programStageInstanceService.programStageInstanceExists( uid ) )
@@ -721,7 +728,7 @@ public class EventController
 
     @RequestMapping( value = "/{uid}/eventDate", method = RequestMethod.PUT, consumes = "application/json" )
     @PreAuthorize( "hasRole('ALL') or hasRole('F_TRACKED_ENTITY_DATAVALUE_ADD')" )
-    public void putJsonEventForEventDate( HttpServletResponse response, HttpServletRequest request, 
+    public void putJsonEventForEventDate( HttpServletResponse response, HttpServletRequest request,
         @PathVariable( "uid" ) String uid, ImportOptions importOptions ) throws IOException, WebMessageException
     {
         if ( !programStageInstanceService.programStageInstanceExists( uid ) )
@@ -742,7 +749,7 @@ public class EventController
 
     @RequestMapping( value = "/{uid}", method = RequestMethod.DELETE )
     @PreAuthorize( "hasRole('ALL') or hasRole('F_TRACKED_ENTITY_DATAVALUE_DELETE')" )
-    public void deleteEvent( HttpServletResponse response, HttpServletRequest request, 
+    public void deleteEvent( HttpServletResponse response, HttpServletRequest request,
         @PathVariable( "uid" ) String uid ) throws WebMessageException
     {
         if ( !programStageInstanceService.programStageInstanceExists( uid ) )
@@ -761,5 +768,24 @@ public class EventController
         {
             webMessageService.send( WebMessageUtils.conflict( "Unable to delete event " + uid, ex.getMessage() ), response, request );
         }
+    }
+
+    private boolean fieldsContains( String match, List<String> fields )
+    {
+        for ( String field : fields )
+        {
+            // for now assume href/access if * or preset is requested
+            if ( field.contains( match ) || field.equals( "*" ) || field.startsWith( ":" ) )
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected boolean hasHref( List<String> fields )
+    {
+        return fieldsContains( "href", fields );
     }
 }

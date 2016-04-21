@@ -110,7 +110,7 @@ public interface QueryPlanner
      * each query. Queries are grouped based on periods if appearing as a 
      * dimension.
      */
-    List<DataQueryParams> groupByPartition( DataQueryParams params, String tableName, String tableSuffix );
+    List<DataQueryParams> groupByPartition( DataQueryParams params, QueryPlannerParams plannerParams );
     
     /**
      * If periods appear as dimensions in the given query; groups the query into 

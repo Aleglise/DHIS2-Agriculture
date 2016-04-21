@@ -41,6 +41,7 @@ import java.util.List;
 
 import org.hisp.dhis.DhisConvenienceTest;
 import org.hisp.dhis.dataelement.DataElement;
+import org.hisp.dhis.dataelement.DataElementCategoryCombo;
 import org.hisp.dhis.organisationunit.OrganisationUnit;
 import org.hisp.dhis.period.Period;
 import org.junit.Before;
@@ -61,7 +62,7 @@ public class DimensionOptionTest
     @Before
     public void before()
     {
-        deA = createDataElement( 'A' );
+        deA = createDataElement( 'A', new DataElementCategoryCombo() );
         peA = createPeriod( "2000Q1" );
         ouA = createOrganisationUnit( 'A' );
         

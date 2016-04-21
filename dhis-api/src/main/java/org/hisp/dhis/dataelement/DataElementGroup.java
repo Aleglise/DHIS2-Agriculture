@@ -37,6 +37,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import org.hisp.dhis.analytics.AggregationType;
 import org.hisp.dhis.common.BaseDimensionalItemObject;
 import org.hisp.dhis.common.BaseIdentifiableObject;
+import org.hisp.dhis.common.DimensionItemType;
 import org.hisp.dhis.common.DxfNamespaces;
 import org.hisp.dhis.common.IdentifiableObject;
 import org.hisp.dhis.common.MergeMode;
@@ -143,6 +144,16 @@ public class DataElementGroup
         return members != null && !members.isEmpty() ? members.iterator().next().getPeriodType() : null;
     }
 
+    // -------------------------------------------------------------------------
+    // DimensionalItemObject
+    // -------------------------------------------------------------------------
+
+    @Override
+    public DimensionItemType getDimensionItemType()
+    {
+        return DimensionItemType.DATA_ELEMENT_GROUP;
+    }
+    
     // -------------------------------------------------------------------------
     // Getters and setters
     // -------------------------------------------------------------------------

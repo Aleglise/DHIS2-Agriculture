@@ -28,7 +28,6 @@ package org.hisp.dhis.system.jep;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -39,70 +38,30 @@ import org.nfunk.jep.JEP;
 import org.nfunk.jep.ParseException;
 import org.nfunk.jep.function.PostfixMathCommandI;
 
+import com.google.common.collect.ImmutableMap;
+
 /**
  * @author Kenneth Haase
  */
 public class CustomFunctions
 {
-    private static Boolean init_done = false;
-
-    public static Map<String, PostfixMathCommandI> aggregate_functions = new HashMap<String, PostfixMathCommandI>();
+    public static final Map<String, PostfixMathCommandI> AGGREGATE_FUNCTIONS = 
+        ImmutableMap.<String, PostfixMathCommandI>builder().
+        put( "AVG", new ArithmeticMean() ).put( "STDDEV", new StandardDeviation() ).
+        put( "MEDIAN", new MedianValue() ).put( "MAX", new MaxValue() ).
+        put( "MIN", new MinValue() ).put( "COUNT", new Count() ).
+        put( "VSUM", new VectorSum() ).build();
+    
+    public static final Pattern AGGREGATE_PATTERN_PREFIX = Pattern.compile( "(AVG|STDDEV|MEDIAN|MAX|MIN|COUNT|VSUM)\\s*\\(" );
 
     public static void addFunctions( JEP parser )
-    {
-        if ( !(init_done) )
-        {
-            initCustomFunctions();
-        }
-        
-        for ( Entry<String, PostfixMathCommandI> e : aggregate_functions.entrySet() )
+    {        
+        for ( Entry<String, PostfixMathCommandI> e : AGGREGATE_FUNCTIONS.entrySet() )
         {
             String fname = e.getKey();
             PostfixMathCommandI cmd = e.getValue();
             parser.addFunction( fname, cmd );
         }
-    }
-
-    private static Pattern aggregate_prefix = Pattern.compile( "" );
-
-    private static int n_aggregates = 0;
-
-    public static Pattern getAggregatePrefixPattern()
-    {
-        if ( !(init_done) )
-        {
-            initCustomFunctions();
-        }
-        
-        if ( n_aggregates == aggregate_functions.size() )
-        {
-            return aggregate_prefix;
-        }
-        else
-        {
-            StringBuffer s = new StringBuffer();
-            int i = 0;
-            s.append( "(" );
-            
-            for ( String key : aggregate_functions.keySet() )
-            {
-                if ( i > 0 )
-                    s.append( '|' );
-                else
-                    i++;
-                s.append( key );
-            }
-            
-            s.append( ")\\s*\\(" );
-            aggregate_prefix = Pattern.compile( s.toString() );
-            n_aggregates = aggregate_functions.size();
-            return aggregate_prefix;
-        }
-    }
-
-    public static void addAggregateFunction( String name, PostfixMathCommandI fn )
-    {
-        aggregate_functions.put( name, fn );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -127,25 +86,5 @@ public class CustomFunctions
         {
             throw new ParseException( "Invalid vector argument" );
         }
-    }
-
-    private synchronized static void initCustomFunctions()
-    {
-        if ( init_done )
-        {
-            return;
-        }
-        else
-        {
-            init_done = true;
-        }
-        
-        CustomFunctions.addAggregateFunction( "AVG", new ArithmeticMean() );
-        CustomFunctions.addAggregateFunction( "STDDEV", new StandardDeviation() );
-        CustomFunctions.addAggregateFunction( "MEDIAN", new MedianValue() );
-        CustomFunctions.addAggregateFunction( "MAX", new MaxValue() );
-        CustomFunctions.addAggregateFunction( "MIN", new MinValue() );
-        CustomFunctions.addAggregateFunction( "COUNT", new Count() );
-        CustomFunctions.addAggregateFunction( "VSUM", new VectorSum() );
     }
 }

@@ -216,7 +216,7 @@ public class DataElementGroupSet
     @Override
     public DimensionType getDimensionType()
     {
-        return DimensionType.DATAELEMENT_GROUPSET;
+        return DimensionType.DATA_ELEMENT_GROUP_SET;
     }
 
     // -------------------------------------------------------------------------

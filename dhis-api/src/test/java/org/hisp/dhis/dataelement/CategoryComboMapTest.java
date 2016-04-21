@@ -1,5 +1,7 @@
 package org.hisp.dhis.dataelement;
 
+import org.hisp.dhis.common.DataDimensionType;
+
 /*
  * Copyright (c) 2004-2016, University of Oslo
  * All rights reserved.
@@ -85,9 +87,9 @@ public class CategoryComboMapTest
         categoryOptionE.setAutoFields();
         categoryOptionF.setAutoFields();
 
-        categoryA = new DataElementCategory( "CategoryA" );
-        categoryB = new DataElementCategory( "CategoryB" );
-        categoryC = new DataElementCategory( "CategoryC" );
+        categoryA = new DataElementCategory( "CategoryA", DataDimensionType.DISAGGREGATION );
+        categoryB = new DataElementCategory( "CategoryB", DataDimensionType.DISAGGREGATION );
+        categoryC = new DataElementCategory( "CategoryC", DataDimensionType.DISAGGREGATION );
 
         categoryA.setAutoFields();
         categoryB.setAutoFields();
@@ -100,7 +102,7 @@ public class CategoryComboMapTest
         categoryC.getCategoryOptions().add( categoryOptionE );
         categoryC.getCategoryOptions().add( categoryOptionF );
 
-        categoryCombo = new DataElementCategoryCombo( "CategoryCombo" );
+        categoryCombo = new DataElementCategoryCombo( "CategoryCombo", DataDimensionType.DISAGGREGATION );
         categoryCombo.setAutoFields();
 
         categoryCombo.addDataElementCategory( categoryA );

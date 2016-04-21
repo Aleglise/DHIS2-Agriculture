@@ -49,7 +49,7 @@ public class InterpretationDeletionHandler
     @Override
     protected String getClassName()
     {
-        return DeletionHandler.class.getSimpleName();
+        return Interpretation.class.getSimpleName();
     }
 
     @Override

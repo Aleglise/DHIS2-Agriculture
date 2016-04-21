@@ -138,6 +138,12 @@ public class Property implements Ordered, Klass
     private boolean collection;
 
     /**
+     * This property is true if collection=true and klass points to a implementation with
+     * a stable order (i.e. List).
+     */
+    private boolean ordered;
+
+    /**
      * If this property is a complex object or a collection, is this property considered
      * the owner of that relationship (important for imports etc).
      */
@@ -447,6 +453,18 @@ public class Property implements Ordered, Klass
     public void setCollection( boolean collection )
     {
         this.collection = collection;
+    }
+
+    @JsonProperty
+    @JacksonXmlProperty( namespace = DxfNamespaces.DXF_2_0 )
+    public boolean isOrdered()
+    {
+        return ordered;
+    }
+
+    public void setOrdered( boolean ordered )
+    {
+        this.ordered = ordered;
     }
 
     @JsonProperty

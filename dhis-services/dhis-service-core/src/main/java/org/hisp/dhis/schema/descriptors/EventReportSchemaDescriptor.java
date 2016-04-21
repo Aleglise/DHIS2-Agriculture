@@ -34,9 +34,7 @@ import org.hisp.dhis.security.Authority;
 import org.hisp.dhis.security.AuthorityType;
 import org.hisp.dhis.schema.Schema;
 import org.hisp.dhis.schema.SchemaDescriptor;
-import org.springframework.stereotype.Component;
 
-@Component
 public class EventReportSchemaDescriptor implements SchemaDescriptor
 {
     public static final String SINGULAR = "eventReport";

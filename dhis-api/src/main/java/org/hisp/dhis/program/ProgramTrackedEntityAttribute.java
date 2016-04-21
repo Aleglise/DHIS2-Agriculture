@@ -36,6 +36,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import org.hisp.dhis.analytics.AggregationType;
 import org.hisp.dhis.common.BaseDimensionalItemObject;
 import org.hisp.dhis.common.BaseIdentifiableObject;
+import org.hisp.dhis.common.DimensionItemType;
 import org.hisp.dhis.common.DxfNamespaces;
 import org.hisp.dhis.common.IdentifiableObject;
 import org.hisp.dhis.common.MergeMode;
@@ -70,7 +71,6 @@ public class ProgramTrackedEntityAttribute
 
     public ProgramTrackedEntityAttribute()
     {
-
     }
 
     public ProgramTrackedEntityAttribute( Program program, TrackedEntityAttribute attribute )
@@ -95,6 +95,16 @@ public class ProgramTrackedEntityAttribute
         this.allowFutureDate = allowFutureDate;
     }
 
+    // -------------------------------------------------------------------------
+    // DimensionalItemObject
+    // -------------------------------------------------------------------------
+
+    @Override
+    public DimensionItemType getDimensionItemType()
+    {
+        return DimensionItemType.PROGRAM_ATTRIBUTE;
+    }
+    
     // -------------------------------------------------------------------------
     // Logic
     // -------------------------------------------------------------------------

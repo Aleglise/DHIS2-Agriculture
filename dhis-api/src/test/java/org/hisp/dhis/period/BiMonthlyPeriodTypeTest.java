@@ -77,7 +77,7 @@ public class BiMonthlyPeriodTypeTest
     @Test
     public void testGetNextPeriod()
     { 
-        testDate = new DateTime(2009, 8, 15, 0, 0 );
+        testDate = new DateTime( 2009, 8, 15, 0, 0 );
       
         Period period = periodType.createPeriod( testDate.toDate() );
         

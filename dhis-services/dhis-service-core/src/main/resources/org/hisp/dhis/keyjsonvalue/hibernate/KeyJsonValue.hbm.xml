@@ -18,7 +18,11 @@
 
         <property name="key" column="namespacekey" type="string" length="255" unique-key="keyjsonvalue_unique_key_in_namespace" /> <!-- set not-null -->
 
-        <property name="value" column="value" type="text"/>
+        <property name="plainValue" column="value" type="text" access="property"/>
+
+        <property name="encryptedValue" column="encrypted_value" type="AESEncryptedString" access="property"/>
+        
+        <property name="encrypted" column="encrypted" type="boolean" />
 
     </class>
 </hibernate-mapping>

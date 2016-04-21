@@ -133,7 +133,7 @@ public class CategoryOptionGroupSet
     @Override
     public DimensionType getDimensionType()
     {
-        return DimensionType.CATEGORYOPTION_GROUPSET;
+        return DimensionType.CATEGORY_OPTION_GROUP_SET;
     }
 
     // -------------------------------------------------------------------------

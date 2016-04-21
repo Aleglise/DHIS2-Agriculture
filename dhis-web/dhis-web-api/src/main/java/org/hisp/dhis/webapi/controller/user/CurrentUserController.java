@@ -518,11 +518,11 @@ public class CurrentUserController
 
         if ( type == null )
         {
-            userPrograms = programService.getCurrentUserPrograms();
+            userPrograms = programService.getUserPrograms();
         }
         else
         {
-            userPrograms = programService.getCurrentUserPrograms( ProgramType.fromValue( type ) );
+            userPrograms = programService.getUserPrograms( ProgramType.fromValue( type ) );
         }
 
         if ( currentUserService.currentUserIsSuper() && currentUser.getOrganisationUnits().isEmpty() )

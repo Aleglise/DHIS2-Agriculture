@@ -36,6 +36,7 @@ import org.hisp.dhis.analytics.DataQueryParams;
 import org.hisp.dhis.analytics.DataType;
 import org.hisp.dhis.analytics.Partitions;
 import org.hisp.dhis.analytics.QueryPlanner;
+import org.hisp.dhis.analytics.QueryPlannerParams;
 import org.hisp.dhis.analytics.partition.PartitionManager;
 import org.hisp.dhis.analytics.table.PartitionUtils;
 import org.hisp.dhis.common.BaseDimensionalObject;
@@ -45,27 +46,26 @@ import org.hisp.dhis.common.DimensionalObject;
 import org.hisp.dhis.common.IllegalQueryException;
 import org.hisp.dhis.common.ListMap;
 import org.hisp.dhis.common.MaintenanceModeException;
-import org.hisp.dhis.common.ValueType;
 import org.hisp.dhis.commons.collection.PaginatedList;
 import org.hisp.dhis.commons.filter.FilterUtils;
 import org.hisp.dhis.dataelement.DataElement;
 import org.hisp.dhis.dataelement.DataElementGroup;
-import org.hisp.dhis.organisationunit.OrganisationUnit;
-import org.hisp.dhis.period.Period;
 import org.hisp.dhis.period.PeriodType;
 import org.hisp.dhis.program.ProgramDataElement;
 import org.hisp.dhis.setting.SettingKey;
 import org.hisp.dhis.setting.SystemSettingManager;
 import org.hisp.dhis.system.filter.AggregatableDataElementFilter;
 import org.hisp.dhis.system.util.MathUtils;
+import org.hisp.dhis.util.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import static org.hisp.dhis.analytics.AggregationType.SUM;
 import static org.hisp.dhis.analytics.DataQueryParams.LEVEL_PREFIX;
@@ -128,9 +128,9 @@ public class DefaultQueryPlanner
             violation = "Indicators cannot be specified as filter";
         }
 
-        if ( !params.getFilterDataSets().isEmpty() )
+        if ( !params.getFilterReportingRates().isEmpty() )
         {
-            violation = "Data sets cannot be specified as filter";
+            violation = "Reporting rates cannot be specified as filter";
         }
 
         if ( params.getFilters().contains( new BaseDimensionalObject( CATEGORYOPTIONCOMBO_DIM_ID ) ) )
@@ -143,9 +143,9 @@ public class DefaultQueryPlanner
             violation = "Dimensions cannot be specified more than once: " + params.getDuplicateDimensions();
         }
 
-        if ( !params.getAllDataSets().isEmpty() && !params.getDataElementGroupSets().isEmpty() )
+        if ( !params.getAllReportingRates().isEmpty() && !params.getDataElementGroupSets().isEmpty() )
         {
-            violation = "Data sets and data element group sets cannot be specified simultaneously";
+            violation = "Reporting rates and data element group sets cannot be specified simultaneously";
         }
 
         if ( params.hasDimensionOrFilter( CATEGORYOPTIONCOMBO_DIM_ID ) && params.getAllDataElements().isEmpty() )
@@ -219,58 +219,39 @@ public class DefaultQueryPlanner
     }
 
     @Override
-    public DataQueryGroups planQuery( DataQueryParams params, int optimalQueries, String tableName )
+    public DataQueryGroups planQuery( DataQueryParams params, final int optimalQueries, final String tableName )
     {
         validate( params );
-
+        
         // ---------------------------------------------------------------------
-        // Group queries by partition, period type and organisation unit level
+        // Group queries which can be executed together
         // ---------------------------------------------------------------------
 
         params = params.instance();
 
-        List<DataQueryParams> queries = new ArrayList<>();
+        final QueryPlannerParams plannerParams = QueryPlannerParams.instance().setTableName( tableName );
 
-        List<DataQueryParams> groupedByPartition = groupByPartition( params, tableName, null );
-
-        for ( DataQueryParams byPartition : groupedByPartition )
+        final List<DataQueryParams> queries = new ArrayList<>( groupByPartition( params, plannerParams ) );
+        
+        List<Consumer<DataQueryParams>> groupers = new ImmutableList.Builder<Consumer<DataQueryParams>>().
+            add( q -> queries.addAll( groupByOrgUnitLevel( q ) ) ).
+            add( q -> queries.addAll( groupByPeriodType( q ) ) ).
+            add( q -> queries.addAll( groupByDataType( q ) ) ).
+            add( q -> queries.addAll( groupByAggregationType( q ) ) ).
+            add( q -> queries.addAll( groupByDaysInPeriod( q ) ) ).
+            add( q -> queries.addAll( groupByDataPeriodType( q ) ) ).build();
+        
+        for ( Consumer<DataQueryParams> grouper : groupers )
         {
-            List<DataQueryParams> groupedByOrgUnitLevel = groupByOrgUnitLevel( byPartition );
-
-            for ( DataQueryParams byOrgUnitLevel : groupedByOrgUnitLevel )
-            {
-                List<DataQueryParams> groupedByPeriodType = groupByPeriodType( byOrgUnitLevel );
-
-                for ( DataQueryParams byPeriodType : groupedByPeriodType )
-                {
-                    List<DataQueryParams> groupedByDataType = groupByDataType( byPeriodType );
-
-                    for ( DataQueryParams byDataType : groupedByDataType )
-                    {
-                        List<DataQueryParams> groupedByAggregationType = groupByAggregationType( byDataType );
-
-                        for ( DataQueryParams byAggregationType : groupedByAggregationType )
-                        {
-                            List<DataQueryParams> groupedByDaysInPeriod = groupByDaysInPeriod( byAggregationType );
-
-                            for ( DataQueryParams byDaysInPeriod : groupedByDaysInPeriod )
-                            {
-                                List<DataQueryParams> groupedByDataPeriodType = groupByDataPeriodType( byDaysInPeriod );
-
-                                for ( DataQueryParams byDataPeriodType : groupedByDataPeriodType )
-                                {
-                                    byDataPeriodType.setPartitions( byPartition.getPartitions() );
-                                    byDataPeriodType.setPeriodType( byPeriodType.getPeriodType() );
-                                    byDataPeriodType.setAggregationType( byAggregationType.getAggregationType() );
-
-                                    queries.add( byDataPeriodType );
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            final List<DataQueryParams> currentQueries = Lists.newArrayList( queries );
+            queries.clear();
+            
+            currentQueries.stream().forEach( grouper );
         }
+
+        // ---------------------------------------------------------------------
+        // Split queries until optimal number
+        // ---------------------------------------------------------------------
 
         DataQueryGroups queryGroups = new DataQueryGroups( queries );
 
@@ -279,29 +260,20 @@ public class DefaultQueryPlanner
             return queryGroups;
         }
 
-        // ---------------------------------------------------------------------
-        // Group by data element
-        // ---------------------------------------------------------------------
-
-        queryGroups = splitByDimension( queryGroups, DATA_X_DIM_ID, optimalQueries );
-
-        if ( queryGroups.isOptimal( optimalQueries ) )
+        List<String> splitDimensions = Lists.newArrayList( DATA_X_DIM_ID, ORGUNIT_DIM_ID );
+        
+        for ( String dim : splitDimensions )
         {
-            return queryGroups;
+            queryGroups = splitByDimension( queryGroups, dim, optimalQueries );
+
+            if ( queryGroups.isOptimal( optimalQueries ) )
+            {
+                break;
+            }
         }
-
-        // ---------------------------------------------------------------------
-        // Group by organisation unit
-        // ---------------------------------------------------------------------
-
-        queryGroups = splitByDimension( queryGroups, ORGUNIT_DIM_ID, optimalQueries );
-
+        
         return queryGroups;
     }
-
-    // -------------------------------------------------------------------------
-    // Dimension constraints methods
-    // -------------------------------------------------------------------------
 
     // -------------------------------------------------------------------------
     // Supportive methods
@@ -351,9 +323,12 @@ public class DefaultQueryPlanner
     // -------------------------------------------------------------------------
 
     @Override
-    public List<DataQueryParams> groupByPartition( DataQueryParams params, String tableName, String tableSuffix )
+    public List<DataQueryParams> groupByPartition( DataQueryParams params, QueryPlannerParams plannerParams )
     {
         Set<String> validPartitions = partitionManager.getAnalyticsPartitions();
+        
+        String tableName = plannerParams.getTableName();
+        String tableSuffix = plannerParams.getTableSuffix();
 
         List<DataQueryParams> queries = new ArrayList<>();
 
@@ -364,7 +339,8 @@ public class DefaultQueryPlanner
         }
         else if ( !params.getPeriods().isEmpty() )
         {
-            ListMap<Partitions, DimensionalItemObject> partitionPeriodMap = PartitionUtils.getPartitionPeriodMap( params.getPeriods(), tableName, tableSuffix, validPartitions );
+            ListMap<Partitions, DimensionalItemObject> partitionPeriodMap = 
+                PartitionUtils.getPartitionPeriodMap( params.getPeriods(), tableName, tableSuffix, validPartitions );
 
             for ( Partitions partitions : partitionPeriodMap.keySet() )
             {
@@ -466,12 +442,13 @@ public class DefaultQueryPlanner
 
         if ( !params.getOrganisationUnits().isEmpty() )
         {
-            ListMap<Integer, DimensionalItemObject> levelOrgUnitMap = getLevelOrgUnitMap( params.getOrganisationUnits() );
+            ListMap<Integer, DimensionalItemObject> levelOrgUnitMap = 
+                QueryPlannerUtils.getLevelOrgUnitMap( params.getOrganisationUnits() );
 
             for ( Integer level : levelOrgUnitMap.keySet() )
             {
                 DataQueryParams query = params.instance();
-                query.setDimensionOptions( ORGUNIT_DIM_ID, DimensionType.ORGANISATIONUNIT, LEVEL_PREFIX + level, levelOrgUnitMap.get( level ) );
+                query.setDimensionOptions( ORGUNIT_DIM_ID, DimensionType.ORGANISATION_UNIT, LEVEL_PREFIX + level, levelOrgUnitMap.get( level ) );
                 queries.add( query );
             }
         }
@@ -479,7 +456,8 @@ public class DefaultQueryPlanner
         {
             DimensionalObject filter = params.getFilter( ORGUNIT_DIM_ID );
 
-            ListMap<Integer, DimensionalItemObject> levelOrgUnitMap = getLevelOrgUnitMap( params.getFilterOrganisationUnits() );
+            ListMap<Integer, DimensionalItemObject> levelOrgUnitMap = 
+                QueryPlannerUtils.getLevelOrgUnitMap( params.getFilterOrganisationUnits() );
 
             params.removeFilter( ORGUNIT_DIM_ID );
 
@@ -505,13 +483,17 @@ public class DefaultQueryPlanner
         return queries;
     }
 
+    /**
+     * Groups queries by their data type.
+     */
     private List<DataQueryParams> groupByDataType( DataQueryParams params )
     {
         List<DataQueryParams> queries = new ArrayList<>();
 
         if ( !params.getDataElements().isEmpty() )
         {
-            ListMap<DataType, DimensionalItemObject> dataTypeDataElementMap = getDataTypeDataElementMap( params.getDataElements() );
+            ListMap<DataType, DimensionalItemObject> dataTypeDataElementMap = 
+                QueryPlannerUtils.getDataTypeDataElementMap( params.getDataElements() );
 
             for ( DataType dataType : dataTypeDataElementMap.keySet() )
             {
@@ -560,17 +542,10 @@ public class DefaultQueryPlanner
     {
         List<DataQueryParams> queries = new ArrayList<>();
 
-        if ( params.hasAggregationType() )
-        {
-            queries.add( params.instance() );
-            return queries;
-        }
-
         if ( !params.getDataElements().isEmpty() )
         {
-            PeriodType periodType = PeriodType.getPeriodTypeByName( params.getPeriodType() );
-
-            ListMap<AggregationType, DimensionalItemObject> aggregationTypeDataElementMap = getAggregationTypeDataElementMap( params.getDataElements(), periodType );
+            ListMap<AggregationType, DimensionalItemObject> aggregationTypeDataElementMap = 
+                QueryPlannerUtils.getAggregationTypeDataElementMap( params );
 
             for ( AggregationType aggregationType : aggregationTypeDataElementMap.keySet() )
             {
@@ -590,11 +565,13 @@ public class DefaultQueryPlanner
             if ( deg != null && !deg.getMembers().isEmpty() )
             {
                 PeriodType periodType = PeriodType.getPeriodTypeByName( params.getPeriodType() );
-                query.setAggregationType( getAggregationType( deg.getValueType(), deg.getAggregationType(), periodType, deg.getPeriodType() ) );
+                AggregationType aggregationType = ObjectUtils.firstNonNull( params.getAggregationType(), deg.getAggregationType() );
+                query.setAggregationType( QueryPlannerUtils.getAggregationType( 
+                    deg.getValueType(), aggregationType, periodType, deg.getPeriodType() ) );
             }
             else
             {
-                query.setAggregationType( SUM );
+                query.setAggregationType( ObjectUtils.firstNonNull( params.getAggregationType(), SUM ) );
             }
 
             queries.add( query );
@@ -602,7 +579,7 @@ public class DefaultQueryPlanner
         else
         {
             DataQueryParams query = params.instance();
-            query.setAggregationType( SUM );
+            query.setAggregationType( ObjectUtils.firstNonNull( params.getAggregationType(), SUM ) );
             queries.add( query );
         }
 
@@ -631,7 +608,8 @@ public class DefaultQueryPlanner
             return queries;
         }
 
-        ListMap<Integer, DimensionalItemObject> daysPeriodMap = getDaysPeriodMap( params.getPeriods() );
+        ListMap<Integer, DimensionalItemObject> daysPeriodMap = 
+            QueryPlannerUtils.getDaysPeriodMap( params.getPeriods() );
 
         DimensionalObject periodDim = params.getDimension( PERIOD_DIM_ID );
 
@@ -665,7 +643,8 @@ public class DefaultQueryPlanner
             return queries;
         }
 
-        ListMap<PeriodType, DimensionalItemObject> periodTypeDataElementMap = getPeriodTypeDataElementMap( params.getDataElements() );
+        ListMap<PeriodType, DimensionalItemObject> periodTypeDataElementMap = 
+            QueryPlannerUtils.getPeriodTypeDataElementMap( params.getDataElements() );
 
         for ( PeriodType periodType : periodTypeDataElementMap.keySet() )
         {
@@ -681,153 +660,5 @@ public class DefaultQueryPlanner
         }
 
         return queries;
-    }
-
-    // -------------------------------------------------------------------------
-    // Supportive - get mapping methods
-    // -------------------------------------------------------------------------
-
-    /**
-     * Creates a mapping between level and organisation unit for the given organisation
-     * units.
-     */
-    private ListMap<Integer, DimensionalItemObject> getLevelOrgUnitMap( List<DimensionalItemObject> orgUnits )
-    {
-        ListMap<Integer, DimensionalItemObject> map = new ListMap<>();
-
-        for ( DimensionalItemObject orgUnit : orgUnits )
-        {
-            OrganisationUnit ou = (OrganisationUnit) orgUnit;
-
-            int level = ou.getLevel();
-
-            map.putValue( level, orgUnit );
-        }
-
-        return map;
-    }
-
-    /**
-     * Creates a mapping between data type and data element for the given data elements.
-     */
-    private ListMap<DataType, DimensionalItemObject> getDataTypeDataElementMap( List<DimensionalItemObject> dataElements )
-    {
-        ListMap<DataType, DimensionalItemObject> map = new ListMap<>();
-
-        for ( DimensionalItemObject element : dataElements )
-        {
-            DataElement dataElement = (DataElement) element;
-            DataType dataType = dataElement.getValueType().isText() ? DataType.TEXT : DataType.NUMERIC;
-
-            map.putValue( dataType, dataElement );
-        }
-
-        return map;
-    }
-
-    /**
-     * Creates a mapping between the aggregation type and data element for the
-     * given data elements and period type.
-     */
-    private ListMap<AggregationType, DimensionalItemObject> getAggregationTypeDataElementMap( List<DimensionalItemObject> dataElements, PeriodType aggregationPeriodType )
-    {
-        ListMap<AggregationType, DimensionalItemObject> map = new ListMap<>();
-
-        for ( DimensionalItemObject element : dataElements )
-        {
-            DataElement de = (DataElement) element;
-
-            AggregationType aggregationType = getAggregationType( de.getValueType(), de.getAggregationType(), aggregationPeriodType, de.getPeriodType() );
-
-            map.putValue( aggregationType, de );
-        }
-
-        return map;
-    }
-
-    /**
-     * Creates a mapping between the number of days in the period interval and period
-     * for the given periods.
-     */
-    private ListMap<Integer, DimensionalItemObject> getDaysPeriodMap( List<DimensionalItemObject> periods )
-    {
-        ListMap<Integer, DimensionalItemObject> map = new ListMap<>();
-
-        for ( DimensionalItemObject period : periods )
-        {
-            Period pe = (Period) period;
-
-            int days = pe.getDaysInPeriod();
-
-            map.putValue( days, pe );
-        }
-
-        return map;
-    }
-
-    /**
-     * Puts the given element into the map according to the value type, aggregation
-     * operator, aggregation period type and data period type.
-     */
-    private AggregationType getAggregationType( ValueType valueType, AggregationType aggregationOperator,
-        PeriodType aggregationPeriodType, PeriodType dataPeriodType )
-    {
-        AggregationType aggregationType;
-
-        boolean disaggregation = isDisaggregation( aggregationPeriodType, dataPeriodType );
-        boolean number = valueType.isNumeric();
-
-        if ( aggregationOperator.isAverage() && ValueType.BOOLEAN == valueType )
-        {
-            aggregationType = AggregationType.AVERAGE_BOOL;
-        }
-        else if ( AggregationType.AVERAGE_SUM_ORG_UNIT == aggregationOperator && number && disaggregation )
-        {
-            aggregationType = AggregationType.AVERAGE_SUM_INT_DISAGGREGATION;
-        }
-        else if ( AggregationType.AVERAGE_SUM_ORG_UNIT == aggregationOperator && number )
-        {
-            aggregationType = AggregationType.AVERAGE_SUM_INT;
-        }
-        else if ( AggregationType.AVERAGE == aggregationOperator && number && disaggregation )
-        {
-            aggregationType = AggregationType.AVERAGE_INT_DISAGGREGATION;
-        }
-        else if ( AggregationType.AVERAGE == aggregationOperator && number )
-        {
-            aggregationType = AggregationType.AVERAGE_INT;
-        }
-        else
-        {
-            aggregationType = aggregationOperator;
-        }
-
-        return aggregationType;
-    }
-
-    /**
-     * Indicates whether disaggregation is allowed for the given input.
-     */
-    private boolean isDisaggregation( PeriodType aggregationPeriodType, PeriodType dataPeriodType )
-    {
-        return dataPeriodType != null && aggregationPeriodType != null && aggregationPeriodType.getFrequencyOrder() < dataPeriodType.getFrequencyOrder();
-    }
-
-    /**
-     * Creates a mapping between the period type and the data element for the
-     * given data elements.
-     */
-    private ListMap<PeriodType, DimensionalItemObject> getPeriodTypeDataElementMap( Collection<DimensionalItemObject> dataElements )
-    {
-        ListMap<PeriodType, DimensionalItemObject> map = new ListMap<>();
-
-        for ( DimensionalItemObject element : dataElements )
-        {
-            DataElement dataElement = (DataElement) element;
-
-            map.putValue( dataElement.getPeriodType(), element );
-        }
-
-        return map;
     }
 }

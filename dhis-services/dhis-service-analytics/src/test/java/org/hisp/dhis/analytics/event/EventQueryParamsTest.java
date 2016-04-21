@@ -41,6 +41,7 @@ import org.hisp.dhis.common.BaseDimensionalObject;
 import org.hisp.dhis.common.DimensionType;
 import org.hisp.dhis.common.DimensionalItemObject;
 import org.hisp.dhis.common.QueryItem;
+import org.hisp.dhis.dataelement.DataElementCategoryCombo;
 import org.hisp.dhis.period.MonthlyPeriodType;
 import org.joda.time.DateTime;
 import org.junit.Test;
@@ -77,10 +78,10 @@ public class EventQueryParamsTest
     {
         EventQueryParams params = new EventQueryParams();
         
-        QueryItem iA = new QueryItem( createDataElement( 'A' ) );
-        QueryItem iB = new QueryItem( createDataElement( 'B' ) );
-        QueryItem iC = new QueryItem( createDataElement( 'B' ) );
-        QueryItem iD = new QueryItem( createDataElement( 'D' ) );
+        QueryItem iA = new QueryItem( createDataElement( 'A', new DataElementCategoryCombo() ) );
+        QueryItem iB = new QueryItem( createDataElement( 'B', new DataElementCategoryCombo() ) );
+        QueryItem iC = new QueryItem( createDataElement( 'B', new DataElementCategoryCombo() ) );
+        QueryItem iD = new QueryItem( createDataElement( 'D', new DataElementCategoryCombo() ) );
         
         params.getItems().add( iA );
         params.getItems().add( iB );

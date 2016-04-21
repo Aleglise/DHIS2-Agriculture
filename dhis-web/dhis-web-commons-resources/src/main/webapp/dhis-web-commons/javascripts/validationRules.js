@@ -362,6 +362,11 @@ var validationRules = {
         	"min": 0,
         	"max": 10
         },
+        "sequentialSkipCount" : {
+        	"number" : true,
+        	"min": 0,
+        	"max": 10
+        },
         "operator" : {
             "required" : true
         },

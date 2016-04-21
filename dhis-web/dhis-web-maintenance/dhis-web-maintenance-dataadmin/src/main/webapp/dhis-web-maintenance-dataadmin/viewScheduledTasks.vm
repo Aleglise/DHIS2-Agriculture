@@ -67,7 +67,6 @@
 </select>
 </div>
 
-
 <!-- SMS -->
 
 <div class="settingHeader">$i18n.getString( "sms_scheduler")</div>
@@ -79,8 +78,7 @@
 <div class="setting settingIndent">
 <select id="smsSchedulerStrategy" name="smsSchedulerStrategy" class="scheduling">
     <option value="disabled">$i18n.getString( "disabled" )</option>
-    <option value="everyMidNight"#if ( $smsSchedulerStrategy && $smsSchedulerStrategy == "everyMidNight" ) selected="selected"#end>$i18n.getString( "every_mid_night" )</option>
-    
+    <option value="everyMidNight"#if ( $smsSchedulerStrategy && $smsSchedulerStrategy == "everyMidNight" ) selected="selected"#end>$i18n.getString( "all_daily" )</option>
 </select>
 <input type="button" style="width:140px" onclick="window.location.href='executeTask.action?taskKey=sendScheduledMessageTaskNow'" value="$i18n.getString( 'Run Now' )"/>
 </div>

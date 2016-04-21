@@ -30,6 +30,7 @@ package org.hisp.dhis.dxf2.metadata2.objectbundle;
 
 import org.hisp.dhis.common.IdentifiableObject;
 import org.hisp.dhis.common.MergeMode;
+import org.hisp.dhis.dxf2.metadata2.AtomicMode;
 import org.hisp.dhis.dxf2.metadata2.FlushMode;
 import org.hisp.dhis.importexport.ImportStrategy;
 import org.hisp.dhis.preheat.Preheat;
@@ -59,11 +60,17 @@ public class ObjectBundle
 
     private final ImportStrategy importMode;
 
+    private final AtomicMode atomicMode;
+
     private final MergeMode mergeMode;
 
     private final FlushMode flushMode;
 
     private final Preheat preheat;
+
+    private final boolean skipSharing;
+
+    private final boolean skipValidation;
 
     private ObjectBundleStatus objectBundleStatus = ObjectBundleStatus.CREATED;
 
@@ -79,10 +86,13 @@ public class ObjectBundle
         this.user = params.getUser();
         this.objectBundleMode = params.getObjectBundleMode();
         this.preheatIdentifier = params.getPreheatIdentifier();
-        this.importMode = params.getImportMode();
+        this.importMode = params.getImportStrategy();
+        this.atomicMode = params.getAtomicMode();
         this.preheatMode = params.getPreheatMode();
         this.mergeMode = params.getMergeMode();
         this.flushMode = params.getFlushMode();
+        this.skipSharing = params.isSkipSharing();
+        this.skipValidation = params.isSkipValidation();
         this.preheat = preheat;
 
         addObject( objectMap );
@@ -91,6 +101,11 @@ public class ObjectBundle
     public User getUser()
     {
         return user;
+    }
+
+    public String getUsername()
+    {
+        return user != null ? user.getUsername() : "system-process";
     }
 
     public ObjectBundleMode getObjectBundleMode()
@@ -113,6 +128,11 @@ public class ObjectBundle
         return importMode;
     }
 
+    public AtomicMode getAtomicMode()
+    {
+        return atomicMode;
+    }
+
     public MergeMode getMergeMode()
     {
         return mergeMode;
@@ -121,6 +141,16 @@ public class ObjectBundle
     public FlushMode getFlushMode()
     {
         return flushMode;
+    }
+
+    public boolean isSkipSharing()
+    {
+        return skipSharing;
+    }
+
+    public boolean isSkipValidation()
+    {
+        return skipValidation;
     }
 
     public ObjectBundleStatus getObjectBundleStatus()
@@ -191,6 +221,11 @@ public class ObjectBundle
         } );
 
         return objectMap;
+    }
+
+    public Map<Class<? extends IdentifiableObject>, List<IdentifiableObject>> getObjects( boolean persisted )
+    {
+        return persisted ? objects.get( Boolean.TRUE ) : objects.get( Boolean.FALSE );
     }
 
     public List<IdentifiableObject> getObjects( Class<? extends IdentifiableObject> klass, boolean persisted )

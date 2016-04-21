@@ -133,7 +133,7 @@ public class ConfigurationController
     @PreAuthorize( "hasRole('ALL') or hasRole('F_SYSTEM_SETTING')" )
     @ResponseStatus( value = HttpStatus.OK )
     @RequestMapping( value = "/feedbackRecipients", method = RequestMethod.DELETE )
-    public void setFeedbackRecipients()
+    public void removeFeedbackRecipients()
     {
         Configuration config = configurationService.getConfiguration();
 
@@ -151,7 +151,7 @@ public class ConfigurationController
     @PreAuthorize( "hasRole('ALL') or hasRole('F_SYSTEM_SETTING')" )
     @ResponseStatus( value = HttpStatus.OK )
     @RequestMapping( value = "/offlineOrganisationUnitLevel", method = RequestMethod.POST )
-    public void setOfflineOrganisationUnitLevels( @RequestBody String uid )
+    public void setOfflineOrganisationUnitLevel( @RequestBody String uid )
         throws NotFoundException
     {
         OrganisationUnitLevel organisationUnitLevel = identifiableObjectManager.get( OrganisationUnitLevel.class, uid );
@@ -165,6 +165,18 @@ public class ConfigurationController
 
         config.setOfflineOrganisationUnitLevel( organisationUnitLevel );
 
+        configurationService.setConfiguration( config );
+    }
+    
+    @PreAuthorize( "hasRole('ALL') or hasRole('F_SYSTEM_SETTING')" )
+    @ResponseStatus( value = HttpStatus.OK )
+    @RequestMapping( value = "/offlineOrganisationUnitLevel", method = RequestMethod.DELETE )
+    public void removeOfflineOrganisationUnitLevel()
+    {
+        Configuration config = configurationService.getConfiguration();
+        
+        config.setOfflineOrganisationUnitLevel( null );
+        
         configurationService.setConfiguration( config );
     }
 
@@ -277,6 +289,18 @@ public class ConfigurationController
         configurationService.setConfiguration( config );
     }
 
+    @PreAuthorize( "hasRole('ALL') or hasRole('F_SYSTEM_SETTING')" )
+    @ResponseStatus( value = HttpStatus.OK )
+    @RequestMapping( value = "/selfRegistrationRole", method = RequestMethod.DELETE )
+    public void removeSelfRegistrationRole()
+    {
+        Configuration config = configurationService.getConfiguration();
+
+        config.setSelfRegistrationRole( null );
+
+        configurationService.setConfiguration( config );
+    }
+
     @RequestMapping( value = "/selfRegistrationOrgUnit", method = RequestMethod.GET )
     public String getSelfRegistrationOrgUnit( Model model, HttpServletRequest request )
     {
@@ -298,6 +322,18 @@ public class ConfigurationController
         Configuration config = configurationService.getConfiguration();
 
         config.setSelfRegistrationOrgUnit( orgunit );
+
+        configurationService.setConfiguration( config );
+    }
+
+    @PreAuthorize( "hasRole('ALL') or hasRole('F_SYSTEM_SETTING')" )
+    @ResponseStatus( value = HttpStatus.OK )
+    @RequestMapping( value = "/selfRegistrationOrgUnit", method = RequestMethod.DELETE )
+    public void removeSelfRegistrationOrgUnit()
+    {
+        Configuration config = configurationService.getConfiguration();
+
+        config.setSelfRegistrationOrgUnit( null );
 
         configurationService.setConfiguration( config );
     }

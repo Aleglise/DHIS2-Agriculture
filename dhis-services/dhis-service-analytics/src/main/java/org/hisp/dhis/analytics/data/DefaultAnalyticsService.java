@@ -88,6 +88,7 @@ import org.hisp.dhis.common.Grid;
 import org.hisp.dhis.common.GridHeader;
 import org.hisp.dhis.common.IdentifiableObjectUtils;
 import org.hisp.dhis.common.NameableObjectUtils;
+import org.hisp.dhis.common.ReportingRateMetric;
 import org.hisp.dhis.commons.collection.ListUtils;
 import org.hisp.dhis.commons.util.DebugUtils;
 import org.hisp.dhis.constant.ConstantService;
@@ -208,9 +209,9 @@ public class DefaultAnalyticsService
 
         addDataElementValues( params, grid );
         
-        addDataElementOperands( params, grid );
+        addDataElementOperandValues( params, grid );
 
-        addDataSetValues( params, grid );
+        addReportingRates( params, grid );
         
         addProgramDataElementAttributeIndicatorValues( params, grid );
 
@@ -323,7 +324,7 @@ public class DefaultAnalyticsService
         if ( !params.getAllDataElements().isEmpty() && !params.isSkipData() )
         {
             DataQueryParams dataSourceParams = params.instance();
-            dataSourceParams.retainDataDimension( DataDimensionItemType.AGGREGATE_DATA_ELEMENT );
+            dataSourceParams.retainDataDimension( DataDimensionItemType.DATA_ELEMENT );
 
             Map<String, Object> aggregatedDataMap = getAggregatedDataValueMapObjectTyped( dataSourceParams );
 
@@ -343,7 +344,7 @@ public class DefaultAnalyticsService
      * @param params the data query parameters.
      * @param grid the grid.
      */
-    private void addDataElementOperands( DataQueryParams params, Grid grid )
+    private void addDataElementOperandValues( DataQueryParams params, Grid grid )
     {
         if ( !params.getDataElementOperands().isEmpty() && !params.isSkipData() )
         {
@@ -378,30 +379,49 @@ public class DefaultAnalyticsService
     }
     
     /**
-     * Adds data set values to the given grid based on the given data query
+     * Adds reporting rates to the given grid based on the given data query
      * parameters.
      *
      * @param params the data query parameters.
      * @param grid the grid.
      */
-    private void addDataSetValues( DataQueryParams params, Grid grid )
+    private void addReportingRates( DataQueryParams params, Grid grid )
     {
-        if ( !params.getDataSets().isEmpty() && !params.isSkipData() )
+        if ( !params.getReportingRates().isEmpty() && !params.isSkipData() )
         {
-            // -----------------------------------------------------------------
-            // Get complete data set registrations
-            // -----------------------------------------------------------------
+            for ( ReportingRateMetric metric : ReportingRateMetric.values() )
+            {
+                DataQueryParams dataSourceParams = params.instance();
+                dataSourceParams.retainDataDimensionReportingRates( metric );
+                dataSourceParams.ignoreDataApproval(); // No approval for reporting rates
+                dataSourceParams.setAggregationType( AggregationType.COUNT );
+                
+                addReportingRates( dataSourceParams, grid, metric );
+            }
+        }
+    }
 
-            DataQueryParams dataSourceParams = params.instance();
-            dataSourceParams.ignoreDataApproval(); // No approval for reporting rates
-            dataSourceParams.retainDataDimension( DataDimensionItemType.DATA_SET );
-            dataSourceParams.setAggregationType( AggregationType.COUNT );
-
+    /**
+     * Adds reporting rates to the given grid based on the given data query
+     * parameters and reporting rate metric.
+     *
+     * @param params the data query parameters.
+     * @param grid the grid.
+     * @param metic the reporting rate metric.
+     */
+    private void addReportingRates( DataQueryParams dataSourceParams, Grid grid, ReportingRateMetric metric )
+    {
+        if ( !dataSourceParams.getReportingRates().isEmpty() && !dataSourceParams.isSkipData() )
+        {
             if ( !COMPLETENESS_DIMENSION_TYPES.containsAll( dataSourceParams.getDimensionTypes() ) )
             {
                 return;
             }
-            
+
+            // -----------------------------------------------------------------
+            // Get complete data set registrations
+            // -----------------------------------------------------------------
+
             Map<String, Double> aggregatedDataMap = getAggregatedCompletenessValueMap( dataSourceParams );
 
             // -----------------------------------------------------------------
@@ -416,6 +436,7 @@ public class DefaultAnalyticsService
             targetParams.setDimensions( ListUtils.getAtIndexes( targetParams.getDimensions(), completenessDimIndexes ) );
             targetParams.setFilters( ListUtils.getAtIndexes( targetParams.getFilters(), completenessFilterIndexes ) );
             targetParams.setSkipPartitioning( true );
+            targetParams.setAggregationType( AggregationType.SUM );
 
             Map<String, Double> targetMap = getAggregatedCompletenessTargetMap( targetParams );
 
@@ -434,22 +455,49 @@ public class DefaultAnalyticsService
             {
                 List<String> dataRow = Lists.newArrayList( entry.getKey().split( DIMENSION_SEP ) );
 
+                // -------------------------------------------------------------
+                // Get target value
+                // -------------------------------------------------------------
+
                 List<String> targetRow = ListUtils.getAtIndexes( dataRow, completenessDimIndexes );
                 String targetKey = StringUtils.join( targetRow, DIMENSION_SEP );
                 Double target = targetMap.get( targetKey );
+                
+                Double actual = entry.getValue();
 
-                if ( target != null && entry.getValue() != null )
+                if ( target != null && actual != null )
                 {
+                    // ---------------------------------------------------------
+                    // Multiply target value by number of periods in time span
+                    // ---------------------------------------------------------
+
                     PeriodType queryPt = filterPeriodType != null ? filterPeriodType : getPeriodTypeFromIsoString( dataRow.get( periodIndex ) );
                     PeriodType dataSetPt = dsPtMap.get( dataRow.get( dataSetIndex ) );
-
                     target = target * queryPt.getPeriodSpan( dataSetPt );
 
-                    double value = entry.getValue() * PERCENT / target;
+                    // ---------------------------------------------------------
+                    // Calculate reporting rate and replace data set with rate
+                    // ---------------------------------------------------------
+
+                    double rate = actual * PERCENT / target;
+                    
+                    Double value = rate;
+                    
+                    if ( ReportingRateMetric.ACTUAL_REPORTS == metric )
+                    {
+                        value = actual;
+                    }
+                    else if ( ReportingRateMetric.EXPECTED_REPORTS == metric )
+                    {
+                        value = target;
+                    }
+                    
+                    String reportingRate = DimensionalObjectUtils.getDimensionItem( dataRow.get( DX_INDEX ), metric );
+                    dataRow.set( DX_INDEX, reportingRate );
 
                     grid.addRow();
                     grid.addValues( dataRow.toArray() );
-                    grid.addValue( params.isSkipRounding() ? value : MathUtils.getRounded( value ) );
+                    grid.addValue( dataSourceParams.isSkipRounding() ? value : MathUtils.getRounded( value ) );
                 }
             }
         }
@@ -702,7 +750,7 @@ public class DefaultAnalyticsService
             return null;
         }
 
-        DataQueryParams orgUnitTargetParams = params.instance().pruneToDimensionType( DimensionType.ORGANISATIONUNIT );
+        DataQueryParams orgUnitTargetParams = params.instance().pruneToDimensionType( DimensionType.ORGANISATION_UNIT );
         orgUnitTargetParams.getDimensions().add( new BaseDimensionalObject( DimensionalObject.ORGUNIT_GROUP_DIM_ID, null, new ArrayList<DimensionalItemObject>( orgUnitGroups ) ) );
         orgUnitTargetParams.setSkipPartitioning( true );
 
@@ -825,7 +873,7 @@ public class DefaultAnalyticsService
 
         int optimalQueries = MathUtils.getWithin( getProcessNo(), 1, MAX_QUERIES );
 
-        int maxLimit = getMaxLimit();
+        int maxLimit = (Integer) systemSettingManager.getSystemSetting( SettingKey.ANALYTICS_MAX_LIMIT );
         
         Timer timer = new Timer().start().disablePrint();
 
@@ -952,7 +1000,7 @@ public class DefaultAnalyticsService
                     map.put( object.getDimensionItem(), object.getDisplayProperty( params.getDisplayProperty() ) );
                 }
 
-                if ( DimensionType.ORGANISATIONUNIT.equals( dimension.getDimensionType() ) && params.isHierarchyMeta() )
+                if ( DimensionType.ORGANISATION_UNIT.equals( dimension.getDimensionType() ) && params.isHierarchyMeta() )
                 {
                     OrganisationUnit unit = (OrganisationUnit) object;
                     
@@ -1017,15 +1065,5 @@ public class DefaultAnalyticsService
         Integer cores = (Integer) systemSettingManager.getSystemSetting( SettingKey.DATABASE_SERVER_CPUS );
 
         return ( cores == null || cores == 0 ) ? SystemUtils.getCpuCores() : cores;
-    }
-
-    /**
-     * Returns the max records limit. 0 indicates no limit.
-     * 
-     * @return the max records limit.
-     */
-    private int getMaxLimit()
-    {
-        return (Integer) systemSettingManager.getSystemSetting( SettingKey.ANALYTICS_MAX_LIMIT );
     }
 }

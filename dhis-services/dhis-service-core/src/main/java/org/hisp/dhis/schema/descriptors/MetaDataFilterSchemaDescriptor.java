@@ -33,14 +33,12 @@ import org.hisp.dhis.security.Authority;
 import org.hisp.dhis.security.AuthorityType;
 import org.hisp.dhis.schema.Schema;
 import org.hisp.dhis.schema.SchemaDescriptor;
-import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Lists;
 
 /**
  * @author Lars Helge Overland
  */
-@Component
 public class MetaDataFilterSchemaDescriptor implements SchemaDescriptor
 {
     public static final String SINGULAR = "metaDataFilter";

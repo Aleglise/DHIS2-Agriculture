@@ -40,6 +40,7 @@ import org.hisp.dhis.dxf2.common.JacksonUtils;
 import org.hisp.dhis.dxf2.datavalueset.DataValueSetService;
 import org.hisp.dhis.dxf2.metadata.ExportService;
 import org.hisp.dhis.dxf2.metadata.Metadata;
+import org.hisp.dhis.dxf2.metadata2.MetadataExportService;
 import org.hisp.dhis.dxf2.webmessage.WebMessageException;
 import org.hisp.dhis.node.types.RootNode;
 import org.hisp.dhis.organisationunit.OrganisationUnit;
@@ -98,6 +99,9 @@ public class DataSetController
 
     @Autowired
     private ExportService exportService;
+
+    @Autowired
+    private MetadataExportService metadataExportService;
 
     @Autowired
     private DataValueService dataValueService;
@@ -269,6 +273,19 @@ public class DataSetController
 
         dataSet.increaseVersion();
         dataSetService.updateDataSet( dataSet );
+    }
+
+    @RequestMapping( value = "/{uid}/metadata", method = RequestMethod.GET )
+    public @ResponseBody RootNode getDataSetWithDependencies( @PathVariable( "uid" ) String pvUid, HttpServletResponse response ) throws WebMessageException, IOException
+    {
+        DataSet dataSet = dataSetService.getDataSet( pvUid );
+
+        if ( dataSet == null )
+        {
+            throw new WebMessageException( WebMessageUtils.notFound( "DataSet not found for uid: " + pvUid ) );
+        }
+
+        return metadataExportService.getMetadataWithDependenciesAsNode( dataSet );
     }
 
     /**

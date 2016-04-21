@@ -43,6 +43,7 @@ import org.hisp.dhis.common.IdentifiableObjectManager;
 import org.hisp.dhis.common.IllegalQueryException;
 import org.hisp.dhis.common.ListMap;
 import org.hisp.dhis.common.MapMap;
+import org.hisp.dhis.common.ReportingRate;
 import org.hisp.dhis.common.ValueType;
 import org.hisp.dhis.dataelement.DataElement;
 import org.hisp.dhis.dataelement.DataElementCategoryOptionCombo;
@@ -123,10 +124,10 @@ public class QueryPlannerTest
     private ProgramDataElement pdeA;
     private ProgramDataElement pdeB;
 
-    private DataSet dsA;
-    private DataSet dsB;
-    private DataSet dsC;
-    private DataSet dsD;
+    private ReportingRate rrA;
+    private ReportingRate rrB;
+    private ReportingRate rrC;
+    private ReportingRate rrD;
 
     private Period peA;
     private Period peB;
@@ -181,17 +182,22 @@ public class QueryPlannerTest
 
         idObjectManager.save( pdeA );
         idObjectManager.save( pdeB );
-        
-        dsA = createDataSet( 'A', pt );
-        dsB = createDataSet( 'B', pt );
-        dsC = createDataSet( 'C', pt );
-        dsD = createDataSet( 'D', pt );
 
+        DataSet dsA = createDataSet( 'A', pt );
+        DataSet dsB = createDataSet( 'B', pt );
+        DataSet dsC = createDataSet( 'C', pt );
+        DataSet dsD = createDataSet( 'D', pt );
+        
         dataSetService.addDataSet( dsA );
         dataSetService.addDataSet( dsB );
         dataSetService.addDataSet( dsC );
         dataSetService.addDataSet( dsD );
         
+        rrA = new ReportingRate( dsA );
+        rrB = new ReportingRate( dsB );
+        rrC = new ReportingRate( dsC );
+        rrD = new ReportingRate( dsD );
+
         peA = PeriodType.getPeriodFromIsoString( "201501" );
         peB = PeriodType.getPeriodFromIsoString( "201502" );
 
@@ -733,7 +739,7 @@ public class QueryPlannerTest
     public void planQueryK()
     {
         DataQueryParams params = new DataQueryParams();
-        params.setDataSets( getList( dsA, dsB, dsC, dsD ) );
+        params.setReportingRates( getList( rrA, rrB, rrC, rrD ) );
         params.setOrganisationUnits( getList( ouA, ouB, ouC, ouD, ouE ) );
         params.setPeriods( getList( createPeriod( "2000Q1" ), createPeriod( "2000Q2" ), createPeriod( "2000Q3" ), createPeriod( "2000Q4" ), createPeriod( "2001Q1" ), createPeriod( "2001Q2" ) ) );
 
@@ -800,12 +806,68 @@ public class QueryPlannerTest
             assertDimensionNameNotNull( query );
         }
     }
+    
+    /**
+     * Split on two data elements. Set aggregation type average and value type
+     * integer on query. Convert aggregation type from data elements to average 
+     * and then to average integer.
+     */
+    @Test
+    public void planQueryAggregationTypeA()
+    {
+        DataElement deA = createDataElement( 'A', ValueType.INTEGER, AggregationType.SUM );
+        DataElement deB = createDataElement( 'B', ValueType.INTEGER, AggregationType.COUNT );
+        
+        DataQueryParams params = new DataQueryParams();
+        params.setDataElements( getList( deA, deB ) );
+        params.setOrganisationUnits( getList( ouA ) );
+        params.setPeriods( getList( createPeriod( "200101" ) ) );
+        params.setAggregationType( AggregationType.AVERAGE );
 
+        DataQueryGroups queryGroups = queryPlanner.planQuery( params, 4, ANALYTICS_TABLE_NAME );
+
+        assertEquals( 2, queryGroups.getAllQueries().size() );
+        
+        for ( DataQueryParams query : queryGroups.getAllQueries() )
+        {
+            assertNotNull( query.getAggregationType() );
+            assertEquals( AggregationType.AVERAGE_INT, query.getAggregationType() );
+        }
+    }
+
+    /**
+     * Split on two data elements. Set aggregation type average and value type
+     * boolean on query. Convert aggregation type from data elements to average 
+     * and then to average boolean.
+     */
+    @Test
+    public void planQueryAggregationTypeB()
+    {
+        DataElement deA = createDataElement( 'A', ValueType.BOOLEAN, AggregationType.SUM );
+        DataElement deB = createDataElement( 'B', ValueType.BOOLEAN, AggregationType.COUNT );
+        
+        DataQueryParams params = new DataQueryParams();
+        params.setDataElements( getList( deA, deB ) );
+        params.setOrganisationUnits( getList( ouA ) );
+        params.setPeriods( getList( createPeriod( "200101" ) ) );
+        params.setAggregationType( AggregationType.AVERAGE );
+
+        DataQueryGroups queryGroups = queryPlanner.planQuery( params, 4, ANALYTICS_TABLE_NAME );
+
+        assertEquals( 2, queryGroups.getAllQueries().size() );
+        
+        for ( DataQueryParams query : queryGroups.getAllQueries() )
+        {
+            assertNotNull( query.getAggregationType() );
+            assertEquals( AggregationType.AVERAGE_BOOL, query.getAggregationType() );
+        }
+    }
+    
     @Test
     public void validateSuccesA()
     {
         DataQueryParams params = new DataQueryParams();
-        params.getDimensions().add( new BaseDimensionalObject( ORGUNIT_DIM_ID, DimensionType.ORGANISATIONUNIT, getList( ouA, ouB ) ) );
+        params.getDimensions().add( new BaseDimensionalObject( ORGUNIT_DIM_ID, DimensionType.ORGANISATION_UNIT, getList( ouA, ouB ) ) );
         params.getDimensions().add( new BaseDimensionalObject( PERIOD_DIM_ID, DimensionType.PERIOD, getList( peA, peB ) ) );
         params.getFilters().add( new BaseDimensionalObject( DATA_X_DIM_ID, DimensionType.DATA_X, getList( deA, deB ) ) );
         
@@ -817,7 +879,7 @@ public class QueryPlannerTest
     {
         DataQueryParams params = new DataQueryParams();
         params.getDimensions().add( new BaseDimensionalObject( DATA_X_DIM_ID, DimensionType.DATA_X, getList( deA, deB, pdeA, pdeB ) ) );
-        params.getFilters().add( new BaseDimensionalObject( ORGUNIT_DIM_ID, DimensionType.ORGANISATIONUNIT, getList( ouA, ouB ) ) );
+        params.getFilters().add( new BaseDimensionalObject( ORGUNIT_DIM_ID, DimensionType.ORGANISATION_UNIT, getList( ouA, ouB ) ) );
         params.getDimensions().add( new BaseDimensionalObject( PERIOD_DIM_ID, DimensionType.PERIOD, getList( peA, peB ) ) );
         
         queryPlanner.validate( params );
@@ -827,7 +889,7 @@ public class QueryPlannerTest
     public void validateFailureA()
     {
         DataQueryParams params = new DataQueryParams();
-        params.getDimensions().add( new BaseDimensionalObject( ORGUNIT_DIM_ID, DimensionType.ORGANISATIONUNIT, getList( ouA, ouB ) ) );
+        params.getDimensions().add( new BaseDimensionalObject( ORGUNIT_DIM_ID, DimensionType.ORGANISATION_UNIT, getList( ouA, ouB ) ) );
         params.getFilters().add( new BaseDimensionalObject( DATA_X_DIM_ID, DimensionType.DATA_X, getList( deA, inA ) ) );
         
         queryPlanner.validate( params );

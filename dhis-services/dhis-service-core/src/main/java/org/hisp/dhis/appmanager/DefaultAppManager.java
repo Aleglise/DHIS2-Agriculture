@@ -28,21 +28,10 @@ package org.hisp.dhis.appmanager;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
-import java.util.zip.ZipFile;
-
-import javax.annotation.PostConstruct;
-
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.ant.compress.taskdefs.Unzip;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -52,6 +41,7 @@ import org.hisp.dhis.datavalue.DefaultDataValueService;
 import org.hisp.dhis.external.location.LocationManager;
 import org.hisp.dhis.external.location.LocationManagerException;
 import org.hisp.dhis.keyjsonvalue.KeyJsonValueService;
+import org.hisp.dhis.query.QueryParserException;
 import org.hisp.dhis.setting.SettingKey;
 import org.hisp.dhis.setting.SystemSettingManager;
 import org.hisp.dhis.user.CurrentUserService;
@@ -59,8 +49,20 @@ import org.hisp.dhis.user.User;
 import org.hisp.dhis.user.UserCredentials;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.annotation.PostConstruct;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipFile;
 
 /**
  * @author Saptarshi Purkayastha
@@ -69,7 +71,7 @@ public class DefaultAppManager
     implements AppManager
 {
     private static final Log log = LogFactory.getLog( DefaultDataValueService.class );
-    
+
     private static final String MANIFEST_FILENAME = "manifest.webapp";
 
     /**
@@ -86,7 +88,7 @@ public class DefaultAppManager
     private void init()
     {
         verifyAppFolder();
-        
+
         reloadApps();
     }
 
@@ -95,13 +97,13 @@ public class DefaultAppManager
 
     @Autowired
     private CurrentUserService currentUserService;
-    
+
     @Autowired
     private LocationManager locationManager;
 
     @Autowired
     private KeyJsonValueService keyJsonValueService;
-    
+
     // -------------------------------------------------------------------------
     // AppManagerService implementation
     // -------------------------------------------------------------------------
@@ -110,8 +112,54 @@ public class DefaultAppManager
     public List<App> getApps( String contextPath )
     {
         apps.forEach( a -> a.init( contextPath ) );
-        
+
         return apps;
+    }
+
+    @Override
+    public List<App> getAppsByType( AppType appType, Collection<App> apps )
+    {
+        return apps.stream()
+            .filter( app -> app.getAppType() == appType )
+            .collect( Collectors.toList() );
+    }
+
+    @Override
+    public List<App> getAppsByName( final String name, Collection<App> apps, final String operator )
+    {
+        return apps.stream().filter( app -> ( 
+            ( "ilike".equalsIgnoreCase( operator ) && app.getName().toLowerCase().contains( name.toLowerCase() ) ) ||
+            ( "eq".equalsIgnoreCase( operator ) && app.getName().equals( name ) ) ) ).
+            collect( Collectors.toList() );
+    }
+
+    @Override
+    public List<App> filterApps( List<String> filters, String contextPath )
+    {
+        List<App> apps = getApps( contextPath );
+        Set<App> returnList = new HashSet<>( apps );
+
+        for ( String filter : filters )
+        {
+            String[] split = filter.split( ":" );
+
+            if ( split.length != 3 )
+            {
+                throw new QueryParserException( "Invalid filter: " + filter );
+            }
+
+            if ( "appType".equalsIgnoreCase( split[0] ) )
+            {
+                String appType = split[2] != null ? split[2].toUpperCase() : null;
+                returnList.retainAll( getAppsByType( AppType.valueOf( appType ), returnList ) );
+            }
+            else if ( "name".equalsIgnoreCase( split[0] ) )
+            {
+                returnList.retainAll( getAppsByName( split[2], returnList, split[1] ) );
+            }
+        }
+
+        return new ArrayList<>( returnList );
     }
 
     @Override
@@ -134,7 +182,7 @@ public class DefaultAppManager
     public List<App> getAccessibleApps( String contextPath )
     {
         User user = currentUserService.getCurrentUser();
-        
+
         return getApps( contextPath ).stream().filter( a -> this.isAccessible( a, user ) ).collect( Collectors.toList() );
     }
 
@@ -142,7 +190,7 @@ public class DefaultAppManager
     public AppStatus installApp( File file, String fileName )
     {
         try
-        {            
+        {
             // -----------------------------------------------------------------
             // Parse ZIP file and it's manifest.webapp file.
             // -----------------------------------------------------------------
@@ -161,14 +209,14 @@ public class DefaultAppManager
             // -----------------------------------------------------------------
 
             String namespace = app.getActivities().getDhis().getNamespace();
-            
-            if ( namespace != null && ( this.appNamespaces.containsKey( namespace ) &&
-                !app.equals( appNamespaces.get( namespace ) ) ) )
+
+            if ( namespace != null && (this.appNamespaces.containsKey( namespace ) &&
+                !app.equals( appNamespaces.get( namespace ) )) )
             {
                 zip.close();
                 return AppStatus.NAMESPACE_TAKEN;
             }
-            
+
             // -----------------------------------------------------------------
             // Delete if app is already installed, assuming app update so no 
             // data is deleted
@@ -189,7 +237,7 @@ public class DefaultAppManager
             unzip.execute();
 
             log.info( "Installed app: " + app );
-            
+
             // -----------------------------------------------------------------
             // Installation complete. Closing zip, reloading apps and return OK
             // -----------------------------------------------------------------
@@ -246,7 +294,7 @@ public class DefaultAppManager
                     FileUtils.forceDelete( new File( folderPath ) );
 
                     // Delete if deleteAppData is true and a namespace associated with the app exists
-                    
+
                     if ( deleteAppData && appNamespaces.containsValue( app ) )
                     {
                         appNamespaces.forEach( ( namespace, app1 ) -> {
@@ -334,7 +382,7 @@ public class DefaultAppManager
                                 appList.add( app );
 
                                 String appNamespace = app.getActivities().getDhis().getNamespace();
-                                
+
                                 if ( appNamespace != null )
                                 {
                                     appNamespaces.put( appNamespace, app );
@@ -393,13 +441,13 @@ public class DefaultAppManager
     private void verifyAppFolder()
     {
         String appFolderPath = getAppFolderPath();
-        
+
         if ( appFolderPath != null && !appFolderPath.isEmpty() )
         {
             try
             {
                 File folder = new File( appFolderPath );
-                
+
                 if ( !folder.exists() )
                 {
                     FileUtils.forceMkdir( folder );

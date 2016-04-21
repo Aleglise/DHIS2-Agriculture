@@ -297,9 +297,10 @@ public class ValidationResult
     @Override
     public String toString()
     {
-        return "[Org unit: " + orgUnit +
-            ", period: " + period +
-            ", validation rule: " + validationRule +
+        return "[Org unit: " + orgUnit.getUid() +
+            ", period: " + period.getUid() +
+            ", validation rule: " + validationRule.getUid() +
+            "(" + validationRule.getDisplayName() + ")"+
             ", left side value: " + leftsideValue +
             ", right side value: " + rightsideValue + "]";
     }

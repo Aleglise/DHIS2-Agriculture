@@ -77,7 +77,8 @@ function saveGatewayConfig()
 	{
 		var username = getFieldValue( 'bulksmsFields input[id=username]' );
 		var password = getFieldValue( 'bulksmsFields input[id=password]' );
-		if ( username == "" || password == "")
+		var URL = getFieldValue( 'bulksmsFields input[id=urlTemplate]' );
+		if ( username == "" || password == "" || URL == "")
 		{	
 			showErrorMessage( i18n_required_data_error );
 		}
@@ -126,7 +127,8 @@ function saveGatewayConfig()
 	{
 		var username = getFieldValue( 'clickatellFields input[id=username]' );
 		var password = getFieldValue( 'clickatellFields input[id=password]' );
-		if ( username == "" || password == "")
+		var URL = getFieldValue( 'clickatellFields input[id=urlTemplate]' );
+		if ( username == "" || password == "" || URL == "")
 		{	
 			showErrorMessage( i18n_required_data_error );
 		}

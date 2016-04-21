@@ -30,6 +30,7 @@ package org.hisp.dhis.validationrule.action;
 
 import com.opensymphony.xwork2.Action;
 import org.apache.commons.lang3.StringUtils;
+import org.hisp.dhis.expression.Expression;
 import org.hisp.dhis.expression.ExpressionService;
 import org.hisp.dhis.expression.Operator;
 import org.hisp.dhis.period.PeriodService;
@@ -169,11 +170,18 @@ public class UpdateValidationRuleAction
         this.rightSideMissingValueStrategy = rightSideMissingValueStrategy;
     }
 
-    private Integer organisationUnitLevel;
+    private String skipTestExpression;
 
-    public void setOrganisationUnitLevel( Integer organisationUnitLevel )
+    public void setSkipTestExpression( String rightSideExpression )
     {
-        this.organisationUnitLevel = organisationUnitLevel;
+        this.rightSideExpression = rightSideExpression;
+    }
+
+    private String skipTestDescription;
+
+    public void setSkipTestDescription( String rightSideDescription )
+    {
+        this.rightSideDescription = rightSideDescription;
     }
 
     private String periodTypeName;
@@ -183,18 +191,25 @@ public class UpdateValidationRuleAction
         this.periodTypeName = periodTypeName;
     }
 
-    private String sequentialSampleCount;
+    private Integer sequentialSampleCount;
 
-    public void setSequentialSampleCount( String sequentialSampleCount )
+    public void setSequentialSampleCount( Integer sequentialSampleCount )
     {
         this.sequentialSampleCount = sequentialSampleCount;
     }
 
-    private String annualSampleCount;
+    private Integer annualSampleCount;
 
-    public void setAnnualSampleCount( String annualSampleCount )
+    public void setAnnualSampleCount( Integer annualSampleCount )
     {
         this.annualSampleCount = annualSampleCount;
+    }
+
+    private Integer sequentialSkipCount;
+
+    public void setSequentialSkipCount( Integer sequentialSkipCount )
+    {
+        this.sequentialSkipCount = sequentialSkipCount;
     }
 
     // -------------------------------------------------------------------------
@@ -205,6 +220,9 @@ public class UpdateValidationRuleAction
     public String execute()
     {
         ValidationRule validationRule = validationRuleService.getValidationRule( id );
+        Expression leftSide = validationRule.getLeftSide();
+        Expression rightSide = validationRule.getLeftSide();
+        Expression skipTest = validationRule.getSampleSkipTest();
 
         validationRule.setName( StringUtils.trimToNull( name ) );
         validationRule.setDescription( StringUtils.trimToNull( description ) );
@@ -213,23 +231,39 @@ public class UpdateValidationRuleAction
         validationRule.setRuleType( RuleType.valueOf( StringUtils.trimToNull( ruleType ) ) );
         validationRule.setOperator( Operator.valueOf( operator ) );
 
-        validationRule.getLeftSide().setExpression( leftSideExpression );
-        validationRule.getLeftSide().setDescription( leftSideDescription );
-        validationRule.getLeftSide().setMissingValueStrategy( safeValueOf( leftSideMissingValueStrategy, SKIP_IF_ANY_VALUE_MISSING ) );
-        validationRule.getLeftSide().setDataElementsInExpression( expressionService.getDataElementsInExpression( leftSideExpression ) );
+        leftSide.setExpression( leftSideExpression );
+        leftSide.setDescription( leftSideDescription );
+        leftSide.setMissingValueStrategy( safeValueOf( leftSideMissingValueStrategy, SKIP_IF_ANY_VALUE_MISSING ) );
+        leftSide.setDataElementsInExpression( expressionService.getDataElementsInExpression( leftSideExpression ) );
+        leftSide.setSampleElementsInExpression( expressionService.getSampleElementsInExpression( leftSideExpression ) );
 
-        validationRule.getRightSide().setExpression( rightSideExpression );
-        validationRule.getRightSide().setDescription( rightSideDescription );
-        validationRule.getRightSide().setMissingValueStrategy( safeValueOf( rightSideMissingValueStrategy, SKIP_IF_ANY_VALUE_MISSING ) );
-        validationRule.getRightSide().setDataElementsInExpression( expressionService.getDataElementsInExpression( rightSideExpression ) );
-        validationRule.setOrganisationUnitLevel( organisationUnitLevel );
+        rightSide.setExpression( rightSideExpression );
+        rightSide.setDescription( rightSideDescription );
+        rightSide.setMissingValueStrategy( safeValueOf( rightSideMissingValueStrategy, SKIP_IF_ANY_VALUE_MISSING ) );
+        rightSide.setDataElementsInExpression( expressionService.getDataElementsInExpression( rightSideExpression ) );
+        rightSide.setSampleElementsInExpression( expressionService.getSampleElementsInExpression( rightSideExpression ) );
+
+        if ( skipTestExpression != null && skipTest == null )
+        {
+            skipTest = new Expression();
+            validationRule.setSampleSkipTest( skipTest );
+        }
+        
+        if ( skipTest != null )
+        {
+            skipTest.setExpression( skipTestExpression );
+            skipTest.setDescription( skipTestDescription );
+            skipTest.setDataElementsInExpression( expressionService.getDataElementsInExpression( skipTestExpression ) );
+            skipTest.setSampleElementsInExpression( expressionService.getSampleElementsInExpression( skipTestExpression ) );
+        }
 
         PeriodType periodType = periodService.getPeriodTypeByName( periodTypeName );
         validationRule.setPeriodType( periodType == null ? null : periodService.getPeriodTypeByClass( periodType.getClass() ) );
 
-        validationRule.setSequentialSampleCount( sequentialSampleCount != null && !sequentialSampleCount.isEmpty() ? Integer.parseInt( sequentialSampleCount ) : null );
-        validationRule.setAnnualSampleCount( annualSampleCount != null && !annualSampleCount.isEmpty() ? Integer.parseInt( annualSampleCount ) : null );
-
+        validationRule.setSequentialSampleCount( sequentialSampleCount );
+        validationRule.setAnnualSampleCount( annualSampleCount );
+        validationRule.setSequentialSkipCount( sequentialSkipCount );
+        
         validationRuleService.updateValidationRule( validationRule );
 
         return SUCCESS;

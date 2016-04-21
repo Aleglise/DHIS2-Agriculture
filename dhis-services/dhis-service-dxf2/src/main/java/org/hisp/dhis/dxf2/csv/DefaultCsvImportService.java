@@ -28,7 +28,16 @@ package org.hisp.dhis.dxf2.csv;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import com.csvreader.CsvReader;
+import static org.hisp.dhis.system.util.DateUtils.getMediumDate;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.hisp.dhis.analytics.AggregationType;
 import org.hisp.dhis.common.BaseIdentifiableObject;
@@ -55,20 +64,13 @@ import org.hisp.dhis.organisationunit.OrganisationUnit;
 import org.hisp.dhis.organisationunit.OrganisationUnitGroup;
 import org.hisp.dhis.period.MonthlyPeriodType;
 import org.hisp.dhis.period.PeriodType;
+import org.hisp.dhis.translation.Translation;
 import org.hisp.dhis.validation.Importance;
 import org.hisp.dhis.validation.RuleType;
 import org.hisp.dhis.validation.ValidationRule;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.hisp.dhis.system.util.DateUtils.getMediumDate;
+import com.csvreader.CsvReader;
 
 /**
  * @author Lars Helge Overland
@@ -126,6 +128,10 @@ public class DefaultCsvImportService
         else if ( OptionSet.class.equals( clazz ) )
         {
             setOptionSetsFromCsv( reader, metadata );
+        }
+        else if ( Translation.class.equals( clazz ) )
+        {
+            metadata.setTranslations( translationsFromCsv( reader ) );
         }
 
         return metadata;
@@ -391,6 +397,7 @@ public class DefaultCsvImportService
             {
                 OptionSet optionSet = new OptionSet();
                 setIdentifiableObject( optionSet, values );
+                optionSet.setValueType( ValueType.TEXT );
 
                 Option option = new Option();
                 option.setName( getSafe( values, 3, null, 230 ) );
@@ -424,6 +431,30 @@ public class DefaultCsvImportService
         }
     }
 
+    private List<Translation> translationsFromCsv( CsvReader reader )
+        throws IOException
+    {
+        List<Translation> list = new ArrayList<>();
+        
+        while ( reader.readRecord() )
+        {
+            String[] values = reader.getValues();
+            
+            if ( values != null && values.length > 0 )
+            {
+                Translation translation = new Translation();
+                translation.setObjectUid( getSafe( values, 0, null, 11 ) );
+                translation.setClassName( getSafe( values, 1, null, 120 ) );
+                translation.setLocale( getSafe( values, 2, null, 15 ) );
+                translation.setProperty( getSafe( values, 3, null, 60 ) );
+                translation.setValue( getSafe( values, 4, null, null ) );
+                list.add( translation );
+            }
+        }
+        
+        return list;
+    }
+    
     // -------------------------------------------------------------------------
     // Supportive methods
     // -------------------------------------------------------------------------
@@ -445,7 +476,7 @@ public class DefaultCsvImportService
      * Returns a string from the given array avoiding exceptions.
      *
      * @param values       the string array.
-     * @param index        the array index of the string to get.
+     * @param index        the array index of the string to get, zero-based.
      * @param defaultValue the default value in case index is out of bounds.
      * @param maxChars     the max number of characters to return for the string.
      */

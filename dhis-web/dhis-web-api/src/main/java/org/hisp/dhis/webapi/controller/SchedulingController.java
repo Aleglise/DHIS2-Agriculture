@@ -73,7 +73,6 @@ public class SchedulingController
         throws IOException
     {
         SchedulingStrategy strategy = renderService.fromJson( request.getInputStream(), SchedulingStrategy.class );
-
         ListMap<String, String> cronKeyMap = new ListMap<>();
 
         // -------------------------------------------------------------

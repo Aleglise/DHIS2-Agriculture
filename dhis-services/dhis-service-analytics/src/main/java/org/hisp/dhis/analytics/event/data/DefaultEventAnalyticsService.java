@@ -433,7 +433,7 @@ public class DefaultEventAnalyticsService
 
         for ( DimensionalObject dimension : dimensions )
         {
-            boolean hierarchy = hierarchyMeta && DimensionType.ORGANISATIONUNIT.equals( dimension.getDimensionType() );
+            boolean hierarchy = hierarchyMeta && DimensionType.ORGANISATION_UNIT.equals( dimension.getDimensionType() );
 
             for ( DimensionalItemObject object : dimension.getItems() )
             {

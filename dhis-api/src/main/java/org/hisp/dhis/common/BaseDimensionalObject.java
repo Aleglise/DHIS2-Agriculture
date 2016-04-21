@@ -182,7 +182,7 @@ public class BaseDimensionalObject
     {
         return
             DimensionType.PROGRAM_ATTRIBUTE.equals( dimensionType ) ||
-            DimensionType.PROGRAM_DATAELEMENT.equals( dimensionType ) ?
+            DimensionType.PROGRAM_DATA_ELEMENT.equals( dimensionType ) ?
             AnalyticsType.EVENT : AnalyticsType.AGGREGATE;
     }
 

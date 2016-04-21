@@ -150,6 +150,8 @@ public interface GenericStore<T>
      */
     List<T> getAll( int first, int max );
 
+    List<T> getAllByAttributes( List<Attribute> attributes );
+
     /**
      * Gets the count of objects.
      *
@@ -172,6 +174,8 @@ public interface GenericStore<T>
     T getByAttribute( Attribute attribute );
 
     List<AttributeValue> getAttributeValueByAttribute( Attribute attribute );
+
+    List<AttributeValue> getAttributeValueByAttributes( List<Attribute> attributes );
 
     List<AttributeValue> getAttributeValueByAttributeAndValue( Attribute attribute, String value );
 

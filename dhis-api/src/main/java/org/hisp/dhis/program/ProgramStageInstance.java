@@ -60,6 +60,7 @@ public class ProgramStageInstance
 
     private DataElementCategoryOptionCombo attributeOptionCombo;
 
+    @Deprecated
     private List<OutboundSms> outboundSms = new ArrayList<>();
 
     private List<MessageConversation> messageConversations = new ArrayList<>();

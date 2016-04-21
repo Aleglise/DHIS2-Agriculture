@@ -32,6 +32,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.hisp.dhis.common.ReportingRate;
 import org.hisp.dhis.dataelement.DataElementOperand;
 import org.hisp.dhis.node.AbstractNode;
 import org.hisp.dhis.node.Node;
@@ -496,6 +497,7 @@ public class DefaultFieldFilterService implements FieldFilterService
 
     private boolean isProperIdObject( Class<?> klass )
     {
-        return !(DataElementOperand.class.isAssignableFrom( klass ) || UserCredentials.class.isAssignableFrom( klass ));
+        return !(DataElementOperand.class.isAssignableFrom( klass ) || UserCredentials.class.isAssignableFrom( klass )
+            || ReportingRate.class.isAssignableFrom( klass ));
     }
 }

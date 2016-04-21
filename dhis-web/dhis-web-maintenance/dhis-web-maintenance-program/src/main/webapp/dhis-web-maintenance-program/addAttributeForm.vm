@@ -89,7 +89,7 @@
 		<td></td>
 	</tr>
 
-	<tr>
+	<!--<tr>
 		<td><label for="searchScope">$i18n.getString( "search_scope" ) <br /></label></td>
 		<td>
             <select id="searchScope" name="searchScope" >
@@ -100,7 +100,7 @@
 			</select>
 		</td>
 		<td></td>
-	</tr>
+	</tr>-->
 	
 	<tr>
 		<td><label for="optionSetId">$i18n.getString( "option_set" )</label></td>
@@ -117,7 +117,11 @@
       <td><label for="valueType">$i18n.getString( "value_type" ) <em title="$i18n.getString( 'required' )" class="required">*</em></label></td>
       <td>
         <select id="valueType" name="valueType" onchange="typeOnChange();">
-          <option value="NUMBER" selected="selected">$i18n.getString( "number" )</option>
+		  <option value="INTEGER" selected="selected">$i18n.getString( "integer" )</option>
+		  <option value="INTEGER_POSITIVE">$i18n.getString( "positive_integer" )</option>
+		  <option value="INTEGER_NEGATIVE">$i18n.getString( "negative_integer" )</option>
+		  <option value="INTEGER_ZERO_OR_POSITIVE">$i18n.getString( "zero_positive_int" )</option>	
+          <option value="NUMBER">$i18n.getString( "number" )</option>
           <option value="TEXT">$i18n.getString( "text" )</option>
           <option value="LONG_TEXT">$i18n.getString( "long_text" )</option>
           <option value="LETTER">$i18n.getString( "letter_only" )</option>

@@ -31,12 +31,10 @@ package org.hisp.dhis.schema.descriptors;
 import org.hisp.dhis.fileresource.FileResource;
 import org.hisp.dhis.schema.Schema;
 import org.hisp.dhis.schema.SchemaDescriptor;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Halvdan Hoem Grelland
  */
-@Component
 public class FileResourceSchemaDescriptor
     implements SchemaDescriptor
 {

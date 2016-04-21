@@ -28,6 +28,7 @@ package org.hisp.dhis.organisationunit.comparator;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import org.hisp.dhis.common.IdentifiableObject;
 import org.hisp.dhis.organisationunit.OrganisationUnit;
 
 import java.util.Comparator;
@@ -36,13 +37,13 @@ import java.util.Comparator;
  * @author Morten Olav Hansen <mortenoh@gmail.com>
  */
 public class OrganisationUnitParentCountComparator
-    implements Comparator<OrganisationUnit>
+    implements Comparator<IdentifiableObject>
 {
     @Override
-    public int compare( OrganisationUnit organisationUnit1, OrganisationUnit organisationUnit2 )
+    public int compare( IdentifiableObject organisationUnit1, IdentifiableObject organisationUnit2 )
     {
-        Integer parents1 = organisationUnit1.getAncestors().size();
-        Integer parents2 = organisationUnit2.getAncestors().size();
+        Integer parents1 = ((OrganisationUnit) organisationUnit1).getAncestors().size();
+        Integer parents2 = ((OrganisationUnit) organisationUnit2).getAncestors().size();
 
         return parents1.compareTo( parents2 );
     }

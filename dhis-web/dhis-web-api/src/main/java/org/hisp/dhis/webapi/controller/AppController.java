@@ -34,13 +34,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.hisp.dhis.appmanager.App;
 import org.hisp.dhis.appmanager.AppManager;
 import org.hisp.dhis.appmanager.AppStatus;
-import org.hisp.dhis.render.DefaultRenderService;
-import org.hisp.dhis.render.RenderService;
 import org.hisp.dhis.dxf2.webmessage.WebMessageException;
 import org.hisp.dhis.hibernate.exception.ReadAccessDeniedException;
 import org.hisp.dhis.i18n.I18nManager;
+import org.hisp.dhis.render.DefaultRenderService;
+import org.hisp.dhis.render.RenderService;
 import org.hisp.dhis.setting.SettingKey;
 import org.hisp.dhis.system.util.DateUtils;
+import org.hisp.dhis.webapi.service.ContextService;
 import org.hisp.dhis.webapi.utils.ContextUtils;
 import org.hisp.dhis.webapi.utils.WebMessageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +52,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StreamUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -75,26 +80,31 @@ public class AppController
 
     @Autowired
     private AppManager appManager;
-    
+
     @Autowired
     private RenderService renderService;
-    
+
     @Autowired
     private I18nManager i18nManager;
-    
+
     private final ResourceLoader resourceLoader = new DefaultResourceLoader();
+
+    @Autowired
+    protected ContextService contextService;
+
 
     // -------------------------------------------------------------------------
     // Resources
     // -------------------------------------------------------------------------
 
     @RequestMapping( method = RequestMethod.GET, produces = ContextUtils.CONTENT_TYPE_JSON )
-    public void getApps( @RequestParam( required = false ) String key, 
+    public void getApps( @RequestParam( required = false ) String key,
         HttpServletRequest request, HttpServletResponse response )
         throws IOException
     {
+        List<String> filters = Lists.newArrayList( contextService.getParameterValues( "filter" ) );
         String contextPath = ContextUtils.getContextPath( request );
-        
+
         List<App> apps = new ArrayList<>();
 
         if ( key != null )
@@ -109,6 +119,10 @@ public class AppController
 
             apps.add( app );
         }
+        else if ( !filters.isEmpty() )
+        {
+            apps = appManager.filterApps( filters, contextPath );
+        }
         else
         {
             apps = appManager.getApps( contextPath );
@@ -120,19 +134,18 @@ public class AppController
     @RequestMapping( method = RequestMethod.POST )
     @ResponseStatus( HttpStatus.NO_CONTENT )
     @PreAuthorize( "hasRole('ALL') or hasRole('M_dhis-web-maintenance-appmanager')" )
-    public void installApp( @RequestParam( "file" ) MultipartFile file, HttpServletRequest request,
-        HttpServletResponse response )
+    public void installApp( @RequestParam( "file" ) MultipartFile file )
         throws IOException, WebMessageException
     {
         File tempFile = File.createTempFile( "IMPORT_", "_ZIP" );
         file.transferTo( tempFile );
 
         AppStatus status = appManager.installApp( tempFile, file.getOriginalFilename() );
-        
+
         if ( !status.ok() )
         {
             String message = i18nManager.getI18n().getString( status.getMessage() );
-            
+
             throw new WebMessageException( WebMessageUtils.conflict( message ) );
         }
     }
@@ -146,7 +159,7 @@ public class AppController
     }
 
     @RequestMapping( value = "/{app}/**", method = RequestMethod.GET )
-    public void renderApp( @PathVariable( "app" ) String app, 
+    public void renderApp( @PathVariable( "app" ) String app,
         HttpServletRequest request, HttpServletResponse response )
         throws IOException
     {
@@ -214,9 +227,7 @@ public class AppController
 
     @RequestMapping( value = "/{app}", method = RequestMethod.DELETE )
     @PreAuthorize( "hasRole('ALL') or hasRole('M_dhis-web-maintenance-appmanager')" )
-    public void deleteApp( @PathVariable( "app" ) String app,
-        @RequestParam( required = false ) boolean deleteAppData,
-        HttpServletRequest request, HttpServletResponse response )
+    public void deleteApp( @PathVariable( "app" ) String app, @RequestParam( required = false ) boolean deleteAppData )
         throws WebMessageException
     {
         if ( !appManager.exists( app ) )
@@ -233,7 +244,7 @@ public class AppController
     @SuppressWarnings( "unchecked" )
     @RequestMapping( value = "/config", method = RequestMethod.POST, consumes = ContextUtils.CONTENT_TYPE_JSON )
     @PreAuthorize( "hasRole('ALL') or hasRole('M_dhis-web-maintenance-appmanager')" )
-    public void setConfig( HttpServletRequest request, HttpServletResponse response )
+    public void setConfig( HttpServletRequest request )
         throws IOException, WebMessageException
     {
         Map<String, String> config = renderService.fromJson( request.getInputStream(), Map.class );
@@ -250,7 +261,7 @@ public class AppController
             appManager.setAppStoreUrl( appStoreUrl );
         }
     }
-    
+
     //--------------------------------------------------------------------------
     // Helpers
     //--------------------------------------------------------------------------

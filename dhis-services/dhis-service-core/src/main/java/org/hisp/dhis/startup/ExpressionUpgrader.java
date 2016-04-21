@@ -50,7 +50,7 @@ import org.hisp.dhis.expression.Expression;
 import org.hisp.dhis.expression.ExpressionService;
 import org.hisp.dhis.indicator.Indicator;
 import org.hisp.dhis.indicator.IndicatorService;
-import org.hisp.dhis.system.startup.AbstractStartupRoutine;
+import org.hisp.dhis.system.startup.TransactionContextStartupRoutine;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -60,7 +60,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Lars Helge Overland
  */
 public class ExpressionUpgrader
-    extends AbstractStartupRoutine
+    extends TransactionContextStartupRoutine
 {
     private static final String OLD_OPERAND_EXPRESSION = "\\[(\\d+)\\.?(\\d*)\\]";
     private static final String OLD_CONSTANT_EXPRESSION = "\\[C(\\d+?)\\]";
@@ -87,10 +87,9 @@ public class ExpressionUpgrader
     
     @Autowired
     private ExpressionService expressionService;
-    
+
     @Override
-    public void execute()
-        throws Exception
+    public void executeInTransaction()
     {
         upgradeIndicators();
         upgradeExpressions();

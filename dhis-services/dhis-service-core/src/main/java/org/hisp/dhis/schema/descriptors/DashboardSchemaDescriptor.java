@@ -30,16 +30,14 @@ package org.hisp.dhis.schema.descriptors;
 
 import com.google.common.collect.Lists;
 import org.hisp.dhis.dashboard.Dashboard;
-import org.hisp.dhis.security.Authority;
-import org.hisp.dhis.security.AuthorityType;
 import org.hisp.dhis.schema.Schema;
 import org.hisp.dhis.schema.SchemaDescriptor;
-import org.springframework.stereotype.Component;
+import org.hisp.dhis.security.Authority;
+import org.hisp.dhis.security.AuthorityType;
 
 /**
  * @author Morten Olav Hansen <mortenoh@gmail.com>
  */
-@Component
 public class DashboardSchemaDescriptor implements SchemaDescriptor
 {
     public static final String SINGULAR = "dashboard";
@@ -54,7 +52,7 @@ public class DashboardSchemaDescriptor implements SchemaDescriptor
         Schema schema = new Schema( Dashboard.class, SINGULAR, PLURAL );
         schema.setRelativeApiEndpoint( API_ENDPOINT );
         schema.setShareable( true );
-        schema.setOrder( 1650 );
+        schema.setOrder( 3501 );
         schema.setDefaultPrivate( true );
 
         schema.getAuthorities().add( new Authority( AuthorityType.CREATE_PUBLIC, Lists.newArrayList( "F_DASHBOARD_PUBLIC_ADD" ) ) );

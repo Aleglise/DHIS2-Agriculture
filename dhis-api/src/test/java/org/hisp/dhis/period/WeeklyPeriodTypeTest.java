@@ -169,9 +169,7 @@ public class WeeklyPeriodTypeTest
 
     @Test
     public void testGetIsoDate()
-    {
-//        Calendar calendar = Calendar.getInstance();
-        
+    {        
         DateTime testDate = new DateTime(2012, 12, 31, 0, 0);
 
         assertEquals( "2013W1", periodType.getIsoDate( new Period( periodType, testDate.toDate(), testDate.toDate() ) ) );

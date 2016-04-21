@@ -37,6 +37,8 @@ import org.hisp.dhis.schema.SchemaService;
 import org.hisp.dhis.schema.validation.SchemaValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+
 /**
  * @author Morten Olav Hansen <mortenoh@gmail.com>
  */
@@ -58,37 +60,47 @@ public class AbstractObjectBundleHook implements ObjectBundleHook
     protected SchemaService schemaService;
 
     @Override
-    public void preImport( ObjectBundle objectBundle )
+    public void preImport( ObjectBundle bundle )
     {
     }
 
     @Override
-    public void postImport( ObjectBundle objectBundle )
+    public void postImport( ObjectBundle bundle )
     {
     }
 
     @Override
-    public void preCreate( IdentifiableObject identifiableObject, ObjectBundle objectBundle )
+    public <T extends IdentifiableObject> void preTypeImport( Class<? extends IdentifiableObject> klass, List<T> objects, ObjectBundle bundle )
     {
     }
 
     @Override
-    public void postCreate( IdentifiableObject identifiableObject, ObjectBundle objectBundle )
+    public <T extends IdentifiableObject> void postTypeImport( Class<? extends IdentifiableObject> klass, List<T> objects, ObjectBundle bundle )
     {
     }
 
     @Override
-    public void preUpdate( IdentifiableObject identifiableObject, ObjectBundle objectBundle )
+    public <T extends IdentifiableObject> void preCreate( T object, ObjectBundle bundle )
     {
     }
 
     @Override
-    public void postUpdate( IdentifiableObject identifiableObject, ObjectBundle objectBundle )
+    public <T extends IdentifiableObject> void postCreate( T object, ObjectBundle bundle )
     {
     }
 
     @Override
-    public void preDelete( IdentifiableObject identifiableObject, ObjectBundle objectBundle )
+    public <T extends IdentifiableObject> void preUpdate( T object, ObjectBundle bundle )
+    {
+    }
+
+    @Override
+    public <T extends IdentifiableObject> void postUpdate( T object, ObjectBundle bundle )
+    {
+    }
+
+    @Override
+    public <T extends IdentifiableObject> void preDelete( T object, ObjectBundle bundle )
     {
     }
 }

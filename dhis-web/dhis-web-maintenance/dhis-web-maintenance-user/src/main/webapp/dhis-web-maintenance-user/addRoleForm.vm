@@ -15,7 +15,7 @@
 		});
 		
 		jQuery("#availableProgramList").dhisAjaxSelect({
-			source: "../dhis-web-commons-ajax-json/getPrograms.action",
+			source: "../api/programs.json?paging=false&fields=id,displayName|rename(name),programType",
 			iterator: 'programs',
 			connectedTo: 'selectedProgramList',
 			handler: function(item) {

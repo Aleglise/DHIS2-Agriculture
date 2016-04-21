@@ -33,8 +33,6 @@ import org.apache.commons.logging.LogFactory;
 import org.hisp.dhis.external.conf.DhisConfigurationProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -48,10 +46,9 @@ import java.util.List;
  * @author <a href="mailto:torgeilo@gmail.com">Torgeir Lorange Ostby</a>
  */
 public class DefaultStartupRoutineExecutor
-    extends AbstractStartupRoutine
     implements StartupRoutineExecutor
 {
-    private static final Log LOG = LogFactory.getLog( DefaultStartupRoutineExecutor.class );
+    private static final Log log = LogFactory.getLog( DefaultStartupRoutineExecutor.class );
 
     private static final String TRUE = "true";
     private static final String SKIP_PROP = "dhis.skip.startup";
@@ -59,26 +56,8 @@ public class DefaultStartupRoutineExecutor
     @Autowired
     private DhisConfigurationProvider config;
     
-    private List<StartupRoutine> routines = new ArrayList<>();
-
-    // -------------------------------------------------------------------------
-    // Add methods
-    // -------------------------------------------------------------------------
-
-    @Override
-    public void addStartupRoutine( StartupRoutine routine )
-    {
-        routines.add( routine );
-    }
-
-    @Override
-    public void addStartupRoutines( Collection<StartupRoutine> routines )
-    {
-        for ( StartupRoutine routine : routines )
-        {
-            addStartupRoutine( routine );
-        }
-    }
+    @Autowired( required = false )
+    private List<StartupRoutine> startupRoutines;
 
     // -------------------------------------------------------------------------
     // Execute
@@ -101,28 +80,34 @@ public class DefaultStartupRoutineExecutor
     private void execute( boolean testing )
         throws Exception
     {
+        if ( startupRoutines == null || startupRoutines.isEmpty() )
+        {
+            log.debug( "No startup routines found" );
+            return;
+        }
+        
         if ( TRUE.equalsIgnoreCase( System.getProperty( SKIP_PROP ) ) )
         {
-            LOG.info( "Skipping startup routines, system property " + SKIP_PROP + " is true" );
+            log.info( "Skipping startup routines, system property " + SKIP_PROP + " is true" );
             return;
         }
         
         if ( config.isReadOnlyMode() )
         {
-            LOG.info( "Skipping startup routines, read-only mode is enabled" );
+            log.info( "Skipping startup routines, read-only mode is enabled" );
             return;
         }
         
-        Collections.sort( routines, new StartupRoutineComparator() );
+        Collections.sort( startupRoutines, new StartupRoutineComparator() );
 
-        int total = routines.size();
+        int total = startupRoutines.size();
         int index = 1;
 
-        for ( StartupRoutine routine : routines )
+        for ( StartupRoutine routine : startupRoutines )
         {
             if ( !( testing && routine.skipInTests() ) )
             {
-                LOG.info( "Executing startup routine [" + index + " of " + total + ", runlevel " + routine.getRunlevel()
+                log.info( "Executing startup routine [" + index + " of " + total + ", runlevel " + routine.getRunlevel()
                     + "]: " + routine.getName() );
 
                 routine.execute();
@@ -131,6 +116,6 @@ public class DefaultStartupRoutineExecutor
             }
         }
 
-        LOG.info( "All startup routines done" );
+        log.info( "All startup routines done" );
     }
 }

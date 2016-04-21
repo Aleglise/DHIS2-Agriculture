@@ -226,6 +226,11 @@ public class DefaultUserService
         return userStore.getUserCount( params );
     }
 
+    @Override
+    public int getUserCount(){
+        return userStore.getUserCount();
+    }
+
     private void handleUserQueryParams( UserQueryParams params )
     {
         boolean canGrantOwnRoles = (Boolean) systemSettingManager.getSystemSetting( SettingKey.CAN_GRANT_OWN_USER_AUTHORITY_GROUPS );

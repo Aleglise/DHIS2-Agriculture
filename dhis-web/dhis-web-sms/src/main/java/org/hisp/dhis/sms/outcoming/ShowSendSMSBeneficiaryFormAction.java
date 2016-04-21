@@ -37,7 +37,6 @@ import org.hisp.dhis.program.Program;
 import org.hisp.dhis.program.ProgramService;
 import org.hisp.dhis.sms.config.GatewayAdministrationService;
 import org.hisp.dhis.sms.config.SmsGatewayConfig;
-import org.hisp.dhis.sms.outbound.OutboundSmsTransportService;
 import org.hisp.dhis.trackedentity.TrackedEntityAttribute;
 import org.hisp.dhis.trackedentity.TrackedEntityAttributeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,7 +113,7 @@ public class ShowSendSMSBeneficiaryFormAction
     {
         patientAttributes = patientAttributeService.getAllTrackedEntityAttributes();
 
-        programs = programService.getCurrentUserPrograms();
+        programs = programService.getUserPrograms();
 
         organisationUnit = selectionManager.getSelectedOrganisationUnit();
 

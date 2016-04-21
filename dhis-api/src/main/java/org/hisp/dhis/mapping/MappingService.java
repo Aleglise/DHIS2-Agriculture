@@ -31,6 +31,7 @@ package org.hisp.dhis.mapping;
 import java.util.List;
 
 import org.hisp.dhis.common.AnalyticalObjectService;
+import org.hisp.dhis.organisationunit.OrganisationUnitGroupSet;
 
 /**
  * @author Jan Henrik Overland
@@ -94,6 +95,8 @@ public interface MappingService
 
     MapView getIndicatorLastYearMapView( String indicatorUid, String organisationUnitUid, int level );
 
+    List<MapView> getMapViewsByOrganisationUnitGroupSet( OrganisationUnitGroupSet groupSet );
+    
     List<MapView> getAllMapViews();
 
     List<MapView> getMapViewsBetweenByName( String name, int first, int max );

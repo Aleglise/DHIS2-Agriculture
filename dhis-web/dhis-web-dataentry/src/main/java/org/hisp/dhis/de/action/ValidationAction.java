@@ -203,7 +203,7 @@ public class ValidationAction
 
         Period selectedPeriod = PeriodType.getPeriodFromIsoString( pe );
 
-        DataElementCategoryOptionCombo attributeOptionCombo = inputUtils.getAttributeOptionCombo( cc, cp );
+        DataElementCategoryOptionCombo attributeOptionCombo = inputUtils.getAttributeOptionCombo( cc, cp, false );
 
         if ( attributeOptionCombo == null )
         {

@@ -29,7 +29,7 @@ package org.hisp.dhis.common;
  */
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSet;
 import org.hisp.dhis.trackedentity.TrackedEntityInstance;
 
 import java.util.Date;
@@ -63,21 +63,21 @@ public enum ValueType
     FILE_RESOURCE( String.class ),
     COORDINATE( String.class );
 
-    public static final Set<ValueType> INTEGER_TYPES = Sets.newHashSet(
-        INTEGER, INTEGER_POSITIVE, INTEGER_NEGATIVE, INTEGER_ZERO_OR_POSITIVE );
+    public static final Set<ValueType> INTEGER_TYPES = ImmutableSet.<ValueType>builder().add(
+        INTEGER, INTEGER_POSITIVE, INTEGER_NEGATIVE, INTEGER_ZERO_OR_POSITIVE ).build();
 
-    public static final Set<ValueType> NUMERIC_TYPES = Sets.newHashSet(
-        INTEGER, INTEGER_POSITIVE, INTEGER_NEGATIVE, INTEGER_ZERO_OR_POSITIVE, NUMBER, UNIT_INTERVAL, PERCENTAGE );
+    public static final Set<ValueType> NUMERIC_TYPES = ImmutableSet.<ValueType>builder().add(
+        INTEGER, INTEGER_POSITIVE, INTEGER_NEGATIVE, INTEGER_ZERO_OR_POSITIVE, NUMBER, UNIT_INTERVAL, PERCENTAGE ).build();
 
-    public static final Set<ValueType> BOOLEAN_TYPES = Sets.newHashSet(
-        BOOLEAN, TRUE_ONLY );
+    public static final Set<ValueType> BOOLEAN_TYPES = ImmutableSet.<ValueType>builder().add(
+        BOOLEAN, TRUE_ONLY ).build();
 
-    public static final Set<ValueType> TEXT_TYPES = Sets.newHashSet(
-        TEXT, LONG_TEXT, LETTER, COORDINATE, TIME );
+    public static final Set<ValueType> TEXT_TYPES = ImmutableSet.<ValueType>builder().add(
+        TEXT, LONG_TEXT, LETTER, COORDINATE, TIME ).build();
 
-    public static final Set<ValueType> DATE_TYPES = Sets.newHashSet(
-        DATE, DATETIME );
-
+    public static final Set<ValueType> DATE_TYPES = ImmutableSet.<ValueType>builder().add(
+        DATE, DATETIME ).build();
+    
     private final Class<?> javaClass;
 
     private ValueType()

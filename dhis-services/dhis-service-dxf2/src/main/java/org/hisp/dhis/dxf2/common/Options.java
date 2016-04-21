@@ -43,87 +43,6 @@ public class Options
         "yyyy-MM-dd", "yyyy-MM", "yyyyMMdd", "yyyyMM", "yyyy" };
     
     //--------------------------------------------------------------------------
-    // Static helpers
-    //--------------------------------------------------------------------------
-
-    protected static String stringAsString( String str, String defaultValue )
-    {
-        if ( str == null )
-        {
-            return defaultValue;
-        }
-
-        return str;
-    }
-
-    public static Date stringAsDate( String str )
-    {
-        if ( str == null )
-        {
-            return null;
-        }
-
-        for ( String pattern : DATE_PATTERNS )
-        {
-            Date date = getDateByPattern( str, pattern );
-
-            if ( date != null )
-            {
-                return date;
-            }
-        }
-
-        return null;
-    }
-
-    protected static Date getDateByPattern( String str, String pattern )
-    {
-        if ( str != null )
-        {
-            try
-            {
-                return new SimpleDateFormat( pattern ).parse( str );
-            }
-            catch ( ParseException ignored )
-            {
-            }
-        }
-
-        return null;
-    }
-
-    protected static boolean stringAsBoolean( String str, boolean defaultValue )
-    {
-        return str != null ? Boolean.parseBoolean( str ) : defaultValue;
-    }
-
-    protected static boolean stringIsTrue( String str )
-    {
-        return stringAsBoolean( str, false );
-    }
-
-    protected static int stringAsInt( String str )
-    {
-        return stringAsInt( str, 0 );
-    }
-
-    protected static int stringAsInt( String str, int defaultValue )
-    {
-        if ( str != null )
-        {
-            try
-            {
-                return Integer.parseInt( str );
-            }
-            catch ( NumberFormatException ignored )
-            {
-            }
-        }
-
-        return defaultValue;
-    }
-
-    //--------------------------------------------------------------------------
     // Internal State
     //--------------------------------------------------------------------------
 
@@ -264,5 +183,86 @@ public class Options
     public void addOptions( Map<String, String> newOptions )
     {
         options.putAll( options );
+    }
+
+    //--------------------------------------------------------------------------
+    // Static helpers
+    //--------------------------------------------------------------------------
+
+    protected static String stringAsString( String str, String defaultValue )
+    {
+        if ( str == null )
+        {
+            return defaultValue;
+        }
+
+        return str;
+    }
+
+    protected static Date stringAsDate( String str )
+    {
+        if ( str == null )
+        {
+            return null;
+        }
+
+        for ( String pattern : DATE_PATTERNS )
+        {
+            Date date = getDateByPattern( str, pattern );
+
+            if ( date != null )
+            {
+                return date;
+            }
+        }
+
+        return null;
+    }
+
+    protected static Date getDateByPattern( String str, String pattern )
+    {
+        if ( str != null )
+        {
+            try
+            {
+                return new SimpleDateFormat( pattern ).parse( str );
+            }
+            catch ( ParseException ignored )
+            {
+            }
+        }
+
+        return null;
+    }
+
+    protected static boolean stringAsBoolean( String str, boolean defaultValue )
+    {
+        return str != null ? Boolean.parseBoolean( str ) : defaultValue;
+    }
+
+    protected static boolean stringIsTrue( String str )
+    {
+        return stringAsBoolean( str, false );
+    }
+
+    protected static int stringAsInt( String str )
+    {
+        return stringAsInt( str, 0 );
+    }
+
+    protected static int stringAsInt( String str, int defaultValue )
+    {
+        if ( str != null )
+        {
+            try
+            {
+                return Integer.parseInt( str );
+            }
+            catch ( NumberFormatException ignored )
+            {
+            }
+        }
+
+        return defaultValue;
     }
 }

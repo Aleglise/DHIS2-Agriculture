@@ -39,6 +39,8 @@ import java.util.List;
 public interface AttributeValueStore
     extends GenericStore<AttributeValue>
 {
+    List<AttributeValue> getAllByAttributes( List<Attribute> attributes );
+
     List<AttributeValue> getAllByAttribute( Attribute attribute );
 
     List<AttributeValue> getAllByAttributeAndValue( Attribute attribute, String value );

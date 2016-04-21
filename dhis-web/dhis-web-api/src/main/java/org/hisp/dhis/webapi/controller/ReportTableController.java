@@ -46,7 +46,6 @@ import org.hisp.dhis.schema.descriptors.ReportTableSchemaDescriptor;
 import org.hisp.dhis.system.grid.GridUtils;
 import org.hisp.dhis.webapi.utils.ContextUtils;
 import org.hisp.dhis.webapi.utils.WebMessageUtils;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -253,7 +252,7 @@ public class ReportTableController
             organisationUnitUid = organisationUnitService.getRootOrganisationUnits().iterator().next().getUid();
         }
 
-        date = date != null ? date : new DateTime().minusMonths( 1 ).toDate();
+        date = date != null ? date : new Date();
 
         return reportTableService.getReportTableGrid( uid, i18nManager.getI18nFormat(), date, organisationUnitUid );
     }

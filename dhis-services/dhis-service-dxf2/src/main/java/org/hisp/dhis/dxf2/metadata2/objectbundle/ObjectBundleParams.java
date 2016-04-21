@@ -31,6 +31,7 @@ package org.hisp.dhis.dxf2.metadata2.objectbundle;
 import com.google.common.base.MoreObjects;
 import org.hisp.dhis.common.IdentifiableObject;
 import org.hisp.dhis.common.MergeMode;
+import org.hisp.dhis.dxf2.metadata2.AtomicMode;
 import org.hisp.dhis.dxf2.metadata2.FlushMode;
 import org.hisp.dhis.importexport.ImportStrategy;
 import org.hisp.dhis.preheat.PreheatIdentifier;
@@ -56,13 +57,17 @@ public class ObjectBundleParams
 
     private PreheatMode preheatMode = PreheatMode.REFERENCE;
 
-    private ImportStrategy importMode = ImportStrategy.ATOMIC_CREATE_AND_UPDATE;
+    private ImportStrategy importStrategy = ImportStrategy.CREATE_AND_UPDATE;
+
+    private AtomicMode atomicMode = AtomicMode.ALL;
 
     private MergeMode mergeMode = MergeMode.MERGE;
 
     private FlushMode flushMode = FlushMode.AUTO;
 
     private Map<Class<? extends IdentifiableObject>, List<IdentifiableObject>> objects = new HashMap<>();
+    private boolean skipSharing;
+    private boolean skipValidation;
 
     public ObjectBundleParams()
     {
@@ -111,14 +116,24 @@ public class ObjectBundleParams
         this.preheatMode = preheatMode;
     }
 
-    public ImportStrategy getImportMode()
+    public ImportStrategy getImportStrategy()
     {
-        return importMode;
+        return importStrategy;
     }
 
-    public void setImportMode( ImportStrategy importMode )
+    public void setImportStrategy( ImportStrategy importStrategy )
     {
-        this.importMode = importMode;
+        this.importStrategy = importStrategy;
+    }
+
+    public AtomicMode getAtomicMode()
+    {
+        return atomicMode;
+    }
+
+    public void setAtomicMode( AtomicMode atomicMode )
+    {
+        this.atomicMode = atomicMode;
     }
 
     public MergeMode getMergeMode()
@@ -139,6 +154,26 @@ public class ObjectBundleParams
     public void setFlushMode( FlushMode flushMode )
     {
         this.flushMode = flushMode;
+    }
+
+    public boolean isSkipSharing()
+    {
+        return skipSharing;
+    }
+
+    public void setSkipSharing( boolean skipSharing )
+    {
+        this.skipSharing = skipSharing;
+    }
+
+    public boolean isSkipValidation()
+    {
+        return skipValidation;
+    }
+
+    public void setSkipValidation( boolean skipValidation )
+    {
+        this.skipValidation = skipValidation;
     }
 
     public Map<Class<? extends IdentifiableObject>, List<IdentifiableObject>> getObjects()
@@ -190,7 +225,6 @@ public class ObjectBundleParams
         return params;
     }
 
-
     @Override
     public String toString()
     {
@@ -199,7 +233,7 @@ public class ObjectBundleParams
             .add( "objectBundleMode", objectBundleMode )
             .add( "preheatIdentifier", preheatIdentifier )
             .add( "preheatMode", preheatMode )
-            .add( "importMode", importMode )
+            .add( "importStrategy", importStrategy )
             .add( "mergeMode", mergeMode )
             .toString();
     }

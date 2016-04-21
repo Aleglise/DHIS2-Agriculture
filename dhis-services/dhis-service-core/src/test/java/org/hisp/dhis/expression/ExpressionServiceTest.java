@@ -42,6 +42,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hisp.dhis.DhisSpringTest;
+import org.hisp.dhis.common.DataDimensionType;
 import org.hisp.dhis.common.DimensionalItemObject;
 import org.hisp.dhis.common.IdentifiableObjectManager;
 import org.hisp.dhis.constant.Constant;
@@ -178,8 +179,8 @@ public class ExpressionServiceTest
         categoryService.addDataElementCategoryOption( categoryOptionC );
         categoryService.addDataElementCategoryOption( categoryOptionD );
 
-        categoryA = new DataElementCategory( "Age" );
-        categoryB = new DataElementCategory( "Gender" );
+        categoryA = new DataElementCategory( "Age", DataDimensionType.DISAGGREGATION );
+        categoryB = new DataElementCategory( "Gender", DataDimensionType.DISAGGREGATION );
 
         categoryA.getCategoryOptions().add( categoryOptionA );
         categoryA.getCategoryOptions().add( categoryOptionB );
@@ -189,7 +190,7 @@ public class ExpressionServiceTest
         categoryService.addDataElementCategory( categoryA );
         categoryService.addDataElementCategory( categoryB );
 
-        categoryCombo = new DataElementCategoryCombo( "Age and gender" );
+        categoryCombo = new DataElementCategoryCombo( "Age and gender", DataDimensionType.DISAGGREGATION );
         categoryCombo.getCategories().add( categoryA );
         categoryCombo.getCategories().add( categoryB );
 

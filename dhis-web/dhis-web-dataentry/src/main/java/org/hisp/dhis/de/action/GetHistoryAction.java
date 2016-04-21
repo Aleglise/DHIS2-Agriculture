@@ -257,7 +257,7 @@ public class GetHistoryAction
 
         OrganisationUnit organisationUnit = organisationUnitService.getOrganisationUnit( organisationUnitId );
 
-        DataElementCategoryOptionCombo attributeOptionCombo = inputUtils.getAttributeOptionCombo( cc, cp );
+        DataElementCategoryOptionCombo attributeOptionCombo = inputUtils.getAttributeOptionCombo( cc, cp, false );
 
         dataValueAudits = dataValueAuditService.getDataValueAudits( Lists.newArrayList( dataElement ), Lists.newArrayList( period ),
             Lists.newArrayList( organisationUnit ), categoryOptionCombo, attributeOptionCombo, null );

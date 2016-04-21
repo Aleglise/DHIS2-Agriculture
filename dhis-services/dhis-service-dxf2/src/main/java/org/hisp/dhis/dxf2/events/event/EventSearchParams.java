@@ -28,12 +28,9 @@ package org.hisp.dhis.dxf2.events.event;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.util.Date;
-import java.util.List;
-
+import org.hisp.dhis.common.IdSchemes;
 import org.hisp.dhis.common.OrganisationUnitSelectionMode;
 import org.hisp.dhis.dataelement.DataElementCategoryOptionCombo;
-import org.hisp.dhis.common.IdSchemes;
 import org.hisp.dhis.event.EventStatus;
 import org.hisp.dhis.organisationunit.OrganisationUnit;
 import org.hisp.dhis.program.Program;
@@ -41,6 +38,11 @@ import org.hisp.dhis.program.ProgramStage;
 import org.hisp.dhis.program.ProgramStatus;
 import org.hisp.dhis.query.Order;
 import org.hisp.dhis.trackedentity.TrackedEntityInstance;
+
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Lars Helge Overland
@@ -72,7 +74,7 @@ public class EventSearchParams
     private EventStatus eventStatus;
 
     private Date lastUpdated;
-    
+
     private DataElementCategoryOptionCombo categoryOptionCombo;
 
     private IdSchemes idSchemes;
@@ -84,10 +86,12 @@ public class EventSearchParams
     private boolean totalPages;
 
     private boolean skipPaging;
-    
+
     private List<Order> orders;
 
     private boolean includeAttributes;
+
+    private Set<String> events = new HashSet<>();
 
     // -------------------------------------------------------------------------
     // Constructors
@@ -304,8 +308,8 @@ public class EventSearchParams
     {
         this.includeAttributes = includeAttributes;
     }
-    
-    public List<Order> getOrders() 
+
+    public List<Order> getOrders()
     {
         return this.orders;
     }
@@ -314,7 +318,7 @@ public class EventSearchParams
     {
         this.orders = orders;
     }
-    
+
     public DataElementCategoryOptionCombo getCategoryOptionCombo()
     {
         return categoryOptionCombo;
@@ -323,5 +327,15 @@ public class EventSearchParams
     public void setCategoryOptionCombo( DataElementCategoryOptionCombo categoryOptionCombo )
     {
         this.categoryOptionCombo = categoryOptionCombo;
+    }
+
+    public void setEvents( Set<String> events )
+    {
+        this.events = events;
+    }
+
+    public Set<String> getEvents()
+    {
+        return events;
     }
 }

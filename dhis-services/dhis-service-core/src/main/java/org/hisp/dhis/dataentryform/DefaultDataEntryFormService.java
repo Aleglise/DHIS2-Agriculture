@@ -400,7 +400,7 @@ public class DefaultDataEntryFormService
                                 "</div>";
                 }
                 else if ( ValueType.TIME == valueType ) {
-                    appendCode += " type=\"time\" name=\"entrytime\" class=\"entrytime\" tabindex=\"" + i++ + "\"" + TAG_CLOSE;
+                    appendCode += " type=\"text\" name=\"entrytime\" class=\"entrytime\" tabindex=\"" + i++ + "\" id=\""+ dataElementId + "-" + optionComboId + "\">";
                 }
                 else
                 {

@@ -224,34 +224,17 @@ public class AddAttributeAction
     {
         this.optionSetAttribute = optionSetAttribute;
     }
-    
-    private boolean projectAttribute;
 
-    public void setProjectAttribute( boolean projectAttribute )
+    private boolean constantAttribute;
+
+    public void setConstantAttribute( boolean constantAttribute )
     {
-        this.projectAttribute = projectAttribute;
+        this.constantAttribute = constantAttribute;
     }
 
-    private boolean resultsFrameworkAttribute;
-    
-    public void setResultsFrameworkAttribute( boolean resultsFrameworkAttribute )
-    {
-        this.resultsFrameworkAttribute = resultsFrameworkAttribute;
-    }
-    
-    private boolean programmAttribute;
-    
-    public void setProgrammAttribute( boolean programmAttribute )
-    {
-        this.programmAttribute = programmAttribute;
-    }
-    
-    private boolean subProgrammAttribute;
-    
-    public void setSubProgrammAttribute( boolean subProgrammAttribute )
-    {
-        this.subProgrammAttribute = subProgrammAttribute;
-    }
+    private boolean legendSetAttribute;
+
+    public void setLegendSetAttribute( boolean legendSetAttribute ) { this.legendSetAttribute = legendSetAttribute; }
 
     private String optionSetUid;
 
@@ -294,10 +277,8 @@ public class AddAttributeAction
         attribute.setDocumentAttribute( documentAttribute );
         attribute.setOptionAttribute( optionAttribute );
         attribute.setOptionSetAttribute( optionSetAttribute );
-        attribute.setProjectAttribute( projectAttribute );
-        attribute.setResultsFrameworkAttribute( resultsFrameworkAttribute );
-        attribute.setProgrammAttribute( programmAttribute );
-        attribute.setSubProgrammAttribute( subProgrammAttribute );
+        attribute.setConstantAttribute( constantAttribute );
+        attribute.setLegendSetAttribute( legendSetAttribute );
 
         attributeService.addAttribute( attribute );
 

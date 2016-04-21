@@ -29,6 +29,9 @@ package org.hisp.dhis.webapi.controller.event;
  */
 
 import com.google.common.collect.Lists;
+import org.hisp.dhis.dxf2.metadata2.MetadataExportService;
+import org.hisp.dhis.dxf2.webmessage.WebMessageException;
+import org.hisp.dhis.node.types.RootNode;
 import org.hisp.dhis.program.Program;
 import org.hisp.dhis.program.ProgramInstance;
 import org.hisp.dhis.program.ProgramInstanceService;
@@ -39,12 +42,18 @@ import org.hisp.dhis.query.Query;
 import org.hisp.dhis.query.QueryParserException;
 import org.hisp.dhis.schema.descriptors.ProgramSchemaDescriptor;
 import org.hisp.dhis.webapi.controller.AbstractCrudController;
+import org.hisp.dhis.webapi.utils.WebMessageUtils;
 import org.hisp.dhis.webapi.webdomain.WebMetadata;
 import org.hisp.dhis.webapi.webdomain.WebOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -62,6 +71,9 @@ public class ProgramController
 
     @Autowired
     private ProgramService programService;
+
+    @Autowired
+    private MetadataExportService metadataExportService;
 
     @Override
     protected void postCreateEntity( Program program )
@@ -99,11 +111,24 @@ public class ProgramController
 
         if ( userFilter )
         {
-            Set<Program> programs = programService.getCurrentUserPrograms();
+            Set<Program> programs = programService.getUserPrograms();
             entityList.retainAll( programs );
             metadata.setPager( null );
         }
 
         return entityList;
+    }
+
+    @RequestMapping( value = "/{uid}/metadata", method = RequestMethod.GET )
+    public @ResponseBody RootNode getProgramWithDependencies( @PathVariable( "uid" ) String pvUid, HttpServletResponse response ) throws WebMessageException, IOException
+    {
+        Program program = programService.getProgram( pvUid );
+
+        if ( program == null )
+        {
+            throw new WebMessageException( WebMessageUtils.notFound( "Program not found for uid: " + pvUid ) );
+        }
+
+        return metadataExportService.getMetadataWithDependenciesAsNode( program );
     }
 }

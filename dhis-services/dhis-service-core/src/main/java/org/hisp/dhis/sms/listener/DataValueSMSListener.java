@@ -41,8 +41,8 @@ import org.hisp.dhis.dataset.DataSetService;
 import org.hisp.dhis.datavalue.DataValue;
 import org.hisp.dhis.datavalue.DataValueService;
 import org.hisp.dhis.organisationunit.OrganisationUnit;
-import org.hisp.dhis.period.CalendarPeriodType;
 import org.hisp.dhis.period.Period;
+import org.hisp.dhis.period.PeriodType;
 import org.hisp.dhis.sms.SmsSender;
 import org.hisp.dhis.sms.command.SMSCommand;
 import org.hisp.dhis.sms.command.SMSCommandService;
@@ -226,20 +226,20 @@ public class DataValueSMSListener
     {
         Period period = null;
         period = command.getDataset().getPeriodType().createPeriod();
-        CalendarPeriodType cpt = (CalendarPeriodType) period.getPeriodType();
+        PeriodType periodType = period.getPeriodType();
 
         if ( command.isCurrentPeriodUsedForReporting() )
         {
-            period = cpt.createPeriod( new Date() );
+            period = periodType.createPeriod( new Date() );
         }
         else
         {
-            period = cpt.getPreviousPeriod( period );
+            period = periodType.getPreviousPeriod( period );
         }
 
         if ( date != null )
         {
-            period = cpt.createPeriod( date );
+            period = periodType.createPeriod( date );
         }
 
         return period;

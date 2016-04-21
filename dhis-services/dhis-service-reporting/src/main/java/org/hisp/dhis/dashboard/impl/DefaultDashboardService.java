@@ -29,6 +29,9 @@ package org.hisp.dhis.dashboard.impl;
  */
 
 import com.google.common.collect.Sets;
+import org.hisp.dhis.appmanager.App;
+import org.hisp.dhis.appmanager.AppManager;
+import org.hisp.dhis.appmanager.AppType;
 import org.hisp.dhis.chart.Chart;
 import org.hisp.dhis.common.IdentifiableObjectManager;
 import org.hisp.dhis.common.hibernate.HibernateIdentifiableObjectStore;
@@ -51,6 +54,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.hisp.dhis.common.IdentifiableObjectUtils.getUids;
@@ -87,6 +91,9 @@ public class DefaultDashboardService
     @Autowired
     private DashboardItemStore dashboardItemStore;
 
+    @Autowired
+    private AppManager appManager;
+
     // -------------------------------------------------------------------------
     // DashboardService implementation
     // -------------------------------------------------------------------------
@@ -98,7 +105,7 @@ public class DefaultDashboardService
     @Override
     public DashboardSearchResult search( String query )
     {
-        return search( query, new HashSet<DashboardItemType>() );
+        return search( query, new HashSet<>() );
     }
 
     @Override
@@ -106,6 +113,8 @@ public class DefaultDashboardService
     {
         Set<String> words = Sets.newHashSet( query.split( TextUtils.SPACE ) );
 
+        List<App> dashboardApps = appManager.getAppsByType( AppType.DASHBOARD_WIDGET, new HashSet<>( appManager.getApps( null ) ) );
+        
         DashboardSearchResult result = new DashboardSearchResult();
 
         result.setUsers( userService.getAllUsersBetweenByName( query, 0, getMax( DashboardItemType.USERS, maxTypes ) ) );
@@ -116,6 +125,7 @@ public class DefaultDashboardService
         result.setEventReports( objectManager.getBetweenLikeName( EventReport.class, words, 0, getMax( DashboardItemType.EVENT_REPORT, maxTypes ) ) );
         result.setReports( objectManager.getBetweenLikeName( Report.class, words, 0, getMax( DashboardItemType.REPORTS, maxTypes ) ) );
         result.setResources( objectManager.getBetweenLikeName( Document.class, words, 0, getMax( DashboardItemType.RESOURCES, maxTypes ) ) );
+        result.setApps( appManager.getAppsByName( query, dashboardApps, "ilike" ) );
 
         return result;
     }
@@ -160,6 +170,11 @@ public class DefaultDashboardService
         else if ( DashboardItemType.MESSAGES.equals( type ) )
         {
             item.setMessages( true );
+            dashboard.getItems().add( 0, item );
+        }
+        else if ( DashboardItemType.APP.equals( type ) )
+        {
+            item.setAppKey( contentUid );
             dashboard.getItems().add( 0, item );
         }
         else // Link item
@@ -250,6 +265,11 @@ public class DefaultDashboardService
         if ( item.getResources() != null )
         {
             item.setResources( objectManager.getByUid( Document.class, getUids( item.getResources() ) ) );
+        }
+
+        if ( item.getAppKey() != null )
+        {
+            item.setAppKey( item.getAppKey() );
         }
     }
 

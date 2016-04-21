@@ -280,6 +280,13 @@ public class AddProgramAction
     {
         this.displayFrontPageList = displayFrontPageList;
     }
+    
+    private boolean useFirstStageDuringRegistration;
+
+    public void setUseFirstStageDuringRegistration( boolean useFirstStageDuringRegistration )
+    {
+        this.useFirstStageDuringRegistration = useFirstStageDuringRegistration;
+    }
 
     // -------------------------------------------------------------------------
     // Action implementation
@@ -311,7 +318,8 @@ public class AddProgramAction
         program.setSelectIncidentDatesInFuture( selectIncidentDatesInFuture );
         program.setDataEntryMethod( dataEntryMethod );
         program.setSkipOffline( skipOffline );
-        program.setDisplayFrontPageList( displayFrontPageList ); 
+        program.setDisplayFrontPageList( displayFrontPageList );
+        program.setUseFirstStageDuringRegistration( useFirstStageDuringRegistration );
 
         if ( programType == ProgramType.WITH_REGISTRATION )
         {

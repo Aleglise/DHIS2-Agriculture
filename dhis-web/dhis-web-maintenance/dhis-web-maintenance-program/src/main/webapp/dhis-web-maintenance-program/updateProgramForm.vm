@@ -182,6 +182,16 @@
             </td>
 		</tr>
 		
+		<tr>
+            <td><label>$i18n.getString( "first_stage_during_registraton" )</label></td>
+            <td>
+              <select id="useFirstStageDuringRegistration" name="useFirstStageDuringRegistration">
+                <option value="false">$i18n.getString( "no" )</option>
+                <option value="true"#if( $program.useFirstStageDuringRegistration == true ) selected="selected"#end>$i18n.getString( "yes" )</option>
+              </select>
+            </td>
+		</tr>
+		
 		<tr name='nonAnonymous'><td>&nbsp;</td></tr>
 		
 		<tr name='nonAnonymous'>

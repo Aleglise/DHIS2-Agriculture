@@ -1,6 +1,5 @@
 package org.hisp.dhis.sms.outbound;
 
-import java.util.HashSet;
 
 /*
  * Copyright (c) 2004-2016, University of Oslo
@@ -31,7 +30,6 @@ import java.util.HashSet;
  */
 
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.transaction.annotation.Transactional;
 

@@ -74,12 +74,9 @@
       <input type="checkbox" id="documentAttribute" name="documentAttribute" value="true" #if( $attribute.documentAttribute ) checked="checked" #end /><label for="documentAttribute">$i18n.getString( 'document' ) <br />
       <input type="checkbox" id="optionAttribute" name="optionAttribute" value="true" #if( $attribute.optionAttribute ) checked="checked" #end /><label for="optionAttribute">$i18n.getString( 'option' ) <br />
       <input type="checkbox" id="optionSetAttribute" name="optionSetAttribute" value="true" #if( $attribute.optionSetAttribute ) checked="checked" #end /><label for="optionSetAttribute">$i18n.getString( 'option_set' ) <br />
-	  <input type="checkbox" id="projectAttribute" name="projectAttribute" value="true" #if( $attribute.projectAttribute ) checked="checked" #end /><label for="projectAttribute">$i18n.getString( 'project' ) <br />
-	  <input type="checkbox" id="resultsFrameworkAttribute" name="resultsFrameworkAttribute" value="true" #if( $attribute.resultsFrameworkAttribute ) checked="checked" #end /><label for="resultsFrameworkAttribute">$i18n.getString( 'results_framework' )</label> <br />
-      <input type="checkbox" id="programmAttribute" name="programmAttribute" value="true" #if( $attribute.programmAttribute ) checked="checked" #end /><label for="programmAttribute">$i18n.getString( 'programm' )</label> <br />
-	  <input type="checkbox" id="subProgrammAttribute" name="subProgrammAttribute" value="true" #if( $attribute.subProgrammAttribute ) checked="checked" #end /><label for="subProgrammAttribute">$i18n.getString( 'sub_programm' )</label> <br /> 
-	  
-	  </label> <br />
+      <input type="checkbox" id="constantAttribute" name="constantAttribute" value="true" #if( $attribute.constantAttribute ) checked="checked" #end  /><label for="constantAttribute">$i18n.getString( 'constant' )</label> <br />
+      <input type="checkbox" id="legendSetAttribute" name="legendSetAttribute" value="true" #if( $attribute.legendSetAttribute ) checked="checked" #end /><label for="legendSetAttribute">$i18n.getString( 'legend_set' )</label> <br />
+		</label> <br />
 		</td>
 	</tr>
 

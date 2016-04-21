@@ -1159,11 +1159,11 @@ public class ActivityReportingServiceImpl
 
         if ( programType == ProgramType.WITHOUT_REGISTRATION )
         {
-            tempPrograms = programService.getCurrentUserPrograms( ProgramType.WITHOUT_REGISTRATION );
+            tempPrograms = programService.getUserPrograms( ProgramType.WITHOUT_REGISTRATION );
         }
         else if ( programType == ProgramType.WITH_REGISTRATION )
         {
-            tempPrograms = programService.getCurrentUserPrograms( ProgramType.WITH_REGISTRATION );
+            tempPrograms = programService.getUserPrograms( ProgramType.WITH_REGISTRATION );
         }
 
         List<Program> programs = new ArrayList<>();

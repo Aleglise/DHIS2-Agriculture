@@ -5,8 +5,6 @@
     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd
     http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.1.xsd">
 
-  <context:component-scan base-package="org.hisp.dhis.schema.descriptors" />
-
   <bean id="org.hisp.dhis.preheat.PreheatService" class="org.hisp.dhis.preheat.DefaultPreheatService" scope="prototype">
     <aop:scoped-proxy proxy-target-class="false" />
   </bean>
@@ -858,17 +856,18 @@
   <bean id="org.hisp.dhis.validation.ValidationRuleService" class="org.hisp.dhis.validation.DefaultValidationRuleService">
     <property name="validationRuleStore" ref="org.hisp.dhis.validation.ValidationRuleStore" />
     <property name="validationRuleGroupStore" ref="org.hisp.dhis.validation.ValidationRuleGroupStore" />
-    <property name="expressionService" ref="org.hisp.dhis.expression.ExpressionService" />
     <property name="periodService" ref="org.hisp.dhis.period.PeriodService" />
     <property name="constantService" ref="org.hisp.dhis.constant.ConstantService" />
     <property name="dataValueService" ref="org.hisp.dhis.datavalue.DataValueService" />
-    <property name="dataElementCategoryService" ref="org.hisp.dhis.dataelement.DataElementCategoryService" />
+    <property name="categoryService" ref="org.hisp.dhis.dataelement.DataElementCategoryService" />
     <property name="i18nService" ref="org.hisp.dhis.i18n.I18nService" />
     <property name="messageService" ref="org.hisp.dhis.message.MessageService" />
     <property name="organisationUnitService" ref="org.hisp.dhis.organisationunit.OrganisationUnitService" />
     <property name="currentUserService" ref="org.hisp.dhis.user.CurrentUserService" />
     <property name="systemSettingManager" ref="org.hisp.dhis.setting.SystemSettingManager" />
   </bean>
+  
+  <bean id="validationTask" class="org.hisp.dhis.validation.DataValidationTask" scope="prototype" />
 
   <bean id="org.hisp.dhis.dataelement.DataElementCategoryService" class="org.hisp.dhis.dataelement.DefaultDataElementCategoryService">
     <property name="categoryStore" ref="org.hisp.dhis.dataelement.CategoryStore" />
@@ -1553,6 +1552,12 @@
     <property name="skipInTests" value="true" />
     <property name="jdbcTemplate" ref="jdbcTemplate" />
   </bean>
+  
+  <bean id="org.hisp.dhis.startup.ModelUpgrader" class="org.hisp.dhis.startup.ModelUpgrader">
+    <property name="name" value="ModelUpgrader" />
+    <property name="runlevel" value="7" />
+    <property name="skipInTests" value="true" />
+  </bean>
 
   <bean id="org.hisp.dhis.startup.FavoriteDataItemUpgrader" class="org.hisp.dhis.startup.FavoriteDataItemUpgrader">
     <property name="name" value="FavoriteDataItemUpgrader" />
@@ -1584,29 +1589,6 @@
     <property name="name" value="I18nLocalePopulator" />
     <property name="runlevel" value="13" />
     <property name="skipInTests" value="true" />
-  </bean>
-
-  <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
-    <property name="targetObject" ref="org.hisp.dhis.system.startup.StartupRoutineExecutor" />
-    <property name="targetMethod" value="addStartupRoutines" />
-    <property name="arguments">
-      <list>
-        <list>
-          <ref bean="org.hisp.dhis.startup.InitTableAlteror" />
-          <ref bean="org.hisp.dhis.period.PeriodTypePopulator" />
-          <ref bean="org.hisp.dhis.dataelement.DataElementDefaultDimensionPopulator" />
-          <ref bean="org.hisp.dhis.common.IdentityPopulator" />
-          <ref bean="org.hisp.dhis.startup.TableCreator" />
-          <ref bean="org.hisp.dhis.startup.TableAlteror" />
-          <ref bean="org.hisp.dhis.trackedentity.startup.TableAlteror" />
-          <ref bean="org.hisp.dhis.startup.FavoriteDataItemUpgrader" />
-          <ref bean="org.hisp.dhis.dataentryform.DataEntryFormUpgrader" />
-          <ref bean="org.hisp.dhis.startup.ExpressionUpgrader" />
-          <ref bean="org.hisp.dhis.startup.ConfigurationPopulator" />
-          <ref bean="org.hisp.dhis.startup.I18nLocalePopulator" />
-        </list>
-      </list>
-    </property>
   </bean>
 
   <!-- DeletionHandlers -->
@@ -1854,8 +1836,8 @@
       <aop:before pointcut="execution( * org.hisp.dhis.user.UserGroupService.delete*(..) )" method="intercept" />
       <aop:before pointcut="execution( * org.hisp.dhis.option.OptionService.delete*(..) )" method="intercept" />
       <aop:before pointcut="execution( * org.hisp.dhis.attribute.AttributeService.delete*(..) )" method="intercept" />
-      <aop:before pointcut="execution( * org.hisp.dhis.mapping.MappingService.deleteLegend(..) )" method="intercept" />
-      <aop:before pointcut="execution( * org.hisp.dhis.mapping.MappingService.deleteLegendSet(..) )" method="intercept" />
+      <aop:before pointcut="execution( * org.hisp.dhis.legend.LegendService.deleteLegend(..) )" method="intercept" />
+      <aop:before pointcut="execution( * org.hisp.dhis.legend.LegendService.deleteLegendSet(..) )" method="intercept" />
       <aop:before pointcut="execution( * org.hisp.dhis.mapping.MappingService.deleteMapView(..) )" method="intercept" />
       <aop:before pointcut="execution( * org.hisp.dhis.mapping.MappingService.deleteMap(..) )" method="intercept" />
       <aop:before pointcut="execution( * org.hisp.dhis.i18n.I18nLocaleService.delete*(..) )" method="intercept" />

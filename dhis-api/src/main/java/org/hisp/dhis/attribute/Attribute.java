@@ -28,10 +28,11 @@ package org.hisp.dhis.attribute;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.google.common.base.MoreObjects;
 import org.hisp.dhis.common.BaseIdentifiableObject;
 import org.hisp.dhis.common.DxfNamespaces;
 import org.hisp.dhis.common.IdentifiableObject;
@@ -39,6 +40,7 @@ import org.hisp.dhis.common.MergeMode;
 import org.hisp.dhis.common.ValueType;
 import org.hisp.dhis.common.view.DetailedView;
 import org.hisp.dhis.common.view.ExportView;
+import org.hisp.dhis.constant.Constant;
 import org.hisp.dhis.dataelement.CategoryOptionGroup;
 import org.hisp.dhis.dataelement.DataElement;
 import org.hisp.dhis.dataelement.DataElementCategoryOption;
@@ -47,6 +49,7 @@ import org.hisp.dhis.dataset.DataSet;
 import org.hisp.dhis.document.Document;
 import org.hisp.dhis.indicator.Indicator;
 import org.hisp.dhis.indicator.IndicatorGroup;
+import org.hisp.dhis.legend.LegendSet;
 import org.hisp.dhis.option.Option;
 import org.hisp.dhis.option.OptionSet;
 import org.hisp.dhis.organisationunit.OrganisationUnit;
@@ -63,11 +66,9 @@ import org.hisp.dhis.trackedentity.TrackedEntityAttribute;
 import org.hisp.dhis.user.User;
 import org.hisp.dhis.user.UserGroup;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
-import com.google.common.base.MoreObjects;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Morten Olav Hansen <mortenoh@gmail.com>
@@ -115,7 +116,11 @@ public class Attribute
     private boolean optionAttribute;
 
     private boolean optionSetAttribute;
-    
+
+    private boolean constantAttribute;
+
+    private boolean legendSetAttribute;
+
     private boolean projectAttribute;
     
     private boolean resultsFrameworkAttribute;
@@ -188,6 +193,9 @@ public class Attribute
             && Objects.equals( this.categoryOptionAttribute, other.categoryOptionAttribute )
             && Objects.equals( this.categoryOptionGroupAttribute, other.categoryOptionGroupAttribute )
             && Objects.equals( this.optionAttribute, other.optionAttribute )
+            && Objects.equals( this.constantAttribute, other.constantAttribute )
+            && Objects.equals( this.legendSetAttribute, other.legendSetAttribute )
+
             && Objects.equals( this.projectAttribute, other.projectAttribute )
             && Objects.equals( this.resultsFrameworkAttribute, other.resultsFrameworkAttribute )
             && Objects.equals( this.programmAttribute, other.programmAttribute )
@@ -483,6 +491,32 @@ public class Attribute
         this.optionSetAttribute = optionSetAttribute;
     }
 
+	@JsonProperty
+    @JsonView( { DetailedView.class, ExportView.class } )
+    @JacksonXmlProperty( namespace = DxfNamespaces.DXF_2_0 )
+    public boolean isLegendSetAttribute()
+    {
+        return legendSetAttribute;
+    }
+
+    public void setLegendSetAttribute( boolean legendSetAttribute )
+    {
+        this.legendSetAttribute = legendSetAttribute;
+    }
+
+    @JsonProperty
+    @JsonView( { DetailedView.class, ExportView.class } )
+    @JacksonXmlProperty( namespace = DxfNamespaces.DXF_2_0 )
+    public boolean isConstantAttribute()
+    {
+        return constantAttribute;
+    }
+
+    public void setConstantAttribute( boolean constantAttribute )
+    {
+        this.constantAttribute = constantAttribute;
+    }
+
     @JsonProperty
     @JsonView( { DetailedView.class, ExportView.class } )
     @JacksonXmlProperty( namespace = DxfNamespaces.DXF_2_0 )
@@ -585,6 +619,8 @@ public class Attribute
         if ( documentAttribute ) klasses.add( Document.class );
         if ( optionAttribute ) klasses.add( Option.class );
         if ( optionSetAttribute ) klasses.add( OptionSet.class );
+        if ( legendSetAttribute ) klasses.add( LegendSet.class );
+        if ( constantAttribute ) klasses.add( Constant.class );
         if ( projectAttribute ) klasses.add( Project.class );
         if ( resultsFrameworkAttribute ) klasses.add( ResultsFramework.class );
         if ( programmAttribute ) klasses.add( Programm.class );
@@ -621,11 +657,14 @@ public class Attribute
             documentAttribute = attribute.isDocumentAttribute();
             optionAttribute = attribute.isOptionAttribute();
             optionSetAttribute = attribute.isOptionSetAttribute();
+            constantAttribute = attribute.isConstantAttribute();
+            legendSetAttribute = attribute.isLegendSetAttribute();
             projectAttribute = attribute.isProjectAttribute();
             resultsFrameworkAttribute = attribute.isResultsFrameworkAttribute();
             programmAttribute = attribute.isProgrammAttribute();
             subProgrammAttribute = attribute.isSubProgrammAttribute();
             mandatory = attribute.isMandatory();
+            unique = attribute.isUnique();
 
             if ( mergeMode.isReplace() )
             {
@@ -662,6 +701,8 @@ public class Attribute
             .add( "trackedEntityAttributeAttribute", trackedEntityAttributeAttribute )
             .add( "categoryOptionAttribute", categoryOptionAttribute )
             .add( "categoryOptionGroupAttribute", categoryOptionGroupAttribute )
+            .add( "constantAttribute", constantAttribute )
+            .add( "legendSetAttribute", legendSetAttribute )
             .add( "projectAttribute", projectAttribute )
             .add( "resultsFrameworkAttribute", resultsFrameworkAttribute )
             .add( "programmAttribute", programmAttribute )

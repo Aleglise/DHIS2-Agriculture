@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hisp.dhis.DhisSpringTest;
+import org.hisp.dhis.common.DataDimensionType;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -108,9 +109,9 @@ public class DataElementCategoryServiceTest
     @Test
     public void testDelete()
     {
-        categoryA = new DataElementCategory( "CategoryA", categoryOptions );
-        categoryB = new DataElementCategory( "CategoryB", categoryOptions );
-        categoryC = new DataElementCategory( "CategoryC", categoryOptions );
+        categoryA = new DataElementCategory( "CategoryA", DataDimensionType.DISAGGREGATION, categoryOptions );
+        categoryB = new DataElementCategory( "CategoryB", DataDimensionType.DISAGGREGATION, categoryOptions );
+        categoryC = new DataElementCategory( "CategoryC", DataDimensionType.DISAGGREGATION, categoryOptions );
 
         int idA = categoryService.addDataElementCategory( categoryA );
         int idB = categoryService.addDataElementCategory( categoryB );

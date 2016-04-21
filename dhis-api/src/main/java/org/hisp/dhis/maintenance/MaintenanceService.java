@@ -61,6 +61,8 @@ public interface MaintenanceService
     
     /**
      * Deletes user accounts representing expired account invitations.
+     * 
+     * @return the number of removed user invitations as a result of this operation.
      */
-    void removeExpiredInvitations();
+    int removeExpiredInvitations();
 }

@@ -123,6 +123,13 @@ public class ImportDataValueAction
         this.orgUnitIdScheme = orgUnitIdScheme;
     }
 
+    private boolean preheatCache;
+
+    public void setPreheatCache( boolean preheatCache )
+    {
+        this.preheatCache = preheatCache;
+    }
+
     private boolean skipExistingCheck;
 
     public void setSkipExistingCheck( boolean skipExistingCheck )
@@ -136,7 +143,7 @@ public class ImportDataValueAction
     {
         this.importFormat = importFormat;
     }
-
+    
     // -------------------------------------------------------------------------
     // Action implementation
     // -------------------------------------------------------------------------
@@ -156,7 +163,9 @@ public class ImportDataValueAction
         in = StreamUtils.wrapAndCheckCompressionFormat( in );
 
         ImportOptions options = new ImportOptions().setDryRun( dryRun )
-            .setStrategy( strategy ).setSkipExistingCheck( skipExistingCheck )
+            .setStrategy( strategy )
+            .setPreheatCache( preheatCache )
+            .setSkipExistingCheck( skipExistingCheck )
             .setIdScheme( StringUtils.trimToNull( idScheme ) )
             .setDataElementIdScheme( StringUtils.trimToNull( dataElementIdScheme ) )
             .setOrgUnitIdScheme( StringUtils.trimToNull( orgUnitIdScheme ) );

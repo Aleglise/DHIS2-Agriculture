@@ -36,9 +36,6 @@ import org.hisp.dhis.event.EventStatus;
 import org.hisp.dhis.mock.MockI18nFormat;
 import org.hisp.dhis.organisationunit.OrganisationUnit;
 import org.hisp.dhis.organisationunit.OrganisationUnitService;
-import org.hisp.dhis.sms.config.BulkSmsGatewayConfig;
-import org.hisp.dhis.sms.config.SmsConfiguration;
-import org.hisp.dhis.sms.config.SmsConfigurationManager;
 import org.hisp.dhis.trackedentity.TrackedEntityAttribute;
 import org.hisp.dhis.trackedentity.TrackedEntityAttributeService;
 import org.hisp.dhis.trackedentity.TrackedEntityInstance;
@@ -47,7 +44,6 @@ import org.hisp.dhis.trackedentity.TrackedEntityInstanceService;
 import org.hisp.dhis.trackedentityattributevalue.TrackedEntityAttributeValue;
 import org.hisp.dhis.trackedentityattributevalue.TrackedEntityAttributeValueService;
 import org.joda.time.DateTime;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -88,9 +84,6 @@ public class ProgramStageInstanceServiceTest
 
     @Autowired
     private ProgramInstanceService programInstanceService;
-
-    @Autowired
-    private SmsConfigurationManager smsConfigurationManager;
 
     @Autowired
     private TrackedEntityAttributeService attributeService;
@@ -435,7 +428,7 @@ public class ProgramStageInstanceServiceTest
     {
         int idA = programStageInstanceService.addProgramStageInstance( programStageInstanceA );
 
-        programStageInstanceService.completeProgramStageInstance( programStageInstanceA, mockFormat );
+        programStageInstanceService.completeProgramStageInstance( programStageInstanceA, false, mockFormat );
 
         assertEquals( true, programStageInstanceService.getProgramStageInstance( idA ).isCompleted() );
     }

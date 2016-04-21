@@ -86,6 +86,11 @@ public class OrganisationUnitQueryParams
     // Logic
     // -------------------------------------------------------------------------
 
+    public boolean hasQuery()
+    {
+        return query != null && !query.isEmpty();
+    }
+    
     public boolean hasParents()
     {
         return parents != null && !parents.isEmpty();

@@ -85,6 +85,12 @@ public class InitTableAlteror
         executeSql( "ALTER TABLE program ALTER COLUMN \"type\" TYPE varchar(255);" );
         executeSql( "update program set \"type\"='WITH_REGISTRATION' where type='1' or type='2'" );
         executeSql( "update program set \"type\"='WITHOUT_REGISTRATION' where type='3'" );
+
+
+        // Update userkeyjsonvalue and keyjsonvalue to set new encrypted column to false.
+
+        executeSql( "UPDATE keyjsonvalue SET encrypted = false WHERE encrypted IS NULL" );
+        executeSql( "UPDATE userkeyjsonvalue SET encrypted = false WHERE encrypted IS NULL" );
     }
 
     private void updateCompletedBy()

@@ -46,7 +46,7 @@ import org.hisp.dhis.trackedentity.TrackedEntityAttribute;
  */
 public class QueryItem
 {
-    private DimensionalItemObject item;
+    private DimensionalItemObject item; // TODO DimensionObject
 
     private LegendSet legendSet;
 
@@ -154,7 +154,7 @@ public class QueryItem
 
     public boolean isProgramIndicator()
     {
-        return DimensionType.PROGRAM_INDICATOR.equals( item.getDimensionType() );
+        return DimensionType.PROGRAM_INDICATOR.equals( item.getDimensionItemType() );
     }
         
     public static List<QueryItem> getQueryItems( Collection<TrackedEntityAttribute> attributes )

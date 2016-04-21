@@ -29,6 +29,7 @@ package org.hisp.dhis.feedback;
  */
 
 /**
+ * E3000 - E3999: Security Errors
  * E4000 - E4999: Metadata Validation Errors
  * E5000 - E5999: Preheat Errors
  * E6000 - E6999: Metadata Import Errors
@@ -37,6 +38,11 @@ package org.hisp.dhis.feedback;
  */
 public enum ErrorCode
 {
+    /* Security Errors */
+    E3000( "User {0} is not allowed to create objects of type {1}." ),
+    E3001( "User {0} is not allowed to update object {1}." ),
+    E3002( "User {0} is not allowed to delete object {1}." ),
+
     /* Metadata Validation Errors */
     E4000( "Missing required property \"{0}\"." ),
     E4001( "Maximum length of property \"{0}\"is {1}, but given length was {2}." ),
@@ -49,7 +55,7 @@ public enum ErrorCode
     E4008( "Allowed range for numeric property \"{0}\" is [{1},{2}], but number given was {3}." ),
     E4009( "Attribute \"{0}\" is unique, and value \"{1}\" already exist." ),
     E4010( "Attribute \"{0}\" is not supported for type \"{1}\"." ),
-    E4011( "Attribute \"{0}\" is required, but not value was found." ),
+    E4011( "Attribute \"{0}\" is required, but no value was found." ),
 
     /* Preheat Errors */
     E5000( "Found matching object for given reference, but import mode is CREATE. Identifier was {0}, and object was {1}." ),

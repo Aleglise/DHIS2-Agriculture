@@ -34,12 +34,10 @@ import org.hisp.dhis.security.Authority;
 import org.hisp.dhis.security.AuthorityType;
 import org.hisp.dhis.schema.Schema;
 import org.hisp.dhis.schema.SchemaDescriptor;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Morten Olav Hansen <mortenoh@gmail.com>
  */
-@Component
 public class IndicatorGroupSetSchemaDescriptor implements SchemaDescriptor
 {
     public static final String SINGULAR = "indicatorGroupSet";

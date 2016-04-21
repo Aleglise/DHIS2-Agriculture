@@ -31,6 +31,8 @@ package org.hisp.dhis.webapi.controller.organisationunit;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
 import org.hisp.dhis.dxf2.common.TranslateParams;
 import org.hisp.dhis.organisationunit.FeatureType;
 import org.hisp.dhis.organisationunit.OrganisationUnit;
@@ -39,7 +41,6 @@ import org.hisp.dhis.organisationunit.OrganisationUnitService;
 import org.hisp.dhis.organisationunit.comparator.OrganisationUnitByLevelComparator;
 import org.hisp.dhis.query.Order;
 import org.hisp.dhis.query.Query;
-import org.hisp.dhis.query.QueryParserException;
 import org.hisp.dhis.schema.descriptors.OrganisationUnitSchemaDescriptor;
 import org.hisp.dhis.user.User;
 import org.hisp.dhis.util.ObjectUtils;
@@ -80,56 +81,75 @@ public class OrganisationUnitController
 
     @Override
     @SuppressWarnings( "unchecked" )
-    protected List<OrganisationUnit> getEntityList( WebMetadata metadata, WebOptions options, List<String> filters, List<Order> orders ) throws QueryParserException
+    protected List<OrganisationUnit> getEntityList( WebMetadata metadata, 
+        WebOptions options, List<String> filters, List<Order> orders )
     {
-        List<OrganisationUnit> entityList;
-        Query query = queryService.getQueryFromUrl( getEntityClass(), filters, orders );
-        query.setDefaultOrder();
+        List<OrganisationUnit> objects = Lists.newArrayList();
+        
+        User user = currentUserService.getCurrentUser();
 
-        Integer level = options.getInt( "level" );
-        Integer maxLevel = options.getInt( "maxLevel" );
-        boolean levelSorted = options.isTrue( "levelSorted" );
+        boolean anySpecialPropertySet = ObjectUtils.anyIsTrue( options.isTrue( "userOnly" ), 
+            options.isTrue( "userDataViewOnly" ), options.isTrue( "userDataViewFallback" ), options.isTrue( "levelSorted" ) );
+        boolean anyQueryPropertySet = ObjectUtils.firstNonNull( options.get( "query" ), options.getInt( "level" ), 
+            options.getInt( "maxLevel" ) ) != null || options.isTrue( "withinUserHierarchy" );
+
+        // ---------------------------------------------------------------------
+        // Special parameter handling
+        // ---------------------------------------------------------------------
 
         if ( options.isTrue( "userOnly" ) )
         {
-            entityList = new ArrayList<>( currentUserService.getCurrentUser().getOrganisationUnits() );
+            objects = new ArrayList<>( user.getOrganisationUnits() );
         }
         else if ( options.isTrue( "userDataViewOnly" ) )
         {
-            entityList = new ArrayList<>( currentUserService.getCurrentUser().getDataViewOrganisationUnits() );
+            objects = new ArrayList<>( user.getDataViewOrganisationUnits() );
         }
         else if ( options.isTrue( "userDataViewFallback" ) )
         {
-            User user = currentUserService.getCurrentUser();
-
-            if ( user != null && user.hasDataViewOrganisationUnit() )
+            if ( user.hasDataViewOrganisationUnit() )
             {
-                entityList = new ArrayList<>( user.getDataViewOrganisationUnits() );
+                objects = new ArrayList<>( user.getDataViewOrganisationUnits() );
             }
             else
             {
-                entityList = new ArrayList<>( organisationUnitService.getOrganisationUnitsAtLevel( 1 ) );
+                objects = organisationUnitService.getOrganisationUnitsAtLevel( 1 );
             }
         }
-        else if ( ObjectUtils.firstNonNull( level, maxLevel ) != null )
+        else if ( options.isTrue( "levelSorted" ) )
+        {
+            objects = new ArrayList<>( manager.getAll( getEntityClass() ) );
+            Collections.sort( objects, OrganisationUnitByLevelComparator.INSTANCE );
+        }
+        
+        // ---------------------------------------------------------------------
+        // OrganisationUnitQueryParams query parameter handling
+        // ---------------------------------------------------------------------
+
+        else if ( anyQueryPropertySet )
         {
             OrganisationUnitQueryParams params = new OrganisationUnitQueryParams();
-            params.setLevel( level );
-            params.setMaxLevels( maxLevel );
-
-            entityList = organisationUnitService.getOrganisationUnitsByQuery( params );
-        }
-        else if ( levelSorted )
-        {
-            entityList = new ArrayList<>( manager.getAll( getEntityClass() ) );
-            Collections.sort( entityList, OrganisationUnitByLevelComparator.INSTANCE );
-        }
-        else
-        {
-            entityList = (List<OrganisationUnit>) queryService.query( query );
+            params.setQuery( options.get( "query" ) );
+            params.setLevel( options.getInt( "level" ) );
+            params.setMaxLevels( options.getInt( "maxLevel" ) );
+            params.setParents( options.isTrue( "withinUserHierarchy" ) ? user.getOrganisationUnits() : Sets.newHashSet() );
+            
+            objects = organisationUnitService.getOrganisationUnitsByQuery( params );
         }
 
-        return entityList;
+        // ---------------------------------------------------------------------
+        // Standard Query handling
+        // ---------------------------------------------------------------------
+
+        Query query = queryService.getQueryFromUrl( getEntityClass(), filters, orders );
+        query.setDefaultOrder();
+        
+        if ( anySpecialPropertySet || anyQueryPropertySet )
+        {
+            query.setObjects( objects );
+        }
+        
+        return (List<OrganisationUnit>) queryService.query( query );
     }
 
     @Override

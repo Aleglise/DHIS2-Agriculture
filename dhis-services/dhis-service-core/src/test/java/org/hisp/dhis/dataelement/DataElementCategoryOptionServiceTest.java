@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.hisp.dhis.DhisSpringTest;
+import org.hisp.dhis.common.DataDimensionType;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -145,9 +146,9 @@ public class DataElementCategoryOptionServiceTest
         optionsA.add( categoryOptionB );
         optionsB.add( categoryOptionC );
         
-        categoryA = new DataElementCategory( "CategoryA", optionsA );
-        categoryB = new DataElementCategory( "CategoryB", optionsB );
-        categoryC = new DataElementCategory( "CategoryC" );
+        categoryA = new DataElementCategory( "CategoryA", DataDimensionType.DISAGGREGATION, optionsA );
+        categoryB = new DataElementCategory( "CategoryB", DataDimensionType.DISAGGREGATION, optionsB );
+        categoryC = new DataElementCategory( "CategoryC", DataDimensionType.DISAGGREGATION );
         
         Set<DataElementCategory> categoriesA = new HashSet<>();
         Set<DataElementCategory> categoriesB = new HashSet<>();

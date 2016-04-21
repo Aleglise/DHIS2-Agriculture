@@ -49,6 +49,8 @@ public class SchedulingStrategy
     private String monitoringStrategy;
     
     private String dataSynchStrategy;
+
+    private String dataStatisticsStrategy;
     
     public SchedulingStrategy()
     {
@@ -62,7 +64,7 @@ public class SchedulingStrategy
     @JacksonXmlProperty( namespace = DxfNamespaces.DXF_2_0 )
     public String getResourceTableStrategy()
     {
-        return resourceTableStrategy;
+       return resourceTableStrategy;
     }
 
     public void setResourceTableStrategy( String resourceTableStrategy )
@@ -116,5 +118,17 @@ public class SchedulingStrategy
     public void setDataSynchStrategy( String dataSynchStrategy )
     {
         this.dataSynchStrategy = dataSynchStrategy;
+    }
+
+    @JsonProperty
+    @JacksonXmlProperty( namespace = DxfNamespaces.DXF_2_0 )
+    public String getDataStatisticsStrategy()
+    {
+        return dataStatisticsStrategy;
+    }
+
+    public void setDataStatisticsStrategy( String dataStatisticsStrategy )
+    {
+        this.dataStatisticsStrategy = dataStatisticsStrategy;
     }
 }

@@ -28,7 +28,6 @@ package org.hisp.dhis.sms.incoming;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -56,46 +55,8 @@ public class DefaultIncomingSmsService
     }
 
     // -------------------------------------------------------------------------
-    // Input & Output
-    // -------------------------------------------------------------------------
-
-    private List<IncomingSms> msgList = new ArrayList<>();
-
-    public void setMsgList( List<IncomingSms> msgList )
-    {
-        this.msgList = msgList;
-    }
-
-    // -------------------------------------------------------------------------
     // Implementation
     // -------------------------------------------------------------------------
-
-    @Override
-    public List<IncomingSms> listAllMessageFromModem()
-    {
-        List<IncomingSms> result = new ArrayList<>();
-
-        try
-        {
-          
-        }
-        catch ( Exception e )
-        {
-            e.printStackTrace();
-        }
-
-        if ( msgList.size() > 0 )
-        {
-            for ( IncomingSms each : msgList )
-            {
-                result.add( each );
-            }
-
-            msgList.clear();
-        }
-
-        return result;
-    }
 
     @Override
     public List<IncomingSms> listAllMessage()
@@ -133,21 +94,6 @@ public class DefaultIncomingSmsService
         sms.setEncoding( SmsMessageEncoding.ENC7BIT );
         sms.setStatus( SmsMessageStatus.INCOMING );
         return save( sms );
-    }
-
-    @Override
-    public void deleteAllFromModem()
-    {
-        try
-        {
-           
-        }
-        catch ( Exception e )
-        {
-            e.printStackTrace();
-        }
-
-        msgList.clear();
     }
 
     @Override

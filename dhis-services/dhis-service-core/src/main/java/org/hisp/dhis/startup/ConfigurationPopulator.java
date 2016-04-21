@@ -34,13 +34,13 @@ import org.hisp.dhis.configuration.Configuration;
 import org.hisp.dhis.configuration.ConfigurationService;
 import org.hisp.dhis.encryption.EncryptionStatus;
 import org.hisp.dhis.external.conf.DhisConfigurationProvider;
-import org.hisp.dhis.system.startup.AbstractStartupRoutine;
+import org.hisp.dhis.system.startup.TransactionContextStartupRoutine;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.UUID;
 
 public class ConfigurationPopulator
-    extends AbstractStartupRoutine
+    extends TransactionContextStartupRoutine
 {
     @Autowired
     private ConfigurationService configurationService;
@@ -51,8 +51,7 @@ public class ConfigurationPopulator
     private static final Log log = LogFactory.getLog( ConfigurationPopulator.class );
 
     @Override
-    public void execute()
-        throws Exception
+    public void executeInTransaction()
     {
         checkSecurityConfiguration();
 

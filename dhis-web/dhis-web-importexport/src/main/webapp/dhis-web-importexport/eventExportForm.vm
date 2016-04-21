@@ -44,6 +44,7 @@ $( function() {
         url += "&startDate=" + startDate;
         url += "&endDate=" + endDate;
         url += "&links=false";
+        url += "&skipPaging=true";
 
         window.location = url;
     });

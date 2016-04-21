@@ -198,8 +198,10 @@
 			<td>$i18n.getString('source_type')</td>
 			<td>
 				<select type="" id="sourceType" name="sourceType" onchange="sourceTypeOnChange()" style="width:250px;">
+					<option value="DATAELEMENT_CURRENT_EVENT">$i18n.getString("data_element_current_event")</option>
 					<option value="DATAELEMENT_NEWEST_EVENT_PROGRAM">$i18n.getString("data_element_newest_event_program")</option>
 					<option value="DATAELEMENT_NEWEST_EVENT_PROGRAM_STAGE">$i18n.getString("data_element_newest_event_program_stage")</option>
+					<option value="DATAELEMENT_PREVIOUS_EVENT">$i18n.getString("data_element_previous_event")</option>
 					<option value="TEI_ATTRIBUTE">$i18n.getString("tei_attribute")</option>
 				</select>
 			</td>

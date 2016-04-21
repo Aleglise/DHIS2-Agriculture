@@ -93,7 +93,7 @@ public class GetAvailablePeriodsAction
     {
         periodType = periodType != null && !periodType.isEmpty() ? periodType : MonthlyPeriodType.NAME;
 
-        CalendarPeriodType _periodType = (CalendarPeriodType) PeriodType.getPeriodTypeByName( periodType );
+        CalendarPeriodType perType = (CalendarPeriodType) PeriodType.getPeriodTypeByName( periodType );
 
         int thisYear = Calendar.getInstance().get( Calendar.YEAR );
 
@@ -111,7 +111,7 @@ public class GetAvailablePeriodsAction
             SessionUtils.setSessionVar( SessionUtils.KEY_CURRENT_YEAR, cal.get( Calendar.YEAR ) );
         }
 
-        periods = _periodType.generatePeriods( cal.getTime() );
+        periods = perType.generatePeriods( cal.getTime() );
 
         FilterUtils.filter( periods, new PastAndCurrentPeriodFilter() );
 

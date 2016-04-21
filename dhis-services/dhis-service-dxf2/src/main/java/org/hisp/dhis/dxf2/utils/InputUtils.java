@@ -1,5 +1,7 @@
 package org.hisp.dhis.dxf2.utils;
 
+import org.hisp.dhis.common.IdScheme;
+
 /*
  * Copyright (c) 2004-2016, University of Oslo
  * All rights reserved.
@@ -58,10 +60,12 @@ public class InputUtils
      *
      * @param cc the category combo identifier.
      * @param cp the category and option query string.
+     * @param skipFallback whether to skip fallback to default option combo if
+     *        attribute option combo is not found.
      * @return the attribute option combo identified from the given input, or null
      * if the input was invalid.
      */
-    public DataElementCategoryOptionCombo getAttributeOptionCombo( String cc, String cp )
+    public DataElementCategoryOptionCombo getAttributeOptionCombo( String cc, String cp, boolean skipFallback )
     {
         Set<String> opts = TextUtils.splitToArray( cp, TextUtils.SEMICOLON );
 
@@ -83,10 +87,15 @@ public class InputUtils
         
         if ( categoryCombo == null && opts == null )
         {
+            if ( skipFallback )
+            {
+                return null;
+            }
+            
             categoryCombo = categoryService.getDefaultDataElementCategoryCombo();
         }
 
-        return getAttributeOptionCombo( categoryCombo, cp );
+        return getAttributeOptionCombo( categoryCombo, cp, IdScheme.UID );
     }
     
     /**
@@ -99,7 +108,7 @@ public class InputUtils
      * @return the attribute option combo identified from the given input, or null
      * if the input was invalid.
      */
-    public DataElementCategoryOptionCombo getAttributeOptionCombo( DataElementCategoryCombo categoryCombo, String cp )
+    public DataElementCategoryOptionCombo getAttributeOptionCombo( DataElementCategoryCombo categoryCombo, String cp, IdScheme idScheme )
     {
         Set<String> opts = TextUtils.splitToArray( cp, TextUtils.SEMICOLON );
 
@@ -120,7 +129,7 @@ public class InputUtils
 
             for ( String uid : opts )
             {
-                DataElementCategoryOption categoryOption = idObjectManager.get( DataElementCategoryOption.class, uid );
+                DataElementCategoryOption categoryOption = idObjectManager.getObject( DataElementCategoryOption.class, idScheme, uid );
 
                 if ( categoryOption == null )
                 {

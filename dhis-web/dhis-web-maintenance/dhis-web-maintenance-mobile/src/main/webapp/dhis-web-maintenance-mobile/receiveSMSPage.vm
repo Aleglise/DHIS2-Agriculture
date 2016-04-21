@@ -15,7 +15,6 @@
 				setHeaderDelayMessage( json.message );
 			}
 		});
-		setTimeout( "checkNewMsg()", document.getElementById( 'pollingInterval' ).value );
 	};
 	
 	checked = false;
@@ -202,7 +201,6 @@
 
 </script>
 
-<input id="pollingInterval" name="pollingInterval" type="hidden" value="$pollingInterval"/>
 <h3>$i18n.getString( "show_receive_sms_form" )</h3>
 <form id="receiveSmsPage" name="receiveSmsPage" action="showReceivingPage.action" method="get" >
 

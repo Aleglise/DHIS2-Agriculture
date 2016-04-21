@@ -36,15 +36,11 @@ import org.hisp.dhis.sms.MessageQueue;
 /**
  * Service providing support for retrieving incoming SMSes.
  */
+
 public interface IncomingSmsService
 {
     String ID = IncomingSmsService.class.getName();
 
-    /**
-     * Get the next sms incoming for processing, if any.
-     * 
-     * @return the oldest sms in the INCOMING state.
-     */
     IncomingSms getNextUnprocessed();
 
     void update( IncomingSms sms );
@@ -52,10 +48,6 @@ public interface IncomingSmsService
     IncomingSms findBy( Integer id );
 
     List<IncomingSms> listAllMessage();
-
-    List<IncomingSms> listAllMessageFromModem();
-
-    void deleteAllFromModem();
 
     void deleteById( Integer id );
 

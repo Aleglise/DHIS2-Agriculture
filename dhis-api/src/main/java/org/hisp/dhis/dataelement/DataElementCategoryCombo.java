@@ -90,14 +90,15 @@ public class DataElementCategoryCombo
     {
     }
 
-    public DataElementCategoryCombo( String name )
+    public DataElementCategoryCombo( String name, DataDimensionType dataDimensionType )
     {
         this.name = name;
+        this.dataDimensionType = dataDimensionType;
     }
 
-    public DataElementCategoryCombo( String name, List<DataElementCategory> categories )
+    public DataElementCategoryCombo( String name, DataDimensionType dataDimensionType, List<DataElementCategory> categories )
     {
-        this( name );
+        this( name, dataDimensionType );
         this.categories = categories;
     }
 

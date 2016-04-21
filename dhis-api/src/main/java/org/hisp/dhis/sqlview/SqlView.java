@@ -50,7 +50,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * @author Dang Duy Hieu
@@ -62,11 +62,12 @@ public class SqlView
 {
     public static final String PREFIX_VIEWNAME = "_view";
 
-    public static final Set<String> PROTECTED_TABLES = Sets.newHashSet( "users", "userinfo", 
-        "trackedentityattribute", "trackedentityattributevalue" );
+    public static final Set<String> PROTECTED_TABLES = ImmutableSet.<String>builder().add( 
+        "users", "userinfo", "trackedentityattribute", "trackedentityattributevalue" ).build();
 
-    public static final Set<String> ILLEGAL_KEYWORDS = Sets.newHashSet( "delete", "alter", "update", 
-        "create", "drop", "commit", "createdb", "createuser", "insert", "rename", "replace", "restore", "write" );
+    public static final Set<String> ILLEGAL_KEYWORDS = ImmutableSet.<String>builder().add(
+        "delete", "alter", "update", "create", "drop", "commit", "createdb", 
+        "createuser", "insert", "rename", "replace", "restore", "write" ).build();
 
     private static final String CRITERIA_SEP = ":";
     private static final String REGEX_SEP = "|";

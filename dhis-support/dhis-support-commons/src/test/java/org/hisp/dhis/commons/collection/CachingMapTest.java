@@ -46,11 +46,82 @@ public class CachingMapTest
         animals.add( new Animal( 3, "cat" ) );
 
         CachingMap<Integer, Animal> cache = new CachingMap<Integer, Animal>().load( animals, a -> a.getId() );
-        
+
+        assertEquals( 3, cache.size() );
         assertEquals( "horse", cache.get( 1 ).getName() );
         assertEquals( "dog", cache.get( 2 ).getName() );
         assertEquals( "cat", cache.get( 3 ).getName() );        
         assertFalse( cache.containsKey( "deer" ) );
+    }
+    
+    @Test
+    public void testLoadWithNull()
+    {
+        Set<Animal> animals = new HashSet<>();
+        animals.add( new Animal( 1, "horse" ) );
+        animals.add( new Animal( 2, null ) );
+        animals.add( new Animal( 3, "cat" ) );
+
+        CachingMap<String, Animal> cache = new CachingMap<String, Animal>().load( animals, a -> a.getName() );
+
+        assertEquals( 2, cache.size() );
+        assertEquals( 1, cache.get( "horse" ).getId() );       
+        assertFalse( cache.containsKey( "dog" ) );
+    }
+    
+    @Test
+    public void testCacheHitMissCount()
+    {
+        CachingMap<Integer, Animal> cache = new CachingMap<Integer, Animal>();
+        
+        cache.put( 1, new Animal( 1, "horse" ) );
+        cache.put( 2, new Animal( 2, "dog" ) );
+        
+        cache.get( 1, () -> null ); // Hit
+        cache.get( 1, () -> null ); // Hit
+        cache.get( 1, () -> null ); // Hit
+        cache.get( 2, () -> null ); // Hit
+        cache.get( 2, () -> null ); // Hit
+        cache.get( 3, () -> null ); // Miss
+        cache.get( 3, () -> null ); // Miss
+        cache.get( 4, () -> null ); // Miss
+        
+        assertEquals( 5, cache.getCacheHitCount() );
+        assertEquals( 3, cache.getCacheMissCount() );
+    }
+
+    @Test
+    public void testCacheLoadCount()
+    {
+        Set<Animal> animals = new HashSet<>();
+        animals.add( new Animal( 1, "horse" ) );
+        animals.add( new Animal( 2, "dog" ) );
+        animals.add( new Animal( 3, "cat" ) );
+
+        CachingMap<Integer, Animal> cache = new CachingMap<Integer, Animal>();
+        
+        assertEquals( 0, cache.getCacheLoadCount() );
+        
+        cache.load( animals, a -> a.getId() );
+
+        assertEquals( 1, cache.getCacheLoadCount() );
+    }
+
+    @Test
+    public void testIsCacheLoaded()
+    {
+        Set<Animal> animals = new HashSet<>();
+        animals.add( new Animal( 1, "horse" ) );
+        animals.add( new Animal( 2, "dog" ) );
+        animals.add( new Animal( 3, "cat" ) );
+
+        CachingMap<Integer, Animal> cache = new CachingMap<Integer, Animal>();
+        
+        assertFalse( cache.isCacheLoaded() );
+        
+        cache.load( animals, a -> a.getId() );
+
+        assertTrue( cache.isCacheLoaded() );
     }
     
     private class Animal

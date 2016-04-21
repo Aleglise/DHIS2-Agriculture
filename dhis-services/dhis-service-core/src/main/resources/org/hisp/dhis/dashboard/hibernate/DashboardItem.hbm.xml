@@ -45,6 +45,8 @@
         
     <property name="messages" />
 
+    <property name="appKey" />
+
     <property name="shape" length="50">
       <type name="org.hibernate.type.EnumType">
         <param name="enumClass">org.hisp.dhis.dashboard.DashboardItemShape</param>

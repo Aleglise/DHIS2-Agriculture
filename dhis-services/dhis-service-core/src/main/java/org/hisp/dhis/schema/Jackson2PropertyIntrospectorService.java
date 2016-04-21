@@ -176,6 +176,7 @@ public class Jackson2PropertyIntrospectorService
             {
                 property.setCollection( true );
                 property.setCollectionName( property.getName() );
+                property.setOrdered( List.class.isAssignableFrom( returnType ) );
 
                 Type type = property.getGetterMethod().getGenericReturnType();
 

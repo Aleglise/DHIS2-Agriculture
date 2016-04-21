@@ -36,5 +36,6 @@ package org.hisp.dhis.sms.incoming;
 public interface SmsConsumerService
 {
     void startSmsConsumer();
+    
     void stopSmsConsumer();    
 }

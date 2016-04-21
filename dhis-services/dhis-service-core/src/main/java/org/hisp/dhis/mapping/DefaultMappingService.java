@@ -35,6 +35,7 @@ import org.hisp.dhis.common.GenericAnalyticalObjectService;
 import org.hisp.dhis.indicator.Indicator;
 import org.hisp.dhis.indicator.IndicatorService;
 import org.hisp.dhis.organisationunit.OrganisationUnit;
+import org.hisp.dhis.organisationunit.OrganisationUnitGroupSet;
 import org.hisp.dhis.organisationunit.OrganisationUnitService;
 import org.hisp.dhis.period.Period;
 import org.hisp.dhis.period.PeriodService;
@@ -198,7 +199,7 @@ public class DefaultMappingService
     {
         return mapViewStore.getByName( name );
     }
-
+    
     @Override
     public MapView getIndicatorLastYearMapView( String indicatorUid, String organisationUnitUid, int level )
     {
@@ -217,6 +218,12 @@ public class DefaultMappingService
         mapView.setName( indicator.getName() );
 
         return mapView;
+    }
+    
+    @Override
+    public List<MapView> getMapViewsByOrganisationUnitGroupSet( OrganisationUnitGroupSet groupSet )
+    {
+        return mapViewStore.getByOrganisationUnitGroupSet( groupSet );
     }
 
     @Override

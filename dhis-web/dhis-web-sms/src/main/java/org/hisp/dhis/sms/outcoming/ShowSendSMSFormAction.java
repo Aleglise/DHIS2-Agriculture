@@ -53,10 +53,10 @@ public class ShowSendSMSFormAction
     // -------------------------------------------------------------------------
 
     @Autowired
-    private GatewayAdministrationService gatewayAdminService;
-
-    @Autowired
     private UserGroupService userGroupService;
+    
+    @Autowired
+    private GatewayAdministrationService gatewayAdminService;
 
     // -------------------------------------------------------------------------
     // Input && Output
@@ -78,7 +78,7 @@ public class ShowSendSMSFormAction
 
     public Map<String, SmsGatewayConfig> getGatewayMap()
     {
-        return gatewayAdminService.getGatewayConfigurationMap();
+        return gatewayMap;
     }
 
     private List<UserGroup> userGroups;
@@ -96,6 +96,8 @@ public class ShowSendSMSFormAction
     public String execute()
         throws Exception
     {
+        gatewayMap = gatewayAdminService.getGatewayConfigurationMap();
+        
         userGroups = new ArrayList<>( userGroupService.getAllUserGroups() );
 
         Collections.sort( userGroups );

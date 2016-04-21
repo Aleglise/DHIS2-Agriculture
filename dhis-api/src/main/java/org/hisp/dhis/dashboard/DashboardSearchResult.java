@@ -31,6 +31,7 @@ package org.hisp.dhis.dashboard;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hisp.dhis.appmanager.App;
 import org.hisp.dhis.chart.Chart;
 import org.hisp.dhis.common.BaseIdentifiableObject;
 import org.hisp.dhis.common.DxfNamespaces;
@@ -66,7 +67,9 @@ public class DashboardSearchResult
     private List<Report> reports = new ArrayList<>();
 
     private List<Document> resources = new ArrayList<>();
-    
+
+    private List<App> apps = new ArrayList<>();
+
     // -------------------------------------------------------------------------
     // Constructor
     // -------------------------------------------------------------------------
@@ -91,6 +94,7 @@ public class DashboardSearchResult
         results += eventReports.size();
         results += reports.size();
         results += resources.size();
+        results += apps.size();
         return results;
     }
 
@@ -140,7 +144,13 @@ public class DashboardSearchResult
     public int getResourceCount()
     {
         return resources.size();
-    }  
+    }
+
+    @JsonProperty
+    public int getAppCount()
+    {
+        return apps.size();
+    }
     
     // -------------------------------------------------------------------------
     // Getters and setters
@@ -256,5 +266,19 @@ public class DashboardSearchResult
     public void setResources( List<Document> resources )
     {
         this.resources = resources;
+    }
+
+    @JsonProperty( value = "apps" )
+    @JsonSerialize( contentAs = App.class )
+    @JacksonXmlElementWrapper( localName = "apps", namespace = DxfNamespaces.DXF_2_0 )
+    @JacksonXmlProperty( localName = "apps", namespace = DxfNamespaces.DXF_2_0 )
+    public List<App> getApps()
+    {
+        return apps;
+    }
+
+    public void setApps( List<App> apps )
+    {
+        this.apps = apps;
     }
 }

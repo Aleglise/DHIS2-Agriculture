@@ -84,7 +84,7 @@ public class DefaultProgramService
     {
         Collection<org.hisp.dhis.program.Program> programByUnit = programService.getPrograms( unit );
 
-        Collection<org.hisp.dhis.program.Program> programByCurrentUser = programService.getCurrentUserPrograms();
+        Collection<org.hisp.dhis.program.Program> programByCurrentUser = programService.getUserPrograms();
 
         programByCurrentUser.retainAll( programByUnit );
 

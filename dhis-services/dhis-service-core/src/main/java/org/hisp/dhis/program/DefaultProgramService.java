@@ -28,14 +28,8 @@ package org.hisp.dhis.program;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import static org.hisp.dhis.i18n.I18nUtils.i18n;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.hisp.dhis.dataelement.DataElement;
 import org.hisp.dhis.dataelement.DataElementService;
 import org.hisp.dhis.i18n.I18nService;
@@ -47,8 +41,13 @@ import org.hisp.dhis.user.CurrentUserService;
 import org.hisp.dhis.user.User;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static org.hisp.dhis.i18n.I18nUtils.i18n;
 
 /**
  * @author Abyot Asalefew
@@ -88,14 +87,14 @@ public class DefaultProgramService
     {
         this.organisationUnitService = organisationUnitService;
     }
-    
+
     private DataElementService dataElementService;
 
     public void setDataElementService( DataElementService dataElementService )
     {
         this.dataElementService = dataElementService;
     }
-    
+
     private ProgramDataElementStore programDataElementStore;
 
     public void setProgramDataElementStore( ProgramDataElementStore programDataElementStore )
@@ -198,29 +197,33 @@ public class DefaultProgramService
     }
 
     @Override
-    public Set<Program> getCurrentUserPrograms()
+    public Set<Program> getUserPrograms()
     {
-        User user = currentUserService.getCurrentUser();
-        
+        return getUserPrograms( currentUserService.getCurrentUser() );
+    }
+
+    @Override
+    public Set<Program> getUserPrograms( User user )
+    {
         if ( user != null )
         {
             return user.isSuper() ? Sets.newHashSet( getAllPrograms() ) : user.getUserCredentials().getAllPrograms();
         }
-        
+
         return Sets.newHashSet();
     }
 
     @Override
-    public Set<Program> getCurrentUserPrograms( ProgramType programType )
-    {        
-        return getCurrentUserPrograms().stream().filter( p -> p.getProgramType() == programType ).collect( Collectors.toSet() );
+    public Set<Program> getUserPrograms( ProgramType programType )
+    {
+        return getUserPrograms().stream().filter( p -> p.getProgramType() == programType ).collect( Collectors.toSet() );
     }
-    
+
     @Override
     public void mergeWithCurrentUserOrganisationUnits( Program program, Collection<OrganisationUnit> mergeOrganisationUnits )
     {
         Set<OrganisationUnit> selectedOrgUnits = Sets.newHashSet( program.getOrganisationUnits() );
-        
+
         OrganisationUnitQueryParams params = new OrganisationUnitQueryParams();
         params.setParents( currentUserService.getCurrentUser().getOrganisationUnits() );
 
@@ -233,7 +236,7 @@ public class DefaultProgramService
 
         updateProgram( program );
     }
-    
+
     // -------------------------------------------------------------------------
     // ProgramDataElement
     // -------------------------------------------------------------------------
@@ -242,38 +245,38 @@ public class DefaultProgramService
     public ProgramDataElement getOrAddProgramDataElement( String programUid, String dataElementUid )
     {
         Program program = programStore.getByUid( programUid );
-        
+
         DataElement dataElement = dataElementService.getDataElement( dataElementUid );
-        
+
         if ( program == null || dataElement == null )
         {
             return null;
         }
-        
+
         ProgramDataElement programDataElement = programDataElementStore.get( program, dataElement );
-        
+
         if ( programDataElement == null )
         {
             programDataElement = new ProgramDataElement( program, dataElement );
-            
+
             programDataElementStore.save( programDataElement );
         }
-        
+
         return programDataElement;
     }
-        
+
     @Override
     public ProgramDataElement getProgramDataElement( String programUid, String dataElementUid )
     {
         Program program = programStore.getByUid( programUid );
-        
+
         DataElement dataElement = dataElementService.getDataElement( dataElementUid );
-        
+
         if ( program == null || dataElement == null )
         {
             return null;
         }
-        
+
         return new ProgramDataElement( program, dataElement );
     }
 
@@ -281,21 +284,21 @@ public class DefaultProgramService
     public List<ProgramDataElement> getGeneratedProgramDataElements( String programUid )
     {
         Program program = getProgram( programUid );
-        
+
         List<ProgramDataElement> programDataElements = Lists.newArrayList();
-        
+
         if ( program == null )
         {
             return programDataElements;
         }
-        
+
         for ( DataElement element : program.getDataElements() )
         {
             programDataElements.add( new ProgramDataElement( program, element ) );
         }
-        
+
         Collections.sort( programDataElements );
-        
+
         return programDataElements;
     }
 }

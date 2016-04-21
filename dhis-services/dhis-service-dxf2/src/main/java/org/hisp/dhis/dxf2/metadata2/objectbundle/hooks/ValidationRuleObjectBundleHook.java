@@ -30,38 +30,49 @@ package org.hisp.dhis.dxf2.metadata2.objectbundle.hooks;
 
 import org.hisp.dhis.common.IdentifiableObject;
 import org.hisp.dhis.dxf2.metadata2.objectbundle.ObjectBundle;
+import org.hisp.dhis.period.PeriodType;
 import org.hisp.dhis.validation.ValidationRule;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Morten Olav Hansen <mortenoh@gmail.com>
  */
-@Component
 public class ValidationRuleObjectBundleHook extends AbstractObjectBundleHook
 {
     @Override
-    public void preCreate( IdentifiableObject identifiableObject, ObjectBundle objectBundle )
+    public void preCreate( IdentifiableObject object, ObjectBundle bundle )
     {
-        if ( !ValidationRule.class.isInstance( identifiableObject ) ) return;
-        ValidationRule validationRule = (ValidationRule) identifiableObject;
+        if ( !ValidationRule.class.isInstance( object ) ) return;
+        ValidationRule validationRule = (ValidationRule) object;
 
-        preheatService.connectReferences( validationRule.getLeftSide(), objectBundle.getPreheat(), objectBundle.getPreheatIdentifier() );
-        preheatService.connectReferences( validationRule.getRightSide(), objectBundle.getPreheat(), objectBundle.getPreheatIdentifier() );
+        preheatService.connectReferences( validationRule.getLeftSide(), bundle.getPreheat(), bundle.getPreheatIdentifier() );
+        preheatService.connectReferences( validationRule.getRightSide(), bundle.getPreheat(), bundle.getPreheatIdentifier() );
 
         sessionFactory.getCurrentSession().save( validationRule.getLeftSide() );
         sessionFactory.getCurrentSession().save( validationRule.getRightSide() );
+
+        if ( validationRule.getPeriodType() != null )
+        {
+            PeriodType periodType = bundle.getPreheat().getPeriodTypeMap().get( validationRule.getPeriodType().getName() );
+            validationRule.setPeriodType( periodType );
+        }
     }
 
     @Override
-    public void preUpdate( IdentifiableObject identifiableObject, ObjectBundle objectBundle )
+    public void preUpdate( IdentifiableObject object, ObjectBundle bundle )
     {
-        if ( !ValidationRule.class.isInstance( identifiableObject ) ) return;
-        ValidationRule validationRule = (ValidationRule) identifiableObject;
+        if ( !ValidationRule.class.isInstance( object ) ) return;
+        ValidationRule validationRule = (ValidationRule) object;
 
-        preheatService.connectReferences( validationRule.getLeftSide(), objectBundle.getPreheat(), objectBundle.getPreheatIdentifier() );
-        preheatService.connectReferences( validationRule.getRightSide(), objectBundle.getPreheat(), objectBundle.getPreheatIdentifier() );
+        preheatService.connectReferences( validationRule.getLeftSide(), bundle.getPreheat(), bundle.getPreheatIdentifier() );
+        preheatService.connectReferences( validationRule.getRightSide(), bundle.getPreheat(), bundle.getPreheatIdentifier() );
 
         sessionFactory.getCurrentSession().save( validationRule.getLeftSide() );
         sessionFactory.getCurrentSession().save( validationRule.getRightSide() );
+
+        if ( validationRule.getPeriodType() != null )
+        {
+            PeriodType periodType = bundle.getPreheat().getPeriodTypeMap().get( validationRule.getPeriodType().getName() );
+            validationRule.setPeriodType( periodType );
+        }
     }
 }

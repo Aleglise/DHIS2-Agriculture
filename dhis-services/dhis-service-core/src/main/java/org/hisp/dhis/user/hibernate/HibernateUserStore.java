@@ -212,4 +212,11 @@ public class HibernateUserStore
         
         return query;
     }
+
+    @Override
+    public int getUserCount()
+    {
+        return ((Long) getQuery( "select count(*) from User" ).
+            uniqueResult()).intValue();
+    }
 }

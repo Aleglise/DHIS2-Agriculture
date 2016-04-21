@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.SessionFactory;
@@ -83,6 +84,17 @@ public class IdentifiableObjectManagerTest
     protected void setUpTest() throws Exception
     {
         this.userService = _userService;
+    }
+
+    @Test
+    public void testGetObjectWithIdScheme()
+    {
+        DataElement dataElementA = createDataElement( 'A' );
+
+        dataElementService.addDataElement( dataElementA );
+
+        assertEquals( dataElementA, identifiableObjectManager.get( DataDimensionItem.DATA_DIMENSION_CLASSES, IdScheme.CODE, dataElementA.getCode() ) );
+        assertEquals( dataElementA, identifiableObjectManager.get( DataDimensionItem.DATA_DIMENSION_CLASSES, IdScheme.UID, dataElementA.getUid() ) );
     }
 
     @Test
@@ -666,5 +678,21 @@ public class IdentifiableObjectManagerTest
         assertEquals( 2, units.size() );
         assertTrue( units.contains( unit2 ) );
         assertTrue( units.contains( unit3 ) );
-    }    
+    }
+    
+    @Test
+    public void testGetIdMapIdScheme()
+    {
+        DataElement dataElementA = createDataElement( 'A' );
+        DataElement dataElementB = createDataElement( 'B' );
+
+        dataElementService.addDataElement( dataElementA );
+        dataElementService.addDataElement( dataElementB );
+
+        Map<String, DataElement> map = identifiableObjectManager.getIdMap( DataElement.class, IdScheme.CODE );
+        
+        assertEquals( dataElementA, map.get( "DataElementCodeA" ) );
+        assertEquals( dataElementB, map.get( "DataElementCodeB" ) );
+        assertNull( map.get( "DataElementCodeX" ) );
+    }
 }

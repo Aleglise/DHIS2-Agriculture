@@ -53,6 +53,8 @@
     <property name="skipOffline" />
     
     <property name="displayFrontPageList" column="displayfrontpagelist" />
+    
+    <property name="useFirstStageDuringRegistration" />
 
     <list name="programAttributes" cascade="all">
       <key column="programid" />

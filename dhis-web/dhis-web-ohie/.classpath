@@ -251,7 +251,6 @@
   <classpathentry kind="var" path="M2_REPO/org/geotools/gt-cql/9.3/gt-cql-9.3.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/geotools/gt-epsg-wkt/9.3/gt-epsg-wkt-9.3.jar"/>
   <classpathentry kind="src" path="/dhis-web-api"/>
-  <classpathentry kind="var" path="M2_REPO/org/hisp/dhis/dhis-service-eventreporting/2.23-SNAPSHOT/dhis-service-eventreporting-2.23-SNAPSHOT.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/springframework/spring-oxm/4.1.9.RELEASE/spring-oxm-4.1.9.RELEASE.jar"/>
   <classpathentry kind="src" path="/dhis-web-api-mobile"/>
   <classpathentry kind="var" path="M2_REPO/org/hisp/dhis/dhis-service-mobile/2.23-SNAPSHOT/dhis-service-mobile-2.23-SNAPSHOT.jar"/>

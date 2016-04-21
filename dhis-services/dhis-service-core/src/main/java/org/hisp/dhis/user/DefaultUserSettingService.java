@@ -42,10 +42,13 @@ import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -234,6 +237,7 @@ public class DefaultUserSettingService
         boolean useFallback )
     {
         Map<String, Serializable> result = Sets.newHashSet( getUserSettings( user ) ).stream()
+            .filter( userSetting -> userSetting != null && userSetting.getName() != null && userSetting.getValue() != null )
             .collect( Collectors.toMap( UserSetting::getName, UserSetting::getValue ) );
 
         names.forEach( name -> {

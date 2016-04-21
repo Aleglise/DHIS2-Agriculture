@@ -1,10 +1,14 @@
 <script type="text/javascript">
 	jQuery(document).ready(	function(){
-	
+
 		var rules = getValidationRules("constant");
 		rules['value'].custome_regex = [ /^-?(0|[1-9]\d*)(\.\d+)?$/, i18n_value_must_be_double ];
 		
-		validation2( 'addConstantForm', function( form ){ form.submit(); },
+		validation2( 'addConstantForm', function( form )
+		{
+		    #tblDynamicAttributesJavascript()
+		    form.submit();
+		},
 		{
 			'rules': rules
 		});
@@ -46,11 +50,15 @@
 		<td><label for="name">$i18n.getString( "value" ) <em title="$i18n.getString( 'required' )" class="required">*</em></label></td>
 		<td><input type="text" id="value" name="value"></td>
 	</tr>
+</table>
+	#tblDynamicAttributes( { "attributes": $attributes, "attributeValues": $attributeValues } )
+<table>
 	<tr>
 		<td></td>
 		<td><input type="submit" value="$i18n.getString( 'add' )" style="width:10em"/>
 		<input type="button" value="$i18n.getString( 'cancel' )" onclick="window.location.href='constant.action'" style="width:10em"/></td>
 	</tr>
 </table>
+
 
 </form>

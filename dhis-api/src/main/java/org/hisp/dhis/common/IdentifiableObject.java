@@ -33,6 +33,8 @@ import org.hisp.dhis.security.acl.Access;
 import org.hisp.dhis.user.User;
 import org.hisp.dhis.user.UserGroupAccess;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Date;
 import java.util.Set;
 
@@ -42,7 +44,7 @@ import java.util.Set;
 public interface IdentifiableObject
     extends LinkableObject, Comparable<IdentifiableObject>, Mergeable<IdentifiableObject>
 {
-    String[] I18N_PROPERTIES = { "name" };
+    final String[] I18N_PROPERTIES = { "name" };
 
     int getId();
 
@@ -77,4 +79,7 @@ public interface IdentifiableObject
     Set<UserGroupAccess> getUserGroupAccesses();
 
     Access getAccess();
+    
+    @JsonIgnore
+    String getPropertyValue( IdScheme idScheme );
 }

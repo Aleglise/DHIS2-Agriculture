@@ -250,7 +250,7 @@ public class GetDataValuesForDataSetAction
         // Attributes
         // ---------------------------------------------------------------------
 
-        DataElementCategoryOptionCombo attributeOptionCombo = inputUtils.getAttributeOptionCombo( cc, cp );
+        DataElementCategoryOptionCombo attributeOptionCombo = inputUtils.getAttributeOptionCombo( cc, cp, false );
 
         // ---------------------------------------------------------------------
         // Data values & Min-max data elements

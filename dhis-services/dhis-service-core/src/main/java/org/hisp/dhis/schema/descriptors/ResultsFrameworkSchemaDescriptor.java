@@ -30,13 +30,11 @@ package org.hisp.dhis.schema.descriptors;
 import org.hisp.dhis.resultsframework.ResultsFramework;
 import org.hisp.dhis.schema.Schema;
 import org.hisp.dhis.schema.SchemaDescriptor;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Abyot Asalefew Gizaw <abyota@gmail.com>
  *
  */
-@Component
 public class ResultsFrameworkSchemaDescriptor
     implements SchemaDescriptor
 {

@@ -39,6 +39,7 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.hisp.dhis.DhisSpringTest;
+import org.hisp.dhis.common.DataDimensionType;
 import org.hisp.dhis.common.GenericIdentifiableObjectStore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,9 +101,9 @@ public class DataElementCategoryStoreTest
     @Test
     public void testAddGet()
     {
-        categoryA = new DataElementCategory( "CategoryA", categoryOptions );
-        categoryB = new DataElementCategory( "CategoryB", categoryOptions );
-        categoryC = new DataElementCategory( "CategoryC", categoryOptions );
+        categoryA = new DataElementCategory( "CategoryA", DataDimensionType.DISAGGREGATION, categoryOptions );
+        categoryB = new DataElementCategory( "CategoryB", DataDimensionType.DISAGGREGATION, categoryOptions );
+        categoryC = new DataElementCategory( "CategoryC", DataDimensionType.DISAGGREGATION, categoryOptions );
 
         int idA = categoryStore.save( categoryA );
         int idB = categoryStore.save( categoryB );
@@ -120,9 +121,9 @@ public class DataElementCategoryStoreTest
     @Test
     public void testDelete()
     {
-        categoryA = new DataElementCategory( "CategoryA", categoryOptions );
-        categoryB = new DataElementCategory( "CategoryB", categoryOptions );
-        categoryC = new DataElementCategory( "CategoryC", categoryOptions );
+        categoryA = new DataElementCategory( "CategoryA", DataDimensionType.DISAGGREGATION, categoryOptions );
+        categoryB = new DataElementCategory( "CategoryB", DataDimensionType.DISAGGREGATION, categoryOptions );
+        categoryC = new DataElementCategory( "CategoryC", DataDimensionType.DISAGGREGATION, categoryOptions );
 
         int idA = categoryStore.save( categoryA );
         int idB = categoryStore.save( categoryB );
@@ -148,9 +149,9 @@ public class DataElementCategoryStoreTest
     @Test
     public void testGetAll()
     {
-        categoryA = new DataElementCategory( "CategoryA", categoryOptions );
-        categoryB = new DataElementCategory( "CategoryB", categoryOptions );
-        categoryC = new DataElementCategory( "CategoryC", categoryOptions );
+        categoryA = new DataElementCategory( "CategoryA", DataDimensionType.DISAGGREGATION, categoryOptions );
+        categoryB = new DataElementCategory( "CategoryB", DataDimensionType.DISAGGREGATION, categoryOptions );
+        categoryC = new DataElementCategory( "CategoryC", DataDimensionType.DISAGGREGATION, categoryOptions );
 
         categoryStore.save( categoryA );
         categoryStore.save( categoryB );

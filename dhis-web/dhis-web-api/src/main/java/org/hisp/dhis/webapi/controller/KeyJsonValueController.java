@@ -62,7 +62,7 @@ public class KeyJsonValueController
 
     @Autowired
     private AppManager appManager;
-    
+
     @Autowired
     private WebMessageService messageService;
 
@@ -113,12 +113,12 @@ public class KeyJsonValueController
         }
 
         keyJsonValueService.deleteNamespace( namespace );
-        
+
         messageService.sendJson( WebMessageUtils.ok( "Namespace '" + namespace + "' deleted." ), response );
     }
 
     /**
-     * Retrieves the value of the KeyJsonValue represented by the given key from 
+     * Retrieves the value of the KeyJsonValue represented by the given key from
      * the given namespace.
      */
     @RequestMapping( value = "/{namespace}/{key}", method = RequestMethod.GET, produces = "application/json" )
@@ -168,7 +168,7 @@ public class KeyJsonValueController
         KeyJsonValue metaDataValue = new KeyJsonValue();
         BeanUtils.copyProperties( metaDataValue, keyJsonValue );
         metaDataValue.setValue( null );
-        
+
         return metaDataValue;
     }
 
@@ -177,7 +177,8 @@ public class KeyJsonValueController
      */
     @RequestMapping( value = "/{namespace}/{key}", method = RequestMethod.POST, produces = "application/json", consumes = "application/json" )
     public void addKeyJsonValue(
-        @PathVariable String namespace, @PathVariable String key, @RequestBody String body, HttpServletResponse response )
+        @PathVariable String namespace, @PathVariable String key, @RequestBody String body,
+        @RequestParam( defaultValue = "false" ) boolean encrypt, HttpServletResponse response )
         throws IOException, WebMessageException
     {
         if ( !hasAccess( namespace ) )
@@ -202,6 +203,7 @@ public class KeyJsonValueController
         keyJsonValue.setKey( key );
         keyJsonValue.setNamespace( namespace );
         keyJsonValue.setValue( body );
+        keyJsonValue.setEncrypted( encrypt );
 
         keyJsonValueService.addKeyJsonValue( keyJsonValue );
 
@@ -239,7 +241,7 @@ public class KeyJsonValueController
         keyJsonValue.setValue( body );
 
         keyJsonValueService.updateKeyJsonValue( keyJsonValue );
-        
+
         response.setStatus( HttpServletResponse.SC_OK );
         messageService.sendJson( WebMessageUtils.ok( "Key '" + key + "' updated." ), response );
     }
@@ -268,7 +270,8 @@ public class KeyJsonValueController
 
         keyJsonValueService.deleteKeyJsonValue( keyJsonValue );
 
-        messageService.sendJson( WebMessageUtils.ok( "Key '" + key + "' deleted from namespace '" + namespace + "'." ), response );
+        messageService.sendJson( WebMessageUtils.ok( "Key '" + key + "' deleted from namespace '" + namespace + "'." ),
+            response );
     }
 
     private boolean hasAccess( String namespace )

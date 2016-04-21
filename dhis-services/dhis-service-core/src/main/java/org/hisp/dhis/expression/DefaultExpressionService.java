@@ -34,6 +34,7 @@ import static org.hisp.dhis.expression.Expression.PAR_CLOSE;
 import static org.hisp.dhis.expression.Expression.PAR_OPEN;
 import static org.hisp.dhis.expression.Expression.SEPARATOR;
 import static org.hisp.dhis.system.util.MathUtils.calculateExpression;
+import static org.hisp.dhis.system.util.MathUtils.calculateGenericExpression;
 import static org.hisp.dhis.system.util.MathUtils.isEqual;
 import static org.hisp.dhis.expression.MissingValueStrategy.*;
 
@@ -84,7 +85,7 @@ import com.google.common.collect.Sets;
  * The expression is a string describing a formula containing data element ids
  * and category option combo ids. The formula can potentially contain references
  * to data element totals.
- * 
+ *
  * @author Margrethe Store
  * @author Lars Helge Overland
  */
@@ -258,8 +259,21 @@ public class DefaultExpressionService
         String expressionString = generateExpression( expression.getExplodedExpressionFallback(), valueMap, constantMap,
             orgUnitCountMap, days, expression.getMissingValueStrategy(), incompleteValues, aggregateMap );
 
-        Double result = expressionString != null ? calculateExpression( expressionString ) : null;
-        
+        Double result = (expressionString != null) ? calculateExpression( expressionString ) : null;
+
+        return result;
+    }
+
+    @Override
+    public Object getExpressionObjectValue( Expression expression, Map<? extends DimensionalItemObject, Double> valueMap,
+        Map<String, Double> constantMap, Map<String, Integer> orgUnitCountMap, Integer days,
+        Set<DataElementOperand> incompleteValues, ListMap<String, Double> aggregateMap )
+    {
+        String expressionString = generateExpression( expression.getExplodedExpressionFallback(), valueMap, constantMap,
+            orgUnitCountMap, days, expression.getMissingValueStrategy(), incompleteValues, aggregateMap );
+
+        Object result = (expressionString != null) ? calculateGenericExpression( expressionString ) : null;
+
         return result;
     }
 
@@ -345,21 +359,21 @@ public class DefaultExpressionService
     @Transactional
     public Set<String> getAggregatesInExpression( String expression )
     {
-        Pattern prefix = CustomFunctions.getAggregatePrefixPattern();
+        Pattern prefix = CustomFunctions.AGGREGATE_PATTERN_PREFIX;
         Set<String> aggregates = new HashSet<>();
 
         if ( expression != null )
         {
             final Matcher matcher = prefix.matcher( expression );
-            
-            int scan = 0, len = expression.length();
+
+            int scan = 0;
+            int len = expression.length();
 
             while ( (scan < len) && (matcher.find( scan )) )
             {
                 int start = matcher.end();
-                
                 int end = Expression.matchExpression( expression, start );
-                
+
                 if ( end < 0 )
                 {
                     log.warn( "Bad expression starting at " + start + " in " + expression );
@@ -377,6 +391,26 @@ public class DefaultExpressionService
         }
 
         return aggregates;
+    }
+
+    @Override
+    @Transactional
+    public Set<DataElement> getSampleElementsInExpression( String expression )
+    {
+        Set<String> aggregates = getAggregatesInExpression( expression );
+        
+        HashSet<DataElement> elements = new HashSet<DataElement>();
+        
+        if ( aggregates.size() > 0 )
+        {
+            for ( String aggregate_expression : aggregates )
+            {
+                elements.addAll( getDataElementsInExpressionInternal( 
+                    OPERAND_PATTERN, aggregate_expression ) );
+            }
+        }
+        
+        return elements;
     }
 
     @Override
@@ -835,9 +869,9 @@ public class DefaultExpressionService
 
             for ( Indicator indicator : indicators )
             {
-                indicator.setExplodedNumerator( substituteExpression( 
+                indicator.setExplodedNumerator( substituteExpression(
                     indicator.getNumerator(), constants, orgUnitGroups, days ) );
-                indicator.setExplodedDenominator( substituteExpression( 
+                indicator.setExplodedDenominator( substituteExpression(
                     indicator.getDenominator(), constants, orgUnitGroups, days ) );
             }
         }
@@ -930,9 +964,10 @@ public class DefaultExpressionService
         }
 
         Map<String, Double> dimensionItemValueMap = valueMap.entrySet().stream().
+            filter( e -> e.getValue() != null ).
             collect( Collectors.toMap( e -> e.getKey().getDimensionItem(), e -> e.getValue() ) );
 
-        Set<String> incompleteItems = incompleteValues != null ? 
+        Set<String> incompleteItems = incompleteValues != null ?
             incompleteValues.stream().map( i -> i.getDimensionItem() ).collect( Collectors.toSet() ) : Sets.newHashSet();
 
         missingValueStrategy = missingValueStrategy == null ? NEVER_SKIP : missingValueStrategy;
@@ -943,23 +978,23 @@ public class DefaultExpressionService
 
         StringBuffer sb = new StringBuffer();
 
-        Pattern prefix = CustomFunctions.getAggregatePrefixPattern();
+        Pattern prefix = CustomFunctions.AGGREGATE_PATTERN_PREFIX;
         Matcher matcher = prefix.matcher( expression );
 
         int scan = 0, len = expression.length(), tail = 0;
-        
+
         while ( (scan < len) && (matcher.find( scan )) )
         {
             int start = matcher.end();
             int end = Expression.matchExpression( expression, start );
-            
+
             if ( end < 0 )
             {
                 sb.append( expression.substring( scan, start ) );
                 scan = start + 1;
                 tail = start;
             }
-            else if ( ( aggregateMap == null) || ( expression.charAt( start ) == '<' ) )
+            else if ( ( aggregateMap == null ) || (expression.charAt( start ) == '<' ) )
             {
                 sb.append( expression.substring( scan, end ) );
                 scan = end + 1;
@@ -976,9 +1011,6 @@ public class DefaultExpressionService
                     {
                         return null;
                     }
-                    else
-                    {
-                    }
                 }
                 else
                 {
@@ -986,7 +1018,7 @@ public class DefaultExpressionService
                     sb.append( expression.substring( scan, start ) );
                     sb.append( literal );
                 }
-                
+
                 scan = end;
                 tail = end;
             }

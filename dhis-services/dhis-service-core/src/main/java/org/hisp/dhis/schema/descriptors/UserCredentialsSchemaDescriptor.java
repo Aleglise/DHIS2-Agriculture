@@ -31,12 +31,10 @@ package org.hisp.dhis.schema.descriptors;
 import org.hisp.dhis.schema.Schema;
 import org.hisp.dhis.schema.SchemaDescriptor;
 import org.hisp.dhis.user.UserCredentials;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Morten Olav Hansen <mortenoh@gmail.com>
  */
-@Component
 public class UserCredentialsSchemaDescriptor implements SchemaDescriptor
 {
     public static final String SINGULAR = "userCredentials";

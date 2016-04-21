@@ -54,17 +54,15 @@ public interface EventAnalyticalObject
     
     DimensionalItemObject getValue();
     
-    boolean isCollapseDataDimensions();
-
     // -------------------------------------------------------------------------
-    // Base class emulation methods
+    // Base class emulation methods with default implementations
     // -------------------------------------------------------------------------
     
-    DataElement getDataElementValueDimension();
-
-    void setDataElementValueDimension( DataElement dataElementValueDimension );
-
-    TrackedEntityAttribute getAttributeValueDimension();
+    default void setDataElementValueDimension( DataElement dataElementValueDimension )
+    {
+    }
     
-    void setAttributeValueDimension( TrackedEntityAttribute attributeValueDimension );   
+    default void setAttributeValueDimension( TrackedEntityAttribute attributeValueDimension )
+    {
+    }
 }

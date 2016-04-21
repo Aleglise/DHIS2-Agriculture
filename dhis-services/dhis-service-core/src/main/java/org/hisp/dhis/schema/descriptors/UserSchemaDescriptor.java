@@ -34,12 +34,10 @@ import org.hisp.dhis.security.AuthorityType;
 import org.hisp.dhis.schema.Schema;
 import org.hisp.dhis.schema.SchemaDescriptor;
 import org.hisp.dhis.user.User;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Morten Olav Hansen <mortenoh@gmail.com>
  */
-@Component
 public class UserSchemaDescriptor implements SchemaDescriptor
 {
     public static final String SINGULAR = "user";

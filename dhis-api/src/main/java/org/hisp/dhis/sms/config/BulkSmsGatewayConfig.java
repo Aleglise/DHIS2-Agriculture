@@ -1,7 +1,5 @@
 package org.hisp.dhis.sms.config;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 /*
  * Copyright (c) 2004-2016, University of Oslo
  * All rights reserved.
@@ -30,11 +28,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+/**
+ * @author Zubair <rajazubair.asghar@gmail.com>
+ */
+
 public class BulkSmsGatewayConfig
     extends SmsGatewayConfig
 {
     private static final long serialVersionUID = 5249703354480948250L;
-
+    
     private String username;
 
     private String password;

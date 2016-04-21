@@ -32,7 +32,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
-
 import org.hisp.dhis.common.DxfNamespaces;
 
 import java.util.ArrayList;
@@ -46,7 +45,7 @@ public class Authority
 {
     private AuthorityType type;
 
-    private List<String> authorities = new ArrayList<String>();
+    private List<String> authorities = new ArrayList<>();
 
     public Authority( AuthorityType type )
     {
@@ -58,7 +57,7 @@ public class Authority
         this( type );
         this.authorities = authorities;
     }
-    
+
     @JsonProperty
     @JacksonXmlProperty( namespace = DxfNamespaces.DXF_2_0 )
     public AuthorityType getType()

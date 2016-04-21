@@ -29,21 +29,13 @@ package org.hisp.dhis.validation;
  */
 
 import java.util.Collection;
-import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.hisp.dhis.constant.ConstantService;
-import org.hisp.dhis.dataelement.DataElementCategoryOptionCombo;
 import org.hisp.dhis.dataelement.DataElementCategoryService;
-import org.hisp.dhis.datavalue.DataValueService;
-import org.hisp.dhis.expression.ExpressionService;
-import org.hisp.dhis.organisationunit.OrganisationUnit;
-import org.hisp.dhis.period.Period;
-import org.hisp.dhis.period.PeriodService;
 import org.hisp.dhis.system.util.SystemUtils;
-import org.hisp.dhis.user.CurrentUserService;
+import org.springframework.context.ApplicationContext;
 
 /**
  * Evaluates validation rules.
@@ -58,33 +50,14 @@ public class Validator
      * evaluation for each organisation unit to a task that can be evaluated
      * independently in a multi-threaded environment.
      * 
-     * @param sources the organisation units in which to run the validation
-     *        rules
-     * @param periods the periods of data to check
-     * @param attributeCombo the attribute combo to check (if restricted)
-     * @param rules the ValidationRules to evaluate
-     * @param lastScheduledRun date/time of the most recent successful scheduled
-     *        monitoring run (needed only for scheduled runs)
-     * @param constantService Constant Service reference
-     * @param expressionService Expression Service reference
-     * @param periodService Period Service reference
-     * @param dataValueService Data Value Service reference
-     * @param dataElementCategoryService Data Element Category Service reference
-     * @param userService user service
-     * @param currentUserService current user service
      * @return a collection of any validations that were found
      */
-    public static Collection<ValidationResult> validate( Collection<OrganisationUnit> sources,
-        Collection<Period> periods, Collection<ValidationRule> rules, DataElementCategoryOptionCombo attributeCombo,
-        Date lastScheduledRun, ConstantService constantService, ExpressionService expressionService,
-        PeriodService periodService, DataValueService dataValueService,
-        DataElementCategoryService dataElementCategoryService,
-        CurrentUserService currentUserService )
+    public static Collection<ValidationResult> validate( ValidationRunContext context, 
+        ApplicationContext applicationContext )
     {
-        ValidationRunContext context = ValidationRunContext.getNewContext( sources, periods, attributeCombo, rules,
-            constantService.getConstantMap(), ValidationRunType.SCHEDULED, lastScheduledRun, expressionService,
-            periodService, dataValueService, dataElementCategoryService, currentUserService );
-
+        DataElementCategoryService categoryService = (DataElementCategoryService) 
+            applicationContext.getBean( DataElementCategoryService.class );
+                
         int threadPoolSize = getThreadPoolSize( context );
         ExecutorService executor = Executors.newFixedThreadPool( threadPoolSize );
 
@@ -92,8 +65,10 @@ public class Validator
         {
             if ( sourceX.getToBeValidated() )
             {
-                Runnable worker = new ValidatorThread( sourceX, context );
-                executor.execute( worker );
+                ValidationTask task = (ValidationTask) applicationContext.getBean( DataValidationTask.NAME );
+                task.init( sourceX, context );
+                
+                executor.execute( task );
             }
         }
 
@@ -108,7 +83,7 @@ public class Validator
             executor.shutdownNow();
         }
 
-        reloadAttributeOptionCombos( context.getValidationResults(), dataElementCategoryService );
+        reloadAttributeOptionCombos( context.getValidationResults(), categoryService );
 
         return context.getValidationResults();
     }

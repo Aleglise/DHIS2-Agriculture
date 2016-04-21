@@ -29,11 +29,23 @@ package org.hisp.dhis.dxf2.metadata2;
  */
 
 import org.hisp.dhis.DhisSpringTest;
-import org.hisp.dhis.common.IdentifiableObjectManager;
-import org.hisp.dhis.constant.Constant;
+import org.hisp.dhis.common.IdentifiableObject;
+import org.hisp.dhis.dxf2.common.Status;
+import org.hisp.dhis.dxf2.metadata2.feedback.ImportReport;
+import org.hisp.dhis.dxf2.metadata2.objectbundle.ObjectBundleMode;
+import org.hisp.dhis.importexport.ImportStrategy;
+import org.hisp.dhis.render.RenderFormat;
 import org.hisp.dhis.render.RenderService;
+import org.hisp.dhis.user.UserService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Morten Olav Hansen <mortenoh@gmail.com>
@@ -42,36 +54,68 @@ public class MetadataImportServiceTest
     extends DhisSpringTest
 {
     @Autowired
-    private MetadataImportService metadataImportService;
-
-    @Autowired
-    private IdentifiableObjectManager manager;
+    private MetadataImportService importService;
 
     @Autowired
     private RenderService _renderService;
+
+    @Autowired
+    private UserService _userService;
 
     @Override
     protected void setUpTest() throws Exception
     {
         renderService = _renderService;
+        userService = _userService;
     }
 
     @Test
-    public void testConstantImport()
+    public void testCorrectStatusOnImportNoErrors() throws IOException
     {
-        Constant constant1 = fromJson( "dxf2/constant1.json", Constant.class );
-        Constant constant2 = fromJson( "dxf2/constant2.json", Constant.class );
+        Map<Class<? extends IdentifiableObject>, List<IdentifiableObject>> metadata = renderService.fromMetadata(
+            new ClassPathResource( "dxf2/dataset_with_sections.json" ).getInputStream(), RenderFormat.JSON );
 
         MetadataImportParams params = new MetadataImportParams();
-        params.addObject( constant1 );
-        params.addObject( constant2 );
+        params.setImportMode( ObjectBundleMode.COMMIT );
+        params.setImportStrategy( ImportStrategy.CREATE );
+        params.setObjects( metadata );
 
-        metadataImportService.importMetadata( params );
+        ImportReport report = importService.importMetadata( params );
+        assertEquals( Status.OK, report.getStatus() );
+    }
 
-        constant1 = manager.get( Constant.class, "abcdefghijA" );
-        constant2 = manager.get( Constant.class, "abcdefghijB" );
+    @Test
+    public void testCorrectStatusOnImportErrors() throws IOException
+    {
+        createUserAndInjectSecurityContext( true );
 
-        // assertNotNull( constant1 );
-        // assertNotNull( constant2 );
+        Map<Class<? extends IdentifiableObject>, List<IdentifiableObject>> metadata = renderService.fromMetadata(
+            new ClassPathResource( "dxf2/dataset_with_sections.json" ).getInputStream(), RenderFormat.JSON );
+
+        MetadataImportParams params = new MetadataImportParams();
+        params.setImportMode( ObjectBundleMode.COMMIT );
+        params.setImportStrategy( ImportStrategy.CREATE );
+        params.setAtomicMode( AtomicMode.NONE );
+        params.setObjects( metadata );
+
+        ImportReport report = importService.importMetadata( params );
+        assertEquals( Status.WARNING, report.getStatus() );
+    }
+
+    @Test
+    public void testCorrectStatusOnImportErrorsATOMIC() throws IOException
+    {
+        createUserAndInjectSecurityContext( true );
+
+        Map<Class<? extends IdentifiableObject>, List<IdentifiableObject>> metadata = renderService.fromMetadata(
+            new ClassPathResource( "dxf2/dataset_with_sections.json" ).getInputStream(), RenderFormat.JSON );
+
+        MetadataImportParams params = new MetadataImportParams();
+        params.setImportMode( ObjectBundleMode.COMMIT );
+        params.setImportStrategy( ImportStrategy.CREATE );
+        params.setObjects( metadata );
+
+        ImportReport report = importService.importMetadata( params );
+        assertEquals( Status.ERROR, report.getStatus() );
     }
 }

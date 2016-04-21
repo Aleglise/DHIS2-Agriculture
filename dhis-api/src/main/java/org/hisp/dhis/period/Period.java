@@ -32,6 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.hisp.dhis.common.BaseDimensionalItemObject;
+import org.hisp.dhis.common.DimensionItemType;
 import org.hisp.dhis.common.DxfNamespaces;
 import org.hisp.dhis.common.adapter.JacksonPeriodTypeDeserializer;
 import org.hisp.dhis.common.adapter.JacksonPeriodTypeSerializer;
@@ -280,7 +281,35 @@ public class Period
     {
         return getEndDate().after( new Date() );
     }
+    
+    /**
+     * Indicates whether this period is after the given period. Bases the 
+     * comparison on the end dates of the periods. If the given period is null,
+     * false is returned.
+     * 
+     * @param period the period to compare.
+     * @return true if this period is after the given period.
+     */
+    public boolean isAfter( Period period )
+    {
+        if ( period == null || period.getEndDate() == null )
+        {
+            return false;
+        }
+        
+        return getEndDate().after( period.getEndDate() );
+    }
 
+    // -------------------------------------------------------------------------
+    // DimensionalItemObject
+    // -------------------------------------------------------------------------
+
+    @Override
+    public DimensionItemType getDimensionItemType()
+    {
+        return DimensionItemType.PERIOD;
+    }
+    
     // -------------------------------------------------------------------------
     // hashCode, equals and toString
     // -------------------------------------------------------------------------

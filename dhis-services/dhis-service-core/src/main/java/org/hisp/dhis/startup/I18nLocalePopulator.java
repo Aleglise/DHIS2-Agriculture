@@ -36,7 +36,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hisp.dhis.i18n.I18nLocaleService;
 import org.hisp.dhis.i18n.locale.I18nLocale;
-import org.hisp.dhis.system.startup.AbstractStartupRoutine;
+import org.hisp.dhis.system.startup.TransactionContextStartupRoutine;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -45,7 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Lars Helge Overland
  */
 public class I18nLocalePopulator
-    extends AbstractStartupRoutine
+    extends TransactionContextStartupRoutine
 {
     private static final Log log = LogFactory.getLog( I18nLocalePopulator.class );
     
@@ -55,10 +55,9 @@ public class I18nLocalePopulator
     private static final List<String> DEFAULT_LOCALES = Arrays.asList( 
         "af","ar","bi","am","de","dz","en","es","fa","fr","gu","hi","id","it",
         "km","lo","my","ne","nl","no","ps","pt","ru","rw","sw","tg","vi","zh" );
-    
+
     @Override
-    public void execute()
-        throws Exception
+    public void executeInTransaction()
     {
         int count = localeService.getI18nLocaleCount();
         

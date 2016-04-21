@@ -39,6 +39,7 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.hisp.dhis.DhisSpringTest;
+import org.hisp.dhis.common.DataDimensionType;
 import org.hisp.dhis.common.GenericIdentifiableObjectStore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,9 +76,9 @@ public class DataElementCategoryComboStoreTest
     {
         categories = new ArrayList<>();
         
-        categoryA = new DataElementCategory( "CategoryA" );
-        categoryB = new DataElementCategory( "CategoryB" );
-        categoryC = new DataElementCategory( "CategoryC" );
+        categoryA = new DataElementCategory( "CategoryA", DataDimensionType.DISAGGREGATION );
+        categoryB = new DataElementCategory( "CategoryB", DataDimensionType.DISAGGREGATION );
+        categoryC = new DataElementCategory( "CategoryC", DataDimensionType.DISAGGREGATION );
         
         categoryService.addDataElementCategory( categoryA );
         categoryService.addDataElementCategory( categoryB );
@@ -95,9 +96,9 @@ public class DataElementCategoryComboStoreTest
     @Test
     public void testAddGet()
     {
-        categoryComboA = new DataElementCategoryCombo( "CategoryComboA", categories );
-        categoryComboB = new DataElementCategoryCombo( "CategoryComboB", categories );
-        categoryComboC = new DataElementCategoryCombo( "CategoryComboC", categories );
+        categoryComboA = new DataElementCategoryCombo( "CategoryComboA", DataDimensionType.DISAGGREGATION, categories );
+        categoryComboB = new DataElementCategoryCombo( "CategoryComboB", DataDimensionType.DISAGGREGATION, categories );
+        categoryComboC = new DataElementCategoryCombo( "CategoryComboC", DataDimensionType.DISAGGREGATION, categories );
         
         int idA = categoryComboStore.save( categoryComboA );
         int idB = categoryComboStore.save( categoryComboB );
@@ -115,9 +116,9 @@ public class DataElementCategoryComboStoreTest
     @Test
     public void testDelete()
     {
-        categoryComboA = new DataElementCategoryCombo( "CategoryComboA", categories );
-        categoryComboB = new DataElementCategoryCombo( "CategoryComboB", categories );
-        categoryComboC = new DataElementCategoryCombo( "CategoryComboC", categories );
+        categoryComboA = new DataElementCategoryCombo( "CategoryComboA", DataDimensionType.DISAGGREGATION, categories );
+        categoryComboB = new DataElementCategoryCombo( "CategoryComboB", DataDimensionType.DISAGGREGATION, categories );
+        categoryComboC = new DataElementCategoryCombo( "CategoryComboC", DataDimensionType.DISAGGREGATION, categories );
         
         int idA = categoryComboStore.save( categoryComboA );
         int idB = categoryComboStore.save( categoryComboB );
@@ -143,9 +144,9 @@ public class DataElementCategoryComboStoreTest
     @Test
     public void testGetAll()
     {
-        categoryComboA = new DataElementCategoryCombo( "CategoryComboA", categories );
-        categoryComboB = new DataElementCategoryCombo( "CategoryComboB", categories );
-        categoryComboC = new DataElementCategoryCombo( "CategoryComboC", categories );
+        categoryComboA = new DataElementCategoryCombo( "CategoryComboA", DataDimensionType.DISAGGREGATION, categories );
+        categoryComboB = new DataElementCategoryCombo( "CategoryComboB", DataDimensionType.DISAGGREGATION, categories );
+        categoryComboC = new DataElementCategoryCombo( "CategoryComboC", DataDimensionType.DISAGGREGATION, categories );
         
         categoryComboStore.save( categoryComboA );
         categoryComboStore.save( categoryComboB );

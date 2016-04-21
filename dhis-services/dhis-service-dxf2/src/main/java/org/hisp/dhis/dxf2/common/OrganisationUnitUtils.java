@@ -39,7 +39,7 @@ import java.util.Map;
  */
 public class OrganisationUnitUtils
 {
-    private static Map<String, OrganisationUnit> getOrganisationUnitMap( Collection<OrganisationUnit> organisationUnits )
+    public static Map<String, OrganisationUnit> getOrganisationUnitMap( Collection<OrganisationUnit> organisationUnits )
     {
         Map<String, OrganisationUnit> organisationUnitMap = new HashMap<>();
 
@@ -71,8 +71,11 @@ public class OrganisationUnitUtils
 
     public static void updateParents( Collection<OrganisationUnit> organisationUnits )
     {
-        Map<String, OrganisationUnit> organisationUnitMap = getOrganisationUnitMap( organisationUnits );
+        updateParents( organisationUnits, getOrganisationUnitMap( organisationUnits ) );
+    }
 
+    public static void updateParents( Collection<OrganisationUnit> organisationUnits, Map<String, OrganisationUnit> organisationUnitMap )
+    {
         for ( OrganisationUnit organisationUnit : organisationUnits )
         {
             OrganisationUnit parent = organisationUnit.getParent();

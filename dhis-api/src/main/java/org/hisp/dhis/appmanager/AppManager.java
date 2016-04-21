@@ -32,6 +32,7 @@ import org.hisp.dhis.user.User;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -42,7 +43,6 @@ public interface AppManager
     String ID = AppManager.class.getName();
 
     String APPS_DIR = "/apps";
-    String APPS_API_PATH = "/api/apps";
 
     /**
      * Returns a list of all the installed apps at @see getAppFolderPath
@@ -51,11 +51,35 @@ public interface AppManager
      * @return list of installed apps
      */
     List<App> getApps( String contextPath );
-    
+
+    /**
+     * Returns a list of all installed apps with AppType equal the given Type
+     *
+     * @return list of installed apps with given AppType
+     */
+    List<App> getAppsByType( AppType appType, Collection<App> apps );
+
+    /**
+     * Returns a list of all installed apps with name equal the given name
+     * and operator. Currently supports eq and ilike.
+     *
+     * @return list of installed apps with given name
+     */
+    List<App> getAppsByName( String name, Collection<App> apps, String operator );
+
+    /**
+     * Return a list of all installed apps with given filter list
+     * Currently support filtering by AppType and name
+     *
+     * @param filter
+     * @return Return a list of all installed apps with given filter list
+     */
+    List<App> filterApps( List<String> filter, String contextPath );
+
     /**
      * Returns the app with the given key (folder name).
-     * 
-     * @param key the app key.
+     *
+     * @param key         the app key.
      * @param contextPath the context path of this instance.
      * @return the app with the given key.
      */
@@ -63,7 +87,7 @@ public interface AppManager
 
     /**
      * Returns apps which are accessible to the current user.
-     * 
+     *
      * @param contextPath the context path of this instance.
      * @return apps which are accessible to the current user.
      */
@@ -90,7 +114,7 @@ public interface AppManager
     /**
      * Deletes the app with the given name.
      *
-     * @param name the app name.
+     * @param name          the app name.
      * @param deleteAppData decide if associated data in dataStore should be deleted or not.
      * @return true if the delete was successful, false if there is no app with
      * the given name or if the app could not be removed from the file
@@ -126,7 +150,7 @@ public interface AppManager
 
     /**
      * Indicates whether the given app is accessible to the current user.
-     * 
+     *
      * @param app the app.
      * @return true if app is accessible.
      */
@@ -134,8 +158,8 @@ public interface AppManager
 
     /**
      * Indicates whether the given app is accessible to the given user.
-     * 
-     * @param app the app.
+     *
+     * @param app  the app.
      * @param user the user.
      * @return true if app is accessible.
      */
@@ -143,8 +167,9 @@ public interface AppManager
 
     /**
      * Returns the app associated with the namespace, or null if no app is associated.
+     *
      * @param namespace the namespace to check
      * @return App or null
      */
-    App getAppByNamespace( String namespace);
+    App getAppByNamespace( String namespace );
 }

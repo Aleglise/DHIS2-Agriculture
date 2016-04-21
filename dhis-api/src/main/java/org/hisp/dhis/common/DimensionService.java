@@ -38,37 +38,38 @@ import org.hisp.dhis.user.User;
 public interface DimensionService
 {
     List<DimensionalItemObject> getCanReadDimensionItems( String uid );
-    
+
     <T extends IdentifiableObject> List<T> getCanReadObjects( List<T> objects );
-    
+
     <T extends IdentifiableObject> List<T> getCanReadObjects( User user, List<T> objects );
-    
+
     DimensionType getDimensionType( String uid );
-    
+
     List<DimensionalObject> getAllDimensions();
-    
+
     List<DimensionalObject> getDimensionConstraints();
-    
+
     DimensionalObject getDimensionalObjectCopy( String uid, boolean filterCanRead );
-    
+
     void mergeAnalyticalObject( BaseAnalyticalObject object );
-    
+
     void mergeEventAnalyticalObject( EventAnalyticalObject object );
 
     /**
      * Gets a dimension item object which are among the data dimension item 
      * objects. The composite dimensional items will be saved if not existing.
-     * 
+     *
+     * @param idScheme the idScheme to identify the item
      * @param dimensionItem the dimension item identifier.
      * @return a dimensional item object.
      */
-    DimensionalItemObject getOrAddDataDimensionalItemObject( String dimensionItem );
+    DimensionalItemObject getOrAddDataDimensionalItemObject( IdScheme idScheme, String dimensionItem );
 
     /**
      * Gets a dimension item object which are among the data dimension item 
      * objects. The composite dimensional items will be transient and the
      * associated objects will be persistent.
-     * 
+     *
      * @param dimensionItem the dimension item identifier.
      * @return a dimensional item object.
      */

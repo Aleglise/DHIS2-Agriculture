@@ -108,6 +108,7 @@ public class DefaultDataValueSetService
     private static final Log log = LogFactory.getLog( DefaultDataValueSetService.class );
 
     private static final String ERROR_OBJECT_NEEDED_TO_COMPLETE = "Must be provided to complete data set";
+    private static final int CACHE_MISS_THRESHOLD = 500;
 
     @Autowired
     private IdentifiableObjectManager identifiableObjectManager;
@@ -154,9 +155,9 @@ public class DefaultDataValueSetService
         this.currentUserService = currentUserService;
     }
 
-    //--------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // DataValueSet implementation
-    //--------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
 
     @Override
     public DataExportParams getFromUrl( Set<String> dataSets, Set<String> periods, Date startDate, Date endDate,
@@ -247,9 +248,9 @@ public class DefaultDataValueSetService
         }
     }
 
-    //--------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // Write
-    //--------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
 
     @Override
     public void writeDataValueSetXml( DataExportParams params, OutputStream out )
@@ -299,9 +300,9 @@ public class DefaultDataValueSetService
         return null;
     }
 
-    //--------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // Template
-    //--------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
 
     @Override
     public RootNode getDataValueSetTemplate( DataSet dataSet, Period period, List<String> orgUnits,
@@ -407,9 +408,9 @@ public class DefaultDataValueSetService
         return collectionNode;
     }
 
-    //--------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // Save
-    //--------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
 
     @Override
     public ImportSummary saveDataValueSet( InputStream in )
@@ -536,9 +537,9 @@ public class DefaultDataValueSetService
 
         I18n i18n = i18nManager.getI18n();
 
-        //----------------------------------------------------------------------
+        // ---------------------------------------------------------------------
         // Get import options
-        //----------------------------------------------------------------------
+        // ---------------------------------------------------------------------
 
         importOptions = importOptions != null ? importOptions : ImportOptions.getDefaultImportOptions();
 
@@ -568,9 +569,9 @@ public class DefaultDataValueSetService
         boolean requireCategoryOptionCombo = importOptions.isRequireCategoryOptionCombo() || (Boolean) systemSettingManager.getSystemSetting( SettingKey.DATA_IMPORT_REQUIRE_CATEGORY_OPTION_COMBO );
         boolean requireAttrOptionCombo = importOptions.isRequireAttributeOptionCombo() || (Boolean) systemSettingManager.getSystemSetting( SettingKey.DATA_IMPORT_REQUIRE_ATTRIBUTE_OPTION_COMBO );
 
-        //----------------------------------------------------------------------
+        // ---------------------------------------------------------------------
         // Create meta-data maps
-        //----------------------------------------------------------------------
+        // ---------------------------------------------------------------------
 
         CachingMap<String, DataElement> dataElementMap = new CachingMap<>();
         CachingMap<String, OrganisationUnit> orgUnitMap = new CachingMap<>();
@@ -580,13 +581,13 @@ public class DefaultDataValueSetService
         CachingMap<String, Set<DataElementCategoryOptionCombo>> dataElementCategoryOptionComboMap = new CachingMap<>();
         CachingMap<String, Set<DataElementCategoryOptionCombo>> dataElementAttrOptionComboMap = new CachingMap<>();
         CachingMap<String, Boolean> dataElementOrgUnitMap = new CachingMap<>();
-        CachingMap<String, Boolean> dataElementOpenFuturePeriodsMap = new CachingMap<>();
+        CachingMap<String, Period> dataElementLatestFuturePeriodMap = new CachingMap<>();
         CachingMap<String, Boolean> orgUnitInHierarchyMap = new CachingMap<>();
         CachingMap<String, Optional<Set<String>>> dataElementOptionsMap = new CachingMap<>();
 
-        //----------------------------------------------------------------------
+        // ---------------------------------------------------------------------
         // Get meta-data maps
-        //----------------------------------------------------------------------
+        // ---------------------------------------------------------------------
 
         IdentifiableObjectCallable<DataElement> dataElementCallable = new IdentifiableObjectCallable<>(
             identifiableObjectManager, DataElement.class, dataElementIdScheme, null );
@@ -595,9 +596,20 @@ public class DefaultDataValueSetService
         IdentifiableObjectCallable<DataElementCategoryOptionCombo> optionComboCallable = new CategoryOptionComboAclCallable( categoryService, idScheme, null );
         IdentifiableObjectCallable<Period> periodCallable = new PeriodCallable( periodService, null, trimToNull( dataValueSet.getPeriod() ) );
 
-        //----------------------------------------------------------------------
+        // ---------------------------------------------------------------------
+        // Heat caches
+        // ---------------------------------------------------------------------
+
+        if ( importOptions.isPreheatCacheDefaultFalse() )
+        {
+            dataElementMap.load( identifiableObjectManager.getAll( DataElement.class ), o -> o.getPropertyValue( dataElementIdScheme ) );
+            orgUnitMap.load( identifiableObjectManager.getAll( OrganisationUnit.class ), o -> o.getPropertyValue( orgUnitIdScheme ) );
+            optionComboMap.load( identifiableObjectManager.getAll( DataElementCategoryOptionCombo.class ), o -> o.getPropertyValue( idScheme ) );
+        }
+        
+        // ---------------------------------------------------------------------
         // Get outer meta-data
-        //----------------------------------------------------------------------
+        // ---------------------------------------------------------------------
 
         DataSet dataSet = dataValueSet.getDataSet() != null ? identifiableObjectManager.getObject( DataSet.class, idScheme, dataValueSet.getDataSet() ) : null;
 
@@ -689,6 +701,24 @@ public class DefaultDataValueSetService
                 optionComboMap.get( trimToNull( dataValue.getAttributeOptionCombo() ), optionComboCallable.setId( trimToNull( dataValue.getAttributeOptionCombo() ) ) );
 
             // -----------------------------------------------------------------
+            // Potentially heat caches
+            // -----------------------------------------------------------------
+
+            if ( !dataElementMap.isCacheLoaded() && dataElementMap.getCacheMissCount() > CACHE_MISS_THRESHOLD )
+            {
+                dataElementMap.load( identifiableObjectManager.getAll( DataElement.class ), o -> o.getPropertyValue( dataElementIdScheme ) );
+                
+                log.info( "Data element cache heated after cache miss threshold reached" );
+            }
+            
+            if ( !orgUnitMap.isCacheLoaded() && orgUnitMap.getCacheMissCount() > CACHE_MISS_THRESHOLD )
+            {
+                orgUnitMap.load( identifiableObjectManager.getAll( OrganisationUnit.class ), o -> o.getPropertyValue( orgUnitIdScheme ) );
+                
+                log.info( "Org unit cache heated after cache miss threshold reached" );
+            }
+            
+            // -----------------------------------------------------------------
             // Validation
             // -----------------------------------------------------------------
 
@@ -730,11 +760,12 @@ public class DefaultDataValueSetService
                 continue;
             }
 
-            boolean invalidFuturePeriod = period.isFuture() && !dataElementOpenFuturePeriodsMap.get( dataElement.getUid(), () -> dataElement.getOpenFuturePeriods() > 0 );
-
-            if ( invalidFuturePeriod )
+            Period latestFuturePeriod = dataElementLatestFuturePeriodMap.get( dataElement.getUid(), () -> dataElement.getLatestOpenFuturePeriod() );
+            
+            if ( period.isAfter( latestFuturePeriod ) )
             {
-                summary.getConflicts().add( new ImportConflict( period.getIsoDate(), "Data element does not allow for future periods through data sets: " + dataElement.getUid() ) );
+                summary.getConflicts().add( new ImportConflict( period.getIsoDate(), "Period: " + 
+                    period.getIsoDate() + " is after latest open future period: " + latestFuturePeriod.getIsoDate() + " for data element: " + dataElement.getUid() ) );
                 continue;
             }
 
@@ -823,7 +854,7 @@ public class DefaultDataValueSetService
             }
 
             if ( strictOrgUnits && BooleanUtils.isFalse( dataElementOrgUnitMap.get( dataElement.getUid() + orgUnit.getUid(),
-                () -> dataElement.hasDataSetOrganisationUnit( orgUnit ) ) ) )
+                () -> orgUnit.hasDataElement( dataElement ) ) ) )
             {
                 summary.getConflicts().add( new ImportConflict( orgUnit.getUid(),
                     "Data element: " + dataElement.getUid() + " must be assigned through data sets to organisation unit: " + orgUnit.getUid() ) );
@@ -929,9 +960,9 @@ public class DefaultDataValueSetService
         return summary;
     }
 
-    //--------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // Supportive methods
-    //--------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
 
     private void handleComplete( DataSet dataSet, Date completeDate, Period period, OrganisationUnit orgUnit,
         DataElementCategoryOptionCombo attributeOptionCombo, ImportSummary summary )

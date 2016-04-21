@@ -30,10 +30,10 @@ package org.hisp.dhis.analytics;
 
 import static org.hisp.dhis.analytics.AggregationType.AVERAGE_INT_DISAGGREGATION;
 import static org.hisp.dhis.analytics.AggregationType.AVERAGE_SUM_INT_DISAGGREGATION;
-import static org.hisp.dhis.common.DimensionType.CATEGORYOPTION_GROUPSET;
+import static org.hisp.dhis.common.DimensionType.CATEGORY_OPTION_GROUP_SET;
 import static org.hisp.dhis.common.DimensionType.DATA_X;
-import static org.hisp.dhis.common.DimensionType.ORGANISATIONUNIT;
-import static org.hisp.dhis.common.DimensionType.ORGANISATIONUNIT_GROUPSET;
+import static org.hisp.dhis.common.DimensionType.ORGANISATION_UNIT;
+import static org.hisp.dhis.common.DimensionType.ORGANISATION_UNIT_GROUP_SET;
 import static org.hisp.dhis.common.DimensionType.PERIOD;
 import static org.hisp.dhis.common.DimensionalObject.CATEGORYOPTIONCOMBO_DIM_ID;
 import static org.hisp.dhis.common.DimensionalObject.DATA_X_DIM_ID;
@@ -67,6 +67,8 @@ import org.hisp.dhis.common.IdentifiableObject;
 import org.hisp.dhis.common.IdentifiableProperty;
 import org.hisp.dhis.common.ListMap;
 import org.hisp.dhis.common.MapMap;
+import org.hisp.dhis.common.ReportingRate;
+import org.hisp.dhis.common.ReportingRateMetric;
 import org.hisp.dhis.commons.collection.CollectionUtils;
 import org.hisp.dhis.commons.collection.ListUtils;
 import org.hisp.dhis.dataelement.CategoryOptionGroupSet;
@@ -111,12 +113,12 @@ public class DataQueryParams
     public static final Set<Class<? extends IdentifiableObject>> DYNAMIC_DIM_CLASSES = ImmutableSet.<Class<? extends IdentifiableObject>>builder().
         add( OrganisationUnitGroupSet.class ).add( DataElementGroupSet.class ).add( CategoryOptionGroupSet.class ).add( DataElementCategory.class ).build();
     
-    private static final List<String> DIMENSION_PERMUTATION_IGNORE_DIMS = Lists.newArrayList( 
-        DATA_X_DIM_ID, CATEGORYOPTIONCOMBO_DIM_ID );    
-    public static final List<DimensionType> COMPLETENESS_DIMENSION_TYPES = Lists.newArrayList( 
-        DATA_X, PERIOD, ORGANISATIONUNIT, ORGANISATIONUNIT_GROUPSET, CATEGORYOPTION_GROUPSET );
-    private static final List<DimensionType> COMPLETENESS_TARGET_DIMENSION_TYPES = Lists.newArrayList( 
-        DATA_X, ORGANISATIONUNIT, ORGANISATIONUNIT_GROUPSET );
+    private static final List<String> DIMENSION_PERMUTATION_IGNORE_DIMS = ImmutableList.<String>builder().add( 
+        DATA_X_DIM_ID, CATEGORYOPTIONCOMBO_DIM_ID ).build();
+    public static final List<DimensionType> COMPLETENESS_DIMENSION_TYPES = ImmutableList.<DimensionType>builder().add( 
+        DATA_X, PERIOD, ORGANISATION_UNIT, ORGANISATION_UNIT_GROUP_SET, CATEGORY_OPTION_GROUP_SET ).build();
+    private static final List<DimensionType> COMPLETENESS_TARGET_DIMENSION_TYPES = ImmutableList.<DimensionType>builder().add( 
+        DATA_X, ORGANISATION_UNIT, ORGANISATION_UNIT_GROUP_SET ).build();
     
     private static final DimensionItem[] DIM_OPT_ARR = new DimensionItem[0];
     private static final DimensionItem[][] DIM_OPT_2D_ARR = new DimensionItem[0][];
@@ -287,7 +289,7 @@ public class DataQueryParams
         params.outputIdScheme = this.outputIdScheme;
         params.approvalLevel = this.approvalLevel;
         //params.program = this.program; //TODO
-        //params.programStage = this.programStage;
+        //params.programStage = this.programStage; //TODO
         
         params.partitions = new Partitions( this.partitions );
         params.dataType = this.dataType;
@@ -310,7 +312,7 @@ public class DataQueryParams
      */
     public DataQueryParams conform()
     {
-        if ( !( !getDataElements().isEmpty() && getDataElementOperands().isEmpty() && getIndicators().isEmpty() && getDataSets().isEmpty() ) )
+        if ( !( !getDataElements().isEmpty() && getDataElementOperands().isEmpty() && getIndicators().isEmpty() && getReportingRates().isEmpty() ) )
         {
             removeDimension( CATEGORYOPTIONCOMBO_DIM_ID );
         }
@@ -598,27 +600,18 @@ public class DataQueryParams
     {
         Map<String, PeriodType> map = new HashMap<>();
         
-        for ( DimensionalItemObject dataSet : getDataSets() )
+        for ( DimensionalItemObject reportingRate : getReportingRates() )
         {
-            DataSet ds = (DataSet) dataSet;
+            ReportingRate rr = (ReportingRate) reportingRate;
             
+            DataSet ds = rr.getDataSet();
+                        
             map.put( ds.getUid(), ds.getPeriodType() );
         }
         
         return map;
     }
     
-    /**
-     * Returns the index of the category option combo dimension. Returns null
-     * if this dimension is not present.
-     */
-    public Integer getCocIndex()
-    {
-        int index = dimensions.indexOf( new BaseDimensionalObject( CATEGORYOPTIONCOMBO_DIM_ID ) );
-        
-        return index == -1 ? null : index;
-    }
-
     /**
      * Indicates whether this object is of the given data type.
      */
@@ -1585,9 +1578,9 @@ public class DataQueryParams
         return ImmutableList.copyOf( ListUtils.union( getDataElements(), getFilterDataElements() ) );
     }
 
-    public List<DimensionalItemObject> getAllDataSets()
+    public List<DimensionalItemObject> getAllReportingRates()
     {
-        return ImmutableList.copyOf( ListUtils.union( getDataSets(), getFilterDataSets() ) );
+        return ImmutableList.copyOf( ListUtils.union( getReportingRates(), getFilterReportingRates() ) );
     }
     
     public List<DimensionalItemObject> getAllProgramAttributes()
@@ -1610,6 +1603,21 @@ public class DataQueryParams
         DimensionalObject dimension = getDimensionOrFilter( DATA_X_DIM_ID );
         
         List<DimensionalItemObject> items = AnalyticsUtils.getByDataDimensionType( itemType, dimension.getItems() );
+        
+        dimension.getItems().clear();
+        dimension.getItems().addAll( items );
+        
+        return this;
+    }
+    
+    public DataQueryParams retainDataDimensionReportingRates( ReportingRateMetric metric )
+    {
+        DimensionalObject dimension = getDimensionOrFilter( DATA_X_DIM_ID );
+        
+        List<ReportingRate> items = DimensionalObjectUtils.asTypedList( 
+            AnalyticsUtils.getByDataDimensionType( DataDimensionItemType.REPORTING_RATE, dimension.getItems() ) );
+        
+        items = items.stream().filter( r -> metric == r.getMetric() ).collect( Collectors.toList() );
         
         dimension.getItems().clear();
         dimension.getItems().addAll( items );
@@ -1650,7 +1658,7 @@ public class DataQueryParams
     
     public List<DimensionalItemObject> getDataElements()
     {
-        return ImmutableList.copyOf( AnalyticsUtils.getByDataDimensionType( DataDimensionItemType.AGGREGATE_DATA_ELEMENT, getDimensionOptions( DATA_X_DIM_ID ) ) );
+        return ImmutableList.copyOf( AnalyticsUtils.getByDataDimensionType( DataDimensionItemType.DATA_ELEMENT, getDimensionOptions( DATA_X_DIM_ID ) ) );
     }
     
     public List<DimensionalItemObject> getDataElementOperands()
@@ -1660,17 +1668,17 @@ public class DataQueryParams
     
     public void setDataElements( List<? extends DimensionalItemObject> dataElements )
     {
-        setDataDimensionOptions( DataDimensionItemType.AGGREGATE_DATA_ELEMENT, dataElements );
+        setDataDimensionOptions( DataDimensionItemType.DATA_ELEMENT, dataElements );
     }
     
-    public List<DimensionalItemObject> getDataSets()
+    public List<DimensionalItemObject> getReportingRates()
     {
-        return ImmutableList.copyOf( AnalyticsUtils.getByDataDimensionType( DataDimensionItemType.DATA_SET, getDimensionOptions( DATA_X_DIM_ID ) ) );
+        return ImmutableList.copyOf( AnalyticsUtils.getByDataDimensionType( DataDimensionItemType.REPORTING_RATE, getDimensionOptions( DATA_X_DIM_ID ) ) );
     }
 
-    public void setDataSets( List<? extends DimensionalItemObject> dataSets )
+    public void setReportingRates( List<? extends DimensionalItemObject> reportingRates )
     {
-        setDataDimensionOptions( DataDimensionItemType.DATA_SET, dataSets );
+        setDataDimensionOptions( DataDimensionItemType.REPORTING_RATE, reportingRates );
     }
 
     public List<DimensionalItemObject> getProgramIndicators()
@@ -1725,7 +1733,7 @@ public class DataQueryParams
     
     public void setOrganisationUnits( List<? extends DimensionalItemObject> organisationUnits )
     {
-        setDimensionOptions( ORGUNIT_DIM_ID, DimensionType.ORGANISATIONUNIT, null, asList( organisationUnits ) );
+        setDimensionOptions( ORGUNIT_DIM_ID, DimensionType.ORGANISATION_UNIT, null, asList( organisationUnits ) );
     }
     
     public void setOrganisationUnit( DimensionalItemObject organisationUnit )
@@ -1736,17 +1744,17 @@ public class DataQueryParams
     public List<DimensionalObject> getDataElementGroupSets()
     {
         return ListUtils.union( dimensions, filters ).stream().
-            filter( d -> DimensionType.DATAELEMENT_GROUPSET.equals( d.getDimensionType() ) ).collect( Collectors.toList() );
+            filter( d -> DimensionType.DATA_ELEMENT_GROUP_SET.equals( d.getDimensionType() ) ).collect( Collectors.toList() );
     }
     
     public void setDataElementGroupSet( DataElementGroupSet groupSet )
     {
-        setDimensionOptions( groupSet.getUid(), DimensionType.DATAELEMENT_GROUPSET, null, new ArrayList<>( groupSet.getItems() ) );
+        setDimensionOptions( groupSet.getUid(), DimensionType.DATA_ELEMENT_GROUP_SET, null, new ArrayList<>( groupSet.getItems() ) );
     }
     
     public void setOrganisationUnitGroupSet( OrganisationUnitGroupSet groupSet )
     {
-        setDimensionOptions( groupSet.getUid(), DimensionType.ORGANISATIONUNIT_GROUPSET, null, new ArrayList<>( groupSet.getItems() ) );
+        setDimensionOptions( groupSet.getUid(), DimensionType.ORGANISATION_UNIT_GROUP_SET, null, new ArrayList<>( groupSet.getItems() ) );
     }
 
     public void setCategory( DataElementCategory category )
@@ -1770,12 +1778,12 @@ public class DataQueryParams
     
     public List<DimensionalItemObject> getFilterDataElements()
     {
-        return ImmutableList.copyOf( AnalyticsUtils.getByDataDimensionType( DataDimensionItemType.AGGREGATE_DATA_ELEMENT, getFilterOptions( DATA_X_DIM_ID ) ) );
+        return ImmutableList.copyOf( AnalyticsUtils.getByDataDimensionType( DataDimensionItemType.DATA_ELEMENT, getFilterOptions( DATA_X_DIM_ID ) ) );
     }
 
-    public List<DimensionalItemObject> getFilterDataSets()
+    public List<DimensionalItemObject> getFilterReportingRates()
     {
-        return ImmutableList.copyOf( AnalyticsUtils.getByDataDimensionType( DataDimensionItemType.DATA_SET, getFilterOptions( DATA_X_DIM_ID ) ) );
+        return ImmutableList.copyOf( AnalyticsUtils.getByDataDimensionType( DataDimensionItemType.REPORTING_RATE, getFilterOptions( DATA_X_DIM_ID ) ) );
     }
     
     public List<DimensionalItemObject> getFilterPeriods()
@@ -1800,7 +1808,7 @@ public class DataQueryParams
     
     public void setFilterOrganisationUnits( List<DimensionalItemObject> organisationUnits )
     {
-        setFilterOptions( ORGUNIT_DIM_ID, DimensionType.ORGANISATIONUNIT, null, organisationUnits );
+        setFilterOptions( ORGUNIT_DIM_ID, DimensionType.ORGANISATION_UNIT, null, organisationUnits );
     }
     
     public void setFilterOrganisationUnit( DimensionalItemObject organisationUnit )

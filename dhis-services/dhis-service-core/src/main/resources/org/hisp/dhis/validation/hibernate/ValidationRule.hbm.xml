@@ -45,6 +45,9 @@
     <many-to-one name="rightSide" column="rightexpressionid" class="org.hisp.dhis.expression.Expression"
       cascade="all" foreign-key="fk_validationrule_rightexpressionid" />
 
+    <many-to-one name="sampleSkipTest" column="skiptestexpressionid" class="org.hisp.dhis.expression.Expression"
+      cascade="all" foreign-key="fk_validationrule_skiptestexpressionid" />
+
     <set name="groups" table="validationrulegroupmembers" inverse="true">
       <key column="validationruleid" />
       <many-to-many class="org.hisp.dhis.validation.ValidationRuleGroup" column="validationgroupid" />
@@ -57,7 +60,7 @@
 
     <property name="sequentialSampleCount" column="sequentialsamplecount" />
 
-    <property name="annualSampleCount" column="annualsamplecount" />
+    <property name="sequentialSkipCount" column="sequentialskipcount" />
 
   </class>
 </hibernate-mapping>

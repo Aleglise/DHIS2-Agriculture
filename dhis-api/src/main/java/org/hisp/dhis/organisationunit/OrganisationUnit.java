@@ -38,6 +38,7 @@ import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.hisp.dhis.common.BaseDimensionalItemObject;
 import org.hisp.dhis.common.BaseIdentifiableObject;
+import org.hisp.dhis.common.DimensionItemType;
 import org.hisp.dhis.common.DisplayProperty;
 import org.hisp.dhis.common.DxfNamespaces;
 import org.hisp.dhis.common.IdentifiableObject;
@@ -788,6 +789,23 @@ public class OrganisationUnit
         return map;
     }
 
+    /**
+     * Indicates whether this organisation unit is associated with the given
+     * data element through its data set associations.
+     */
+    public boolean hasDataElement( DataElement dataElement )
+    {
+        for ( DataSet dataSet : dataSets )
+        {
+            if ( dataSet.getDataElements().contains( dataElement ) )
+            {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
     @Override
     public boolean haveUniqueNames()
     {
@@ -1127,6 +1145,16 @@ public class OrganisationUnit
         this.users = users;
     }
 
+    // -------------------------------------------------------------------------
+    // DimensionalItemObject
+    // -------------------------------------------------------------------------
+
+    @Override
+    public DimensionItemType getDimensionItemType()
+    {
+        return DimensionItemType.ORGANISATION_UNIT;
+    }
+    
     // -------------------------------------------------------------------------
     // Getters and setters for transient fields
     // -------------------------------------------------------------------------

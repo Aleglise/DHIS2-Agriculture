@@ -103,7 +103,7 @@ public class JdbcCompletenessTableManager
     @Async
     public Future<?> populateTableAsync( ConcurrentLinkedQueue<AnalyticsTable> tables )
     {
-        taskLoop : while ( true )
+        taskLoop: while ( true )
         {
             AnalyticsTable table = tables.poll();
                 
@@ -163,10 +163,10 @@ public class JdbcCompletenessTableManager
     {
         List<AnalyticsTableColumn> columns = new ArrayList<>();
 
-        Collection<OrganisationUnitGroupSet> orgUnitGroupSets = 
+        List<OrganisationUnitGroupSet> orgUnitGroupSets = 
             idObjectManager.getDataDimensionsNoAcl( OrganisationUnitGroupSet.class );
         
-        Collection<OrganisationUnitLevel> levels =
+        List<OrganisationUnitLevel> levels =
             organisationUnitService.getFilledOrganisationUnitLevels();
         
         for ( OrganisationUnitGroupSet groupSet : orgUnitGroupSets )

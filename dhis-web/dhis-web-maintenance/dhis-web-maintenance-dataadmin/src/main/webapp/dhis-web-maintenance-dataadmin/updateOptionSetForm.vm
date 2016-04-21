@@ -39,7 +39,7 @@
       <td><label for="valueType">$i18n.getString( "value_type" ) <em title="$i18n.getString( 'required' )" class="required">*</em></label></td>
       <td>
         <select id="valueType" name="valueType" disabled style="background-color: lightgrey;">
-          <option value="INTEGER" #if( $!optionSet.valueType == 'INTEGER' ) selected="selected" #end >$i18n.getString( "int" )</option>
+          <option value="INTEGER" #if( $!optionSet.valueType == 'INTEGER' ) selected="selected" #end >$i18n.getString( "integer" )</option>
           <option value="INTEGER_POSITIVE" #if( $!optionSet.valueType == 'INTEGER_POSITIVE' ) selected="selected" #end >$i18n.getString( "positive_integer" )</option>
           <option value="INTEGER_NEGATIVE" #if( $!optionSet.valueType == 'INTEGER_NEGATIVE' ) selected="selected" #end >$i18n.getString( "negative_integer" )</option>
           <option value="INTEGER_ZERO_OR_POSITIVE" #if( $!optionSet.valueType == 'INTEGER_ZERO_OR_POSITIVE' ) selected="selected" #end >$i18n.getString( "zero_positive_int" )</option>

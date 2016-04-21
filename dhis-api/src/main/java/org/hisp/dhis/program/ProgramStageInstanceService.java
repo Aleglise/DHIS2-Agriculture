@@ -138,9 +138,10 @@ public interface ProgramStageInstanceService
      * was defined to send when to complete this program
      *
      * @param programStageInstance ProgramStageInstance
+     * @param sendNotifications indicates whether to send messages and notifications.
      * @param format I18nFormat
      */
-    void completeProgramStageInstance( ProgramStageInstance programStageInstance, I18nFormat format );
+    void completeProgramStageInstance( ProgramStageInstance programStageInstance, boolean sendNotifications, I18nFormat format );
 
     /**
      * Creates a program stage instance. Will create a program instance in case

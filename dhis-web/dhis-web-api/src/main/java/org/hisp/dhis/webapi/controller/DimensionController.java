@@ -106,6 +106,7 @@ public class DimensionController
         return Lists.newArrayList( dimensionService.getDimensionalObjectCopy( uid, true ) );
     }
 
+    @SuppressWarnings( "unchecked" )
     @RequestMapping( value = "/{uid}/items", method = RequestMethod.GET )
     public @ResponseBody RootNode getItems( @PathVariable String uid, @RequestParam Map<String, String> parameters,
         TranslateParams translateParams, Model model, HttpServletRequest request, HttpServletResponse response ) throws QueryParserException
@@ -122,6 +123,8 @@ public class DimensionController
         Query query = queryService.getQueryFromUrl( getEntityClass(), filters, new ArrayList<>() );
         query.setObjects( items );
         query.setDefaultOrder();
+
+        items = (List<DimensionalItemObject>) queryService.query( query );
 
         translate( items, translateParams );
 

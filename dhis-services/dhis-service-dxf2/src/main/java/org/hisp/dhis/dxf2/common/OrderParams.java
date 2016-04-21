@@ -64,7 +64,7 @@ public class OrderParams
 
     public List<Order> getOrders( Schema schema )
     {
-        Map<String, Order> orders = new LinkedHashMap<String,Order>();
+        Map<String, Order> orders = new LinkedHashMap<>();
 
         for ( String o : order )
         {

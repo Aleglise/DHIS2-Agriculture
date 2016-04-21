@@ -33,6 +33,7 @@ import static org.hisp.dhis.common.DimensionalObjectUtils.COMPOSITE_DIM_OBJECT_P
 import org.hisp.dhis.analytics.AggregationType;
 import org.hisp.dhis.common.BaseDimensionalItemObject;
 import org.hisp.dhis.common.BaseIdentifiableObject;
+import org.hisp.dhis.common.DimensionItemType;
 import org.hisp.dhis.common.DxfNamespaces;
 import org.hisp.dhis.common.ValueType;
 import org.hisp.dhis.common.view.DetailedView;
@@ -118,6 +119,12 @@ public class ProgramDataElement
     {
         return program.getUid() + COMPOSITE_DIM_OBJECT_PLAIN_SEP + dataElement.getUid();
     }
+
+    @Override
+    public DimensionItemType getDimensionItemType()
+    {
+        return DimensionItemType.PROGRAM_DATA_ELEMENT;
+    }
     
     @Override
     public LegendSet getLegendSet()
@@ -130,7 +137,7 @@ public class ProgramDataElement
     {
         return dataElement.getAggregationType();
     }
-    
+
     // -------------------------------------------------------------------------
     // Get and set methods
     // -------------------------------------------------------------------------

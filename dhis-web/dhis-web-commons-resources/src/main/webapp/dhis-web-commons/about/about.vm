@@ -6,6 +6,7 @@
   <dt>$i18n.getString( "version" ):</dt><dd>$!info.version</dd>
   <dt>$i18n.getString( "build_revision" ):</dt><dd>$!info.revision</dd>
   <dt>$i18n.getString( "build_date" ):</dt><dd>$format.formatDateTime( $!info.buildTime )</dd>
+  <dt>$i18n.getString( "jasper_reports_version" ):</dt><dd>$!info.jasperReportsVersion</dd>
   <dt>$i18n.getString( "user_agent" ):</dt><dd>$!userAgent</dd>
   <dt>$i18n.getString( "server_date" ):</dt><dd>$!format.formatDateTime( $!info.serverDate )</dd>
   <dt>$i18n.getString( "last_analytics_table_generation" ):</dt><dd>$!format.formatDateTime( $!info.lastAnalyticsTableSuccess )</dd>
@@ -14,6 +15,7 @@
   <dt>$i18n.getString( "environment_variable" ):</dt><dd>$!info.environmentVariable</dd>
   #if ( $currentUserIsSuper )
   <dt>$i18n.getString( "external_configuration_directory" ):</dt><dd>$!info.externalDirectory</dd>
+  <dt>$i18n.getString( "file_store_provider" ):</dt><dd>$!info.fileStoreProvider</dd>
   <dt>$i18n.getString( "database_type" ):</dt><dd>$!info.databaseInfo.type</dd>
   <dt>$i18n.getString( "database_name" ):</dt><dd>$!info.databaseInfo.name</dd>
   <dt>$i18n.getString( "database_user" ):</dt><dd>$!info.databaseInfo.user</dd>

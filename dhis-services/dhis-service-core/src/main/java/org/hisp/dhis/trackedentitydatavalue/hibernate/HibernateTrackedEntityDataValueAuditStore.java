@@ -29,6 +29,7 @@ package org.hisp.dhis.trackedentitydatavalue.hibernate;
  */
 
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
@@ -99,6 +100,15 @@ public class HibernateTrackedEntityDataValueAuditStore
     {
         return ((Number) getTrackedEntityDataValueAuditCriteria( dataElements, programStageInstances, auditType )
             .setProjection( Projections.countDistinct( "id" ) ).uniqueResult()).intValue();
+    }
+    
+    @Override
+    public void deleteTrackedEntityDataValueAudits( ProgramStageInstance programStageInstance )
+    {
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery( "delete TrackedEntityDataValueAudit where programStageInstance = :programStageInstance" );
+        query.setEntity( "programStageInstance", programStageInstance );
+        query.executeUpdate();
     }
 
     private Criteria getTrackedEntityDataValueAuditCriteria( List<DataElement> dataElements, List<ProgramStageInstance> programStageInstances,

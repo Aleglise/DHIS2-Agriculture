@@ -277,7 +277,10 @@ public class DefaultAnalyticsTableService
             
             for ( AnalyticsTableColumn col : columns )
             {
-                indexes.add( new AnalyticsIndex( table.getTempTableName(), col.getName(), col.getIndexType() ) );
+                if ( !col.isSkipIndex() )
+                {
+                    indexes.add( new AnalyticsIndex( table.getTempTableName(), col.getName(), col.getIndexType() ) );
+                }
             }
         }
         

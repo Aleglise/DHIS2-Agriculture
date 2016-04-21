@@ -33,9 +33,10 @@ dhis2.db.shapeDoubleWidth = "DOUBLE_WIDTH";
 dhis2.db.shapeFullWidth = "FULL_WIDTH";
 dhis2.db.widthNormal = 408;
 dhis2.db.widthDouble = 847;
-dhis2.db.visualItemTypes = ["CHART", "EVENT_CHART", "MAP", "REPORT_TABLE", "EVENT_REPORT"];
+dhis2.db.visualItemTypes = ["CHART", "EVENT_CHART", "MAP", "REPORT_TABLE", "EVENT_REPORT", "APP"];
 dhis2.db.itemContentHeight = 308;
 dhis2.db.itemScrollbarWidth = /\bchrome\b/.test(navigator.userAgent.toLowerCase()) ? 8 : 17;
+dhis2.db.reportTableItems = [];
 
 // TODO support table as link and embedded
 // TODO double horizontal size
@@ -92,6 +93,9 @@ dhis2.db.tmpl = {
 	hitItem: "<li><a class='viewLink' href='${link}'><img src='../images/${img}.png'>${name}</a>" +
 	"{{if canManage}}<a class='addLink' href='javascript:dhis2.db.addItemContent( \"${type}\", \"${id}\" )'>${i18n_add}</a>{{/if}}</li>",
 
+	appHitItem: "<li><a class='viewLink' href='javascript:dhis2.db.addItemContent( \"${type}\", \"${id}\" )'><img src='../images/${img}.png'>${name}</a>" +
+	"{{if canManage}}<a class='addLink' href='javascript:dhis2.db.addItemContent( \"${type}\", \"${id}\" )'>${i18n_add}</a>{{/if}}</li>",
+
 	chartItem: "<li id='liDrop-${itemId}' class='liDropItem'><div class='dropItem' id='drop-${itemId}' style='${style}' data-item='${itemId}'></div></li>" +
 	"<li id='li-${itemId}' class='liItem'><div class='item' id='${itemId}' style='${style}'><div class='itemHeader'><a href='javascript:dhis2.db.removeItem( \"${itemId}\" )'>${i18n_remove}</a>" +
 	"<a href='javascript:dhis2.db.viewImage( \"../api/charts/${id}/data?width=820&height=550\", \"${name}\" )'>${i18n_get_as_image}</a>" +
@@ -136,7 +140,35 @@ dhis2.db.tmpl = {
 	"<a href='javascript:dhis2.db.resizeItem( \"${itemId}\", true )'>${i18n_resize}</a>" +
 	"<i class=\"fa fa-arrows dragIcon\" title=\"${i18n_click_and_drag_to_new_position}\"></i></div>" +
 	"<div id='plugin-${itemId}'></div>" +
-	"</div></li>"
+	"</div></li>",
+
+	loadingAppItem: "<li id='liDrop-${itemId}' class='liDropItem'><div class='dropItem' id='drop-${itemId}' data-item='${itemId}'></div><li>" +
+	"<li id='li-${itemId}' class='liItem'><div class='item' id='${itemId}' style='${style}'><div class='itemHeader'>" +
+	"<a href='javascript:dhis2.db.removeItem( \"${itemId}\" )'>${i18n_remove}</a>" +
+	"<a href='javascript:dhis2.db.resizeItem( \"${itemId}\", true )'>${i18n_resize}</a>" +
+	"<i class=\"fa fa-arrows dragIcon\" title=\"${i18n_click_and_drag_to_new_position}\"></i>" +
+	"</div><div style='position:relative'>" +
+	"<div id='plugin-${itemId}' style='width:100%;height:${dhis2.db.itemContentHeight}px'></div>" +
+	"</div></div></li>",
+
+	missingAppItem: "<li id='liDrop-${itemId}' class='liDropItem'><div class='dropItem' id='drop-${itemId}' data-item='${itemId}'></div><li>" +
+	"<li id='li-${itemId}' class='liItem'><div class='item' id='${itemId}' style='${style}'><div class='itemHeader'>" +
+	"<a href='javascript:dhis2.db.removeItem( \"${itemId}\" )'>${i18n_remove}</a>" +
+	"<a href='javascript:dhis2.db.resizeItem( \"${itemId}\", true )'>${i18n_resize}</a>" +
+	"<i class=\"fa fa-arrows dragIcon\" title=\"${i18n_click_and_drag_to_new_position}\"></i>" +
+	"</div><div style='position:relative'>" +
+	"<div id='plugin-${itemId}' style='width:100%;height:${dhis2.db.itemContentHeight}px'>${i18n_missing_dashboard_app}: ${appKey}</div>" +
+	"</div></div></li>",
+
+	appItem: "<li id='liDrop-${itemId}' class='liDropItem'><div class='dropItem' id='drop-${itemId}' data-item='${itemId}'></div><li>" +
+	"<li id='li-${itemId}' class='liItem'><div class='item' id='${itemId}' style='${style}'><div class='itemHeader'>" +
+	"<a href='javascript:dhis2.db.removeItem( \"${itemId}\" )'>${i18n_remove}</a>" +
+	"<a href='javascript:dhis2.db.exploreApp( \"${appKey}\", \"${itemId}\" )'>${i18n_explore}</a>" +
+	"<a href='javascript:dhis2.db.resizeItem( \"${itemId}\", true )'>${i18n_resize}</a>" +
+	"<i class=\"fa fa-arrows dragIcon\" title=\"${i18n_click_and_drag_to_new_position}\"></i>" +
+	"</div><div style='position:relative'>" +
+	"<iframe id='plugin-${itemId}' style='width:100%;height:${dhis2.db.itemContentHeight-4}px;border:0' allowfullscreen src='${app.launchUrl}?dashboardItemId=${itemId}'></iframe>" +
+	"</div></div></li>"
 };
 
 dhis2.db.dashboardReady = function()
@@ -476,23 +508,31 @@ dhis2.db.resizeItem = function( id, isScrollbar )
 	} );
 }
 
+dhis2.db.onSetItemWidth = function(id, width, isScrollbar) {
+    var el = Ext.get( "plugin-" + id );
+    var fn = el.setViewportWidth || el.dom.setViewportWidth;
+	if (fn) {
+		fn(width - (isScrollbar ? this.itemScrollbarWidth : 0));
+	}
+}
+
 dhis2.db.setNormalItemWidth = function( id, isScrollbar ) {
 	$( "#" + id ).css( "width", dhis2.db.widthNormal + "px" );
 	$( "#drop-" + id ).css( "width", dhis2.db.widthNormal + "px" );
-	Ext.get( "plugin-" + id ).setViewportWidth( dhis2.db.widthNormal - (isScrollbar ? dhis2.db.itemScrollbarWidth : 0));
+    this.onSetItemWidth(id, this.widthNormal, isScrollbar);
 }
 
 dhis2.db.setDoubleItemWidth = function( id, isScrollbar ) {
 	$( "#" + id ).css( "width", dhis2.db.widthDouble + "px" );
 	$( "#drop-" + id ).css( "width", dhis2.db.widthDouble + "px" );
-	Ext.get( "plugin-" + id ).setViewportWidth( dhis2.db.widthDouble - (isScrollbar ? dhis2.db.itemScrollbarWidth : 0));
+    this.onSetItemWidth(id, this.widthDouble, isScrollbar);
 }
 
 dhis2.db.setFullItemWidth = function( id, isScrollbar ) {
 	var	fullWidth = dhis2.db.getFullWidth();
 	$( "#" + id ).css( "width", fullWidth + "px" );
 	$( "#drop-" + id ).css( "width", fullWidth + "px" );
-	Ext.get( "plugin-" + id ).setViewportWidth( fullWidth - (isScrollbar ? dhis2.db.itemScrollbarWidth : 0));
+    this.onSetItemWidth(id, fullWidth, isScrollbar);
 }
 
 dhis2.db.drawWideItems = function()
@@ -534,7 +574,7 @@ dhis2.db.renderDashboard = function( id )
 
 	$( "#dashboard-" + dhis2.db.current() ).addClass( "currentDashboard" );
 
-	$.getJSON( "../api/dashboards/" + id + "?fields=:all,dashboardItems[:all,reports[id,displayName],chart[id,displayName],map[id,displayName],reportTable[id,displayName],resources[id,displayName]]&" + dhis2.util.cacheBust(), function( data )
+	$.getJSON( "../api/dashboards/" + id + "?fields=:all,dashboardItems[:all,reports[id,displayName],chart[id,displayName],map[id,displayName],reportTable[id,displayName],resources[id,displayName],users[id,displayName]]&" + dhis2.util.cacheBust(), function( data )
 	{
 		$d = $( "#contentList" ).empty();
 
@@ -558,8 +598,12 @@ dhis2.db.renderDashboard = function( id )
 					width = dhis2.db.widthDouble;
 				}
 
-				dhis2.db.renderItems( $d, dashboardItem, width, false );
+				dhis2.db.renderItem( $d, dashboardItem, width, false );
 			} );
+
+            reportTablePlugin.url = '..';
+            reportTablePlugin.showTitles = true;
+            reportTablePlugin.load(dhis2.db.reportTableItems);
 
 			dhis2.db.renderLastDropItem( $d );
 		}
@@ -569,6 +613,7 @@ dhis2.db.renderDashboard = function( id )
 		}
 
 		dhis2.db.dashboardReady();
+		dhis2.db.registerDashboardViewEvent();
 	} );
 }
 
@@ -582,7 +627,7 @@ dhis2.db.linkItemHeaderHtml = function( itemId, title )
 	return html;
 }
 
-dhis2.db.renderItems = function( $d, dashboardItem, width, prepend )
+dhis2.db.renderItem = function( $d, dashboardItem, width, prepend )
 {
 	width = width || dhis2.db.widthNormal;
 	prepend = prepend || false;
@@ -693,15 +738,12 @@ dhis2.db.renderItems = function( $d, dashboardItem, width, prepend )
 			"i18n_remove": i18n_remove, "i18n_share": i18n_share_interpretation, "i18n_click_and_drag_to_new_position": i18n_click_and_drag_to_new_position } );
 		dhis2.db.preOrAppend( $d, content, prepend );
 
-		DHIS.getTable({
+		dhis2.db.reportTableItems.push({
 			url: '..',
 			el: 'plugin-' + dashboardItem.id,
 			id: dashboardItem.reportTable.id,
-			dashboard: true,
-			crossDomain: false,
-			skipMask: true,
-			displayDensity: 'compact',
-			fontSize: 'small',
+			displayDensity: 'COMPACT',
+			fontSize: 'SMALL',
 			userOrgUnit: userOrgUnit
 		});
 	}
@@ -738,6 +780,42 @@ dhis2.db.renderItems = function( $d, dashboardItem, width, prepend )
 	else if ( "MESSAGES" == dashboardItem.type )
 	{
 		dhis2.db.renderMessagesItem( $d, dashboardItem.id );
+	}
+	else if ( "APP" == dashboardItem.type )
+	{
+		if ( undefined === dhis2.db.apps ) {
+			$.getJSON('../api/apps', function (apps) {
+				dhis2.db.apps = {};
+				$.each(apps, function(i, app) {
+					dhis2.db.apps[app.key] = app;
+				});
+				dhis2.db.renderDashboard( dhis2.db.current() );
+			})
+			.fail(function (xhr, status, err) {
+				console.warn('Failed to load apps:', err);
+				dhis2.db.apps = {};
+				dhis2.db.renderDashboard( dhis2.db.current() );
+			});
+		}
+
+		var content = $.tmpl( dhis2.db.tmpl.loadingAppItem, { "itemId": dashboardItem.id, "appKey": dashboardItem.appKey, "style": tableStyle,
+			"i18n_remove": i18n_remove, "i18n_share": i18n_share_interpretation, "i18n_click_and_drag_to_new_position": i18n_click_and_drag_to_new_position } );
+
+		if ( dhis2.db.apps )
+		{
+			if ( dhis2.db.apps.hasOwnProperty(dashboardItem.appKey) )
+			{
+				content = $.tmpl( dhis2.db.tmpl.appItem, { "itemId": dashboardItem.id, "appKey": dashboardItem.appKey, "app": dhis2.db.apps[dashboardItem.appKey], "style": tableStyle,
+				  "i18n_remove": i18n_remove, "i18n_share": i18n_share_interpretation, "i18n_click_and_drag_to_new_position": i18n_click_and_drag_to_new_position } );
+			}
+			else
+			{
+				content = $.tmpl( dhis2.db.tmpl.missingAppItem, { "itemId": dashboardItem.id, "appKey": dashboardItem.appKey, "style": tableStyle,
+					"i18n_remove": i18n_remove, "i18n_share": i18n_share_interpretation, "i18n_click_and_drag_to_new_position": i18n_click_and_drag_to_new_position } );
+			}
+		}
+
+		dhis2.db.preOrAppend( $d, content, prepend );
 	}
 }
 
@@ -831,7 +909,7 @@ dhis2.db.addItemContent = function( type, id )
 					$.getJSON( "../api" + location, function( item ) {
 						if ( item && $.inArray( item.type, dhis2.db.visualItemTypes ) != -1 ) {
 							$d = $( "#contentList" );
-							dhis2.db.renderItems( $d, item, undefined, true );
+							dhis2.db.renderItem( $d, item, undefined, true );
 							dhis2.db.addDragDrop( item.id );
 						}
 						else {
@@ -877,7 +955,7 @@ dhis2.db.removeItemContent = function( itemId, contentId )
 
 dhis2.db.addMessagesContent = function()
 {
-	dhis2.db.addItemContent( "messages", "" );
+	dhis2.db.addItemContent( "MESSAGES", "" );
 	$( "#manageDashboardForm" ).dialog( "destroy" );
 }
 
@@ -909,6 +987,11 @@ dhis2.db.exploreReportTable = function( uid )
 dhis2.db.exploreEventReport = function( uid )
 {
 	window.location.href = "../dhis-web-event-reports/index.html?id=" + uid;
+}
+
+dhis2.db.exploreApp = function( appKey, itemId )
+{
+	window.open(dhis2.db.apps[appKey].launchUrl + '?dashboardItemId=' + itemId, 'win' + dhis2.util.cacheBust());
 }
 
 dhis2.db.renderReportTable = function( tableId, itemId )
@@ -1099,6 +1182,17 @@ dhis2.db.renderSearch = function( data, $h )
 				$h.append( $.tmpl( dhis2.db.tmpl.hitItem, { "canManage": canManage, "link": "../api/documents/" + o.id, "img": "document_small", "name": o.name, "type": "RESOURCES", "id": o.id, "i18n_add": i18n_add } ) );
 			}
 		}
+
+		if ( data.appCount > 0 )
+		{
+			$h.append( $.tmpl( dhis2.db.tmpl.hitHeader, { "title": "Apps", "type": "APP", "i18n_see_more_hits": i18n_see_more_hits, "i18n_see_fewer_hits": i18n_see_fewer_hits } ) );
+
+			for ( var i in data.apps )
+			{
+				var o = data.apps[i];
+				$h.append( $.tmpl( dhis2.db.tmpl.appHitItem, { "canManage": canManage, "link": "../api/apps/" + o.key, "img": "app_small", "name": o.name, "type": "APP", "id": o.key, "i18n_add": i18n_add } ) );
+			}
+		}
 	}
 	else
 	{
@@ -1109,6 +1203,11 @@ dhis2.db.renderSearch = function( data, $h )
 dhis2.db.hideSearch = function()
 {
 	$( "#hitDiv" ).hide();
+}
+
+dhis2.db.registerDashboardViewEvent = function()
+{
+	$.post( "../api/dataStatistics?eventType=DASHBOARD_VIEW" );
 }
 
 //------------------------------------------------------------------------------

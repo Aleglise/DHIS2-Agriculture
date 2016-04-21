@@ -34,7 +34,6 @@ import org.hisp.dhis.indicator.Indicator;
 import org.hisp.dhis.indicator.IndicatorGroup;
 import org.hisp.dhis.organisationunit.OrganisationUnit;
 import org.hisp.dhis.organisationunit.OrganisationUnitGroup;
-import org.hisp.dhis.resultsframework.Project;
 import org.hisp.dhis.system.deletion.DeletionHandler;
 import org.hisp.dhis.user.User;
 import org.hisp.dhis.user.UserGroup;
@@ -129,12 +128,6 @@ public class AttributeValueDeletionHandler
         removeAttributeValues( userGroup.getAttributeValues() );
     }
 
-    @Override
-    public void deleteProject( Project project )
-    {
-        removeAttributeValues( project.getAttributeValues() );
-    }
-    
     private void removeAttributeValues( Set<AttributeValue> attributeValues )
     {
         Iterator<AttributeValue> iterator = attributeValues.iterator();

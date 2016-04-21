@@ -296,6 +296,7 @@ public class ChartController
         dimensionService.mergeAnalyticalObject( chart );
 
         chart.getFilterDimensions().clear();
+        chart.getFilterDimensions().addAll( getDimensions( chart.getFilters() ) );
 
         if ( chart.getColumns() != null )
         {
@@ -306,7 +307,5 @@ public class ChartController
         {
             chart.setCategory( chart.getRows().get( 0 ).getDimension() );
         }
-
-        chart.getFilterDimensions().addAll( getDimensions( chart.getFilters() ) );
     }
 }

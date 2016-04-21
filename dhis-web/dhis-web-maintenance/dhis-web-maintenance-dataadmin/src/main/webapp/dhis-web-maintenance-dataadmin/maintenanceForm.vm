@@ -47,6 +47,11 @@
 </p>
 
 <p>
+	<input type="checkbox" id="clearApplicationCache"/>
+	<label for="clearApplicationCache">$i18n.getString( "clear_application_cache" )</label>
+</p>
+
+<p>
 	<input type="button" value="$i18n.getString( 'perform_maintenance' )" onclick="performMaintenance()" style="width:170px"/>
 </p>
 

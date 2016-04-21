@@ -60,7 +60,6 @@ import org.hisp.dhis.period.Period;
 import org.hisp.dhis.period.RelativePeriodEnum;
 import org.hisp.dhis.period.RelativePeriods;
 import org.hisp.dhis.period.comparator.AscendingPeriodComparator;
-import org.hisp.dhis.program.Program;
 import org.hisp.dhis.trackedentity.TrackedEntityAttributeDimension;
 import org.hisp.dhis.trackedentity.TrackedEntityDataElementDimension;
 import org.hisp.dhis.trackedentity.TrackedEntityProgramIndicatorDimension;
@@ -135,8 +134,6 @@ public abstract class BaseAnalyticalObject
 
     @Scanned
     protected List<TrackedEntityProgramIndicatorDimension> programIndicatorDimensions = new ArrayList<>();
-
-    private Program program;
 
     protected boolean userOrganisationUnit;
 
@@ -378,7 +375,7 @@ public abstract class BaseAnalyticalObject
                 items.addAll( organisationUnitsInGroups ); // Must be set externally
             }
 
-            type = DimensionType.ORGANISATIONUNIT;
+            type = DimensionType.ORGANISATION_UNIT;
         }
         else if ( CATEGORYOPTIONCOMBO_DIM_ID.equals( dimension ) )
         {
@@ -416,7 +413,7 @@ public abstract class BaseAnalyticalObject
             {
                 items.addAll( deGroupMap.get( dimension ) );
 
-                type = DimensionType.DATAELEMENT_GROUPSET;
+                type = DimensionType.DATA_ELEMENT_GROUP_SET;
             }
 
             // Organisation unit group set
@@ -435,7 +432,7 @@ public abstract class BaseAnalyticalObject
             {
                 items.addAll( ouGroupMap.get( dimension ) );
 
-                type = DimensionType.ORGANISATIONUNIT_GROUPSET;
+                type = DimensionType.ORGANISATION_UNIT_GROUP_SET;
             }
 
             // Category option group set
@@ -454,7 +451,7 @@ public abstract class BaseAnalyticalObject
             {
                 items.addAll( coGroupMap.get( dimension ) );
 
-                type = DimensionType.CATEGORYOPTION_GROUPSET;
+                type = DimensionType.CATEGORY_OPTION_GROUP_SET;
             }
 
             // Tracked entity attribute
@@ -476,7 +473,7 @@ public abstract class BaseAnalyticalObject
             {
                 TrackedEntityDataElementDimension tedd = dataElements.get( dimension );
 
-                return new BaseDimensionalObject( dimension, DimensionType.PROGRAM_DATAELEMENT, null, tedd.getDisplayName(), tedd.getLegendSet(), tedd.getFilter() );
+                return new BaseDimensionalObject( dimension, DimensionType.PROGRAM_DATA_ELEMENT, null, tedd.getDisplayName(), tedd.getLegendSet(), tedd.getFilter() );
             }
 
             // Tracked entity program indicator
@@ -577,7 +574,7 @@ public abstract class BaseAnalyticalObject
                 }
             }
 
-            return new BaseDimensionalObject( dimension, DimensionType.ORGANISATIONUNIT, ouList );
+            return new BaseDimensionalObject( dimension, DimensionType.ORGANISATION_UNIT, ouList );
         }
         else if ( CATEGORYOPTIONCOMBO_DIM_ID.equals( dimension ) )
         {
@@ -613,7 +610,7 @@ public abstract class BaseAnalyticalObject
 
             if ( deGroupMap.containsKey( dimension ) )
             {
-                return new BaseDimensionalObject( dimension, DimensionType.DATAELEMENT_GROUPSET, deGroupMap.get( dimension ) );
+                return new BaseDimensionalObject( dimension, DimensionType.DATA_ELEMENT_GROUP_SET, deGroupMap.get( dimension ) );
             }
 
             // Organisation unit group set
@@ -630,7 +627,7 @@ public abstract class BaseAnalyticalObject
 
             if ( ouGroupMap.containsKey( dimension ) )
             {
-                return new BaseDimensionalObject( dimension, DimensionType.ORGANISATIONUNIT_GROUPSET, ouGroupMap.get( dimension ) );
+                return new BaseDimensionalObject( dimension, DimensionType.ORGANISATION_UNIT_GROUP_SET, ouGroupMap.get( dimension ) );
             }
 
             // Category option group set
@@ -647,7 +644,7 @@ public abstract class BaseAnalyticalObject
 
             if ( coGroupMap.containsKey( dimension ) )
             {
-                return new BaseDimensionalObject( dimension, DimensionType.CATEGORYOPTION_GROUPSET, coGroupMap.get( dimension ) );
+                return new BaseDimensionalObject( dimension, DimensionType.CATEGORY_OPTION_GROUP_SET, coGroupMap.get( dimension ) );
             }
 
             // Tracked entity attribute
@@ -669,7 +666,7 @@ public abstract class BaseAnalyticalObject
             {
                 TrackedEntityDataElementDimension tedd = dataElements.get( dimension );
 
-                return new BaseDimensionalObject( dimension, DimensionType.PROGRAM_DATAELEMENT, null, tedd.getDisplayName(), tedd.getLegendSet(), tedd.getFilter() );
+                return new BaseDimensionalObject( dimension, DimensionType.PROGRAM_DATA_ELEMENT, null, tedd.getDisplayName(), tedd.getLegendSet(), tedd.getFilter() );
             }
 
             // Tracked entity program indicator
@@ -836,13 +833,11 @@ public abstract class BaseAnalyticalObject
             if ( mergeMode.isReplace() )
             {
                 relatives = object.getRelatives();
-                program = object.getProgram();
                 aggregationType = object.getAggregationType();
             }
             else if ( mergeMode.isMerge() )
             {
                 relatives = object.getRelatives() == null ? relatives : object.getRelatives();
-                program = object.getProgram() == null ? program : object.getProgram();
                 aggregationType = object.getAggregationType() == null ? aggregationType : object.getAggregationType();
             }
 
@@ -1040,20 +1035,6 @@ public abstract class BaseAnalyticalObject
     public void setProgramIndicatorDimensions( List<TrackedEntityProgramIndicatorDimension> programIndicatorDimensions )
     {
         this.programIndicatorDimensions = programIndicatorDimensions;
-    }
-
-    @JsonProperty
-    @JsonSerialize( as = BaseIdentifiableObject.class )
-    @JsonView( { DetailedView.class, ExportView.class } )
-    @JacksonXmlProperty( namespace = DxfNamespaces.DXF_2_0 )
-    public Program getProgram()
-    {
-        return program;
-    }
-
-    public void setProgram( Program program )
-    {
-        this.program = program;
     }
 
     @JsonProperty

@@ -44,7 +44,7 @@
   <context:annotation-config />
 
   <bean id="fixedContentNegotiationStrategy" class="org.springframework.web.accept.FixedContentNegotiationStrategy">
-    <constructor-arg name="defaultContentType" value="application/json" />
+    <constructor-arg type="org.springframework.http.MediaType" value="application/json" />
   </bean>
 
   <bean id="headerContentNegotiationStrategy" class="org.springframework.web.accept.HeaderContentNegotiationStrategy" />

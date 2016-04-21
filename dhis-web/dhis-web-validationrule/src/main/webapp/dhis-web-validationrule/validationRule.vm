@@ -109,6 +109,7 @@
 				<p id="organisationUnitLevelP"><label>$i18n.getString( "organisation_unit_level" ):</label><br><span id="organisationUnitLevelField"></span></p>
 				<p id="sequentialSampleCountP"><label>$i18n.getString( "sequential_sample_count" ):</label><br><span id="sequentialSampleCountField"></span></p>
 				<p id="annualSampleCountP"><label>$i18n.getString( "annual_sample_count" ):</label><br><span id="annualSampleCountField"></span></p>
+				<p id="sequentialSkipCountP"><label>$i18n.getString( "sequential_skip_count" ):</label><br><span id="sequentialSkipCountField"></span></p>
 				<p><label>$i18n.getString( "left_side_description" ):</label><br><span id="leftSideDescriptionField"></span></p>
 				<p><label>$i18n.getString( "operator" ):</label><br><span id="operatorField"></span></p>
 				<p><label>$i18n.getString( "right_side_description" ):</label><br><span id="rightSideDescriptionField"></span></p>

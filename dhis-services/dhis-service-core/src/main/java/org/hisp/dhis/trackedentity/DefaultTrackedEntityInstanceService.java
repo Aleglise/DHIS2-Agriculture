@@ -142,39 +142,20 @@ public class DefaultTrackedEntityInstanceService
 
         return trackedEntityInstanceStore.countTrackedEntityInstances( params );
     }
-
+    
     // TODO lower index on attribute value?
+    
     @Override
     public Grid getTrackedEntityInstancesGrid( TrackedEntityInstanceQueryParams params )
     {
         decideAccess( params );
         validate( params );
+        handleAttributes( params );
 
         params.setUser( currentUserService.getCurrentUser() );
 
         // ---------------------------------------------------------------------
-        // If params of type query and no attributes or filters defined, use
-        // attributes from program if program is defined, if not, use 
-        // display-in-list attributes.
-        // ---------------------------------------------------------------------
-
-        if ( params.isOrQuery() || !params.hasAttributes() )
-        {
-            if ( params.hasProgram() )
-            {
-                params.addAttributesIfNotExist( QueryItem.getQueryItems( params.getProgram().getTrackedEntityAttributes() ) );
-            }
-            else
-            {
-                Collection<TrackedEntityAttribute> attributes = attributeService.getTrackedEntityAttributesDisplayInList();
-
-                params.addAttributesIfNotExist( QueryItem.getQueryItems( attributes ) );
-                params.addFiltersIfNotExist( QueryItem.getQueryItems( attributes ) );
-            }
-        }
-
-        // ---------------------------------------------------------------------
-        // Conform params
+        // Conform parameters
         // ---------------------------------------------------------------------
 
         params.conform();
@@ -258,6 +239,32 @@ public class DefaultTrackedEntityInstanceService
         return grid;
     }
 
+    /**
+     * Handles injection of attributes. The following combinations of parameters
+     * will lead to attributes being injected.
+     * 
+     * - query: add display in list attributes
+     * - attributes
+     * - program: add program attributes
+     * - query + attributes
+     * - query + program: add program attributes
+     * - attributes + program
+     * - query + attributes + program
+     */
+    private void handleAttributes( TrackedEntityInstanceQueryParams params )
+    {
+        if ( params.isOrQuery() && !params.hasAttributes() && !params.hasProgram() )
+        {
+            Collection<TrackedEntityAttribute> attributes = attributeService.getTrackedEntityAttributesDisplayInList();
+            params.addAttributes( QueryItem.getQueryItems( attributes ) );
+            params.addFiltersIfNotExist( QueryItem.getQueryItems( attributes ) );
+        }
+        else if ( params.hasProgram() && !params.hasAttributes() )
+        {
+            params.addAttributes( QueryItem.getQueryItems( params.getProgram().getTrackedEntityAttributes() ) );
+        }
+    }
+    
     @Override
     public void decideAccess( TrackedEntityInstanceQueryParams params )
     {
@@ -281,12 +288,12 @@ public class DefaultTrackedEntityInstanceService
 
         User user = currentUserService.getCurrentUser();
 
-        if ( !params.hasOrganisationUnits() && !(params.isOrganisationUnitMode( ALL ) || params.isOrganisationUnitMode( ACCESSIBLE )) )
+        if ( !params.hasOrganisationUnits() && !( params.isOrganisationUnitMode( ALL ) || params.isOrganisationUnitMode( ACCESSIBLE ) ) )
         {
             violation = "At least one organisation unit must be specified";
         }
 
-        if ( params.isOrganisationUnitMode( ACCESSIBLE ) && (user == null || !user.hasDataViewOrganisationUnitWithFallback()) )
+        if ( params.isOrganisationUnitMode( ACCESSIBLE ) && ( user == null || !user.hasDataViewOrganisationUnitWithFallback() ) )
         {
             violation = "Current user must be associated with at least one organisation unit when selection mode is ACCESSIBLE";
         }

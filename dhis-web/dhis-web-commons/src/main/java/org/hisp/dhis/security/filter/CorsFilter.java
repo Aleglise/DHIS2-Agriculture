@@ -28,17 +28,6 @@ package org.hisp.dhis.security.filter;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.io.IOException;
-
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hisp.dhis.configuration.ConfigurationService;
@@ -48,10 +37,23 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 /**
  * @author Morten Olav Hansen <mortenoh@gmail.com>
  */
-public class CorsFilter 
+public class CorsFilter
     implements Filter
 {
     private static final Log log = LogFactory.getLog( CorsFilter.class );
@@ -82,7 +84,7 @@ public class CorsFilter
         String origin = request.getHeader( CORS_ORIGIN );
 
         // Origin header is required for CORS requests
-        
+
         if ( StringUtils.isEmpty( origin ) )
         {
             filterChain.doFilter( request, response );
@@ -110,10 +112,10 @@ public class CorsFilter
             response.addHeader( CORS_MAX_AGE, String.valueOf( MAX_AGE ) );
 
             response.setStatus( HttpServletResponse.SC_NO_CONTENT );
-            
+
             // CORS preflight requires a 2xx status code, so short-circuit the filter chain
-            
-            return; 
+
+            return;
         }
         else
         {
@@ -132,7 +134,8 @@ public class CorsFilter
 
     private boolean isOriginWhitelisted( HttpServletRequest request, String origin )
     {
-        UriComponentsBuilder uriBuilder = ServletUriComponentsBuilder.fromContextPath( request ).replacePath( "" );
+        HttpServletRequestEncodingWrapper encodingWrapper = new HttpServletRequestEncodingWrapper( request );
+        UriComponentsBuilder uriBuilder = ServletUriComponentsBuilder.fromContextPath( encodingWrapper ).replacePath( "" );
 
         String forwardedProto = request.getHeader( "X-Forwarded-Proto" );
 
@@ -143,8 +146,8 @@ public class CorsFilter
 
         String localUrl = uriBuilder.build().toString();
 
-        return !StringUtils.isEmpty( origin ) && ( localUrl.equals( origin ) ||
-            configurationService.isCorsWhitelisted( origin ) );
+        return !StringUtils.isEmpty( origin ) && (localUrl.equals( origin ) ||
+            configurationService.isCorsWhitelisted( origin ));
     }
 
     @Override
@@ -155,5 +158,35 @@ public class CorsFilter
     @Override
     public void destroy()
     {
+    }
+
+    /**
+     * Simple HttpServletRequestWrapper implementation that makes sure that the query string is properly encoded.
+     */
+    class HttpServletRequestEncodingWrapper extends HttpServletRequestWrapper
+    {
+        public HttpServletRequestEncodingWrapper( HttpServletRequest request )
+        {
+            super( request );
+        }
+
+        @Override
+        public String getQueryString()
+        {
+            String queryString = super.getQueryString();
+
+            if ( !StringUtils.isEmpty( queryString ) )
+            {
+                try
+                {
+                    return URLEncoder.encode( queryString, "UTF-8" );
+                }
+                catch ( UnsupportedEncodingException ignored )
+                {
+                }
+            }
+
+            return queryString;
+        }
     }
 }

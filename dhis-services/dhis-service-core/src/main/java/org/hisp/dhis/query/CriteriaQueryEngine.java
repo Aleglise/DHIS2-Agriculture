@@ -33,7 +33,7 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hisp.dhis.common.IdentifiableObject;
-import org.hisp.dhis.hibernate.HibernateGenericStore;
+import org.hisp.dhis.hibernate.InternalHibernateGenericStore;
 import org.hisp.dhis.schema.Property;
 import org.hisp.dhis.schema.Schema;
 import org.hisp.dhis.user.CurrentUserService;
@@ -58,9 +58,9 @@ public class CriteriaQueryEngine<T extends IdentifiableObject>
     private CurrentUserService currentUserService;
 
     @Autowired
-    private final List<HibernateGenericStore<T>> hibernateGenericStores = new ArrayList<>();
+    private final List<InternalHibernateGenericStore<T>> hibernateGenericStores = new ArrayList<>();
 
-    private Map<Class<?>, HibernateGenericStore<T>> stores = new HashMap<>();
+    private Map<Class<?>, InternalHibernateGenericStore<T>> stores = new HashMap<>();
 
     @Override
     @SuppressWarnings( "unchecked" )
@@ -73,7 +73,7 @@ public class CriteriaQueryEngine<T extends IdentifiableObject>
             return new ArrayList<>();
         }
 
-        HibernateGenericStore<?> store = getStore( (Class<? extends IdentifiableObject>) schema.getKlass() );
+        InternalHibernateGenericStore<?> store = getStore( (Class<? extends IdentifiableObject>) schema.getKlass() );
 
         if ( store == null )
         {
@@ -110,7 +110,7 @@ public class CriteriaQueryEngine<T extends IdentifiableObject>
             return 0;
         }
 
-        HibernateGenericStore<?> store = getStore( (Class<? extends IdentifiableObject>) schema.getKlass() );
+        InternalHibernateGenericStore<?> store = getStore( (Class<? extends IdentifiableObject>) schema.getKlass() );
 
         if ( store == null )
         {
@@ -323,13 +323,13 @@ public class CriteriaQueryEngine<T extends IdentifiableObject>
             return;
         }
 
-        for ( HibernateGenericStore<T> store : hibernateGenericStores )
+        for ( InternalHibernateGenericStore<T> store : hibernateGenericStores )
         {
             stores.put( store.getClazz(), store );
         }
     }
 
-    private HibernateGenericStore<?> getStore( Class<? extends IdentifiableObject> klass )
+    private InternalHibernateGenericStore<?> getStore( Class<? extends IdentifiableObject> klass )
     {
         initStoreMap();
         return stores.get( klass );

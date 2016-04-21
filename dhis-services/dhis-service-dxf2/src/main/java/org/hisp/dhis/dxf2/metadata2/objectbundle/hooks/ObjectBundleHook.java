@@ -31,22 +31,28 @@ package org.hisp.dhis.dxf2.metadata2.objectbundle.hooks;
 import org.hisp.dhis.common.IdentifiableObject;
 import org.hisp.dhis.dxf2.metadata2.objectbundle.ObjectBundle;
 
+import java.util.List;
+
 /**
  * @author Morten Olav Hansen <mortenoh@gmail.com>
  */
 public interface ObjectBundleHook
 {
-    void preImport( ObjectBundle objectBundle );
+    void preImport( ObjectBundle bundle );
 
-    void postImport( ObjectBundle objectBundle );
+    void postImport( ObjectBundle bundle );
 
-    void preCreate( IdentifiableObject identifiableObject, ObjectBundle objectBundle );
+    <T extends IdentifiableObject> void preTypeImport( Class<? extends IdentifiableObject> klass, List<T> objects, ObjectBundle bundle );
 
-    void postCreate( IdentifiableObject identifiableObject, ObjectBundle objectBundle );
+    <T extends IdentifiableObject> void postTypeImport( Class<? extends IdentifiableObject> klass, List<T> objects, ObjectBundle bundle );
 
-    void preUpdate( IdentifiableObject identifiableObject, ObjectBundle objectBundle );
+    <T extends IdentifiableObject> void preCreate( T object, ObjectBundle bundle );
 
-    void postUpdate( IdentifiableObject identifiableObject, ObjectBundle objectBundle );
+    <T extends IdentifiableObject> void postCreate( T object, ObjectBundle bundle );
 
-    void preDelete( IdentifiableObject identifiableObject, ObjectBundle objectBundle );
+    <T extends IdentifiableObject> void preUpdate( T object, ObjectBundle bundle );
+
+    <T extends IdentifiableObject> void postUpdate( T object, ObjectBundle bundle );
+
+    <T extends IdentifiableObject> void preDelete( T object, ObjectBundle bundle );
 }

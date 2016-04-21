@@ -35,9 +35,10 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.google.common.collect.Sets;
+
 import org.hisp.dhis.common.BaseDimensionalItemObject;
 import org.hisp.dhis.common.BaseIdentifiableObject;
-import org.hisp.dhis.common.DimensionType;
+import org.hisp.dhis.common.DimensionItemType;
 import org.hisp.dhis.common.DxfNamespaces;
 import org.hisp.dhis.common.IdentifiableObject;
 import org.hisp.dhis.common.MergeMode;
@@ -49,7 +50,6 @@ import org.hisp.dhis.dataset.DataSet;
 import org.hisp.dhis.dataset.comparator.DataSetApprovalFrequencyComparator;
 import org.hisp.dhis.dataset.comparator.DataSetFrequencyComparator;
 import org.hisp.dhis.option.OptionSet;
-import org.hisp.dhis.organisationunit.OrganisationUnit;
 import org.hisp.dhis.period.Period;
 import org.hisp.dhis.period.PeriodType;
 import org.hisp.dhis.period.YearlyPeriodType;
@@ -136,8 +136,7 @@ public class DataElement
     private List<Integer> aggregationLevels = new ArrayList<>();
 
     /**
-     * There is no point of saving 0's for this data element default is false
-     * ,we don't want to store 0's if not set to true
+     * Indicates whether to store zero data values.
      */
     private boolean zeroIsSignificant;
 
@@ -233,7 +232,12 @@ public class DataElement
         Collections.sort( list, DataSetFrequencyComparator.INSTANCE );
         return !list.isEmpty() ? list.get( 0 ) : null;
     }
-
+    
+    /**
+     * Returns the data set of this data element. If this data element has
+     * multiple data sets, the data set with approval enabled, then the highest 
+     * collection frequency, is returned.
+     */
     public DataSet getApprovalDataSet()
     {
         List<DataSet> list = new ArrayList<>( dataSets );
@@ -271,23 +275,6 @@ public class DataElement
         }
 
         return categoryOptionCombos;
-    }
-
-    /**
-     * Indicates whether the data sets of this data element is associated with
-     * the given organisation unit.
-     */
-    public boolean hasDataSetOrganisationUnit( OrganisationUnit unit )
-    {
-        for ( DataSet dataSet : dataSets )
-        {
-            if ( dataSet.getSources().contains( unit ) )
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -345,6 +332,32 @@ public class DataElement
         }
 
         return maxOpenPeriods;
+    }
+    
+    /**
+     * Returns the latest period which is open for data input. Returns null if
+     * data set is not associated with any data sets.
+     * 
+     * @return the latest period which is open for data input.
+     */
+    public Period getLatestOpenFuturePeriod()
+    {        
+        int periods = getOpenFuturePeriods();
+        
+        PeriodType periodType = getPeriodType();
+        
+        if ( periodType != null )
+        {
+            Period period = periodType.createPeriod();
+            
+            // Rewind one as 0 open periods implies current period is locked
+            
+            period = periodType.getPreviousPeriod( period );
+        
+            return periodType.getNextPeriod( period, periods );
+        }
+        
+        return null;
     }
 
     /**
@@ -424,7 +437,7 @@ public class DataElement
      */
     public String getFormNameFallback()
     {
-        return formName != null && !formName.isEmpty() ? getDisplayFormName() : getDisplayName();
+        return formName != null && !formName.isEmpty() ? getFormName() : getDisplayName();
     }
 
     @JsonProperty
@@ -432,7 +445,8 @@ public class DataElement
     @JacksonXmlProperty( namespace = DxfNamespaces.DXF_2_0 )
     public String getDisplayFormName()
     {
-        return displayFormName != null && !displayFormName.trim().isEmpty() ? displayFormName : formName;
+        return displayFormName != null && !displayFormName.trim().isEmpty() ? displayFormName : 
+            getFormName() != null && !getFormName().isEmpty() ? getFormName() : getDisplayName();
     }
 
     public void setDisplayFormName( String displayFormName )
@@ -491,13 +505,15 @@ public class DataElement
     }
 
     // -------------------------------------------------------------------------
-    // DimensionalObject
+    // DimensionalItemObject
     // -------------------------------------------------------------------------
 
+    //TODO can also be dimension
+    
     @Override
-    public DimensionType getDimensionType()
+    public DimensionItemType getDimensionItemType()
     {
-        return DimensionType.PROGRAM_DATAELEMENT;
+        return DimensionItemType.DATA_ELEMENT;
     }
 
     // -------------------------------------------------------------------------

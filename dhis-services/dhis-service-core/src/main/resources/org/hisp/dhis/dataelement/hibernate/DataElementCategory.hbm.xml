@@ -17,7 +17,7 @@
 
     <property name="name" column="name" not-null="true" unique="true" length="230" />
 
-    <property name="dataDimensionType" column="datadimensiontype" type="org.hisp.dhis.common.DataDimensionTypeUserType" />
+    <property name="dataDimensionType" column="datadimensiontype" type="org.hisp.dhis.common.DataDimensionTypeUserType" not-null="true" />
 
     <list name="categoryOptions" table="categories_categoryoptions">
       <cache usage="read-write" />

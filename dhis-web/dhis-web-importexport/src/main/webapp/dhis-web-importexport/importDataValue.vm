@@ -39,6 +39,13 @@
     </select></td>
 </tr>
 <tr>
+	<td>$i18n.getString( "preload_cache" )</td>
+	<td><select id="preheatCache" name="preheatCache" style="width:190px">
+		<option value="false">$i18n.getString( "no" )</option>
+		<option value="false">$i18n.getString( "yes" ) ($i18n.getString( "faster_for_large_imports" ))</option>
+	</select></td>
+</tr>
+<tr>
 	<td></td>
 	<td><a href="javascript:toggleOptions()">$i18n.getString( "more_options" )</a></td>
 </tr>

@@ -10,6 +10,7 @@
 	"periodType": "$!encoder.jsonEncode( ${validationRule.periodType} )",
 	"sequentialSampleCount": "$!encoder.jsonEncode( ${validationRule.sequentialSampleCount} )",
 	"annualSampleCount": "$!encoder.jsonEncode( ${validationRule.annualSampleCount} )",
+	"sequentialSkipCount": "$!encoder.jsonEncode( ${validationRule.sequentialSkipCount} )",
 	"operator": "${validationRule.operator}",
 	"leftSideDescription": "$!encoder.jsonEncode( ${validationRule.leftSide.description} )",
 	"rightSideDescription": "$!encoder.jsonEncode( ${validationRule.rightSide.description} )"

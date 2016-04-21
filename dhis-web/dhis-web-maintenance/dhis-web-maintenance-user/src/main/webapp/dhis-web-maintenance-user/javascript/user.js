@@ -257,3 +257,69 @@ function resendInvitation( context ) {
 		}
 	} );
 }
+
+//------------------------------------------------------------------------------
+// Assign search organisation units to user
+//------------------------------------------------------------------------------
+
+var userJsonObject;
+function showAssignOrgUnitsToUser( context ){	
+	$.ajax({		
+		url: "../api/users/" + context.uid + ".json",
+		type: "get",
+		contentType: "application/json; charset=utf-8",
+		success: function( user ){		
+			userJsonObject = user;
+			searchOuTreePopup();
+		}
+	});
+}
+
+function assignOrgUnitsToUser(){
+	
+	userJsonObject.teiSearchOrganisationUnits = [];
+	var ous = selection.getSelected();
+	for( var i=0; i<ous.length; i++){
+		userJsonObject.teiSearchOrganisationUnits.push({id: ous[i]});
+	}
+	
+	$.ajax({		
+		url: "../api/users/" + userJsonObject.id + ".json",
+		type: "put",
+		data: JSON.stringify( userJsonObject ),
+		contentType: "application/json; charset=utf-8",
+		success: function(json){
+			window.alert( i18n_success );
+		}
+	});
+}
+
+function searchOuTreePopup(){
+	$("#searchOrgUnitForm").load('../dhis-web-maintenance-user/searchOUTree.vm', initializeTree).dialog({
+		height: 450,
+		width: 500,
+		title: i18n_search_orgunit,
+		modal: true,
+		buttons: [{
+			text: i18n_save_button_label,
+			click: function(){
+				assignOrgUnitsToUser();
+		}},{
+			text: i18n_close_button_label,
+			click: function(){
+				$(this).dialog('close');
+			}			
+		}],
+		close: function(event,ui){
+			$("#searchOrgUnitForm").dialog('destroy');
+		}
+	});
+}
+
+function initializeTree( ){
+	var selectedOus = [];
+	for(var i=0; i<userJsonObject.teiSearchOrganisationUnits.length; i++){
+		selectedOus.push(userJsonObject.teiSearchOrganisationUnits[i].id);
+	}	
+	selection.setSelected( selectedOus );
+}

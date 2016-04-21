@@ -36,6 +36,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hisp.dhis.sms.config.GatewayAdministrationService;
+import org.hisp.dhis.sms.config.SmsGatewayConfig;
 import org.hisp.dhis.sms.outbound.OutboundSms;
 import org.hisp.dhis.sms.outbound.OutboundSmsService;
 import org.hisp.dhis.sms.outbound.OutboundSmsTransportService;
@@ -68,6 +69,10 @@ public class DefaultSmsSender
     @Autowired
     private GatewayAdministrationService gatewayAdminService;
 
+    // -------------------------------------------------------------------------
+    // SmsSender implementation
+    // -------------------------------------------------------------------------
+
     @Transactional
     @Override
     public String sendMessage( OutboundSms sms, String gatewayId )
@@ -92,13 +97,36 @@ public class DefaultSmsSender
     public String sendMessage( OutboundSms sms )
         throws SmsServiceException
     {
-        if ( transportService == null )
+        SmsGatewayConfig gateway = gatewayAdminService.getDefaultGateway();
+        
+        if ( transportService == null || gateway == null )
         {
             throw new SmsServiceNotEnabledException();
         }
-
-        return transportService.sendMessage( sms, gatewayAdminService.getDefaultGateway().getName() )
+                
+        return transportService.sendMessage( sms, gateway.getName() )
             .getResponseMessage();
+    }
+
+    @Transactional
+    @Override
+    public String sendMessage( List<OutboundSms> smsBatch )
+    {
+        SmsGatewayConfig gateway = gatewayAdminService.getDefaultGateway();
+        
+        if ( gateway == null )
+        {
+            throw new SmsServiceNotEnabledException();
+        }
+        
+        return sendMessage( smsBatch, gateway.getName() );
+    }
+
+    @Transactional
+    @Override
+    public String sendMessage( List<OutboundSms> smsBatch, String gatewayId )
+    {
+        return transportService.sendMessage( smsBatch, gatewayId ).getResponseMessage();
     }
 
     @Transactional
@@ -122,15 +150,16 @@ public class DefaultSmsSender
     {
         String message = null;
 
-        if ( transportService == null )
+        SmsGatewayConfig gateway = gatewayAdminService.getDefaultGateway();
+        
+        if ( transportService == null || gateway == null )
         {
-            message = "No transport service available";
-            return message;
+            throw new SmsServiceNotEnabledException();
         }
-
+        
         List<User> toSendList = new ArrayList<>();
 
-        String gatewayId = gatewayAdminService.getDefaultGateway().getName();
+        String gatewayId = gateway.getName();
 
         if ( gatewayId != null && !gatewayId.trim().isEmpty() )
         {
@@ -159,41 +188,30 @@ public class DefaultSmsSender
             int maxChar = MAX_CHAR;
 
             Set<String> phoneNumbers = null;
+            phoneNumbers = SmsUtils.getRecipientsPhoneNumber( toSendList );
 
-            if ( transportService != null )
+            text = SmsUtils.createMessage( subject, text, sender );
+
+            // Bulk is limited in sending long SMS, need to cut into small
+            // pieces
+            // Check if text contain any specific unicode character
+            for ( char each : text.toCharArray() )
             {
-                phoneNumbers = SmsUtils.getRecipientsPhoneNumber( toSendList );
-
-                text = SmsUtils.createMessage( subject, text, sender );
-
-                // Bulk is limited in sending long SMS, need to cut into small
-                // pieces
-                // Check if text contain any specific unicode character
-                for ( char each : text.toCharArray() )
+                if ( !Character.UnicodeBlock.of( each ).equals( UnicodeBlock.BASIC_LATIN ) )
                 {
-                    if ( !Character.UnicodeBlock.of( each ).equals( UnicodeBlock.BASIC_LATIN ) )
-                    {
-                        maxChar = 40;
-                        break;
-                    }
+                    maxChar = 40;
+                    break;
                 }
-                if ( text.length() > maxChar )
-                {
-                    List<String> splitTextList = new ArrayList<>();
-                    splitTextList = SmsUtils.splitLongUnicodeString( text, splitTextList );
-                    for ( String each : splitTextList )
-                    {
-                        if ( !phoneNumbers.isEmpty() && phoneNumbers.size() > 0 )
-                        {
-                            message = sendMessage( each, phoneNumbers, gatewayId );
-                        }
-                    }
-                }
-                else
+            }
+            if ( text.length() > maxChar )
+            {
+                List<String> splitTextList = new ArrayList<>();
+                splitTextList = SmsUtils.splitLongUnicodeString( text, splitTextList );
+                for ( String each : splitTextList )
                 {
                     if ( !phoneNumbers.isEmpty() && phoneNumbers.size() > 0 )
                     {
-                        message = sendMessage( text, phoneNumbers, gatewayId );
+                        message = sendMessage( each, phoneNumbers, gatewayId );
                     }
                 }
             }
@@ -204,7 +222,6 @@ public class DefaultSmsSender
                     message = sendMessage( text, phoneNumbers, gatewayId );
                 }
             }
-
         }
 
         return message;
@@ -228,7 +245,7 @@ public class DefaultSmsSender
         catch ( SmsServiceException e )
         {
             message = "Unable to send message through sms: " + sms + e.getCause().getMessage();
-            log.warn( "Unable to send message through sms: " + sms, e );
+            log.warn( "Message failed: " + sms, e );
         }
 
         return message;

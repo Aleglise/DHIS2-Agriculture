@@ -557,18 +557,56 @@ public class BaseIdentifiableObject
 
         return map;
     }
+    
+    /**
+     * Returns the value of the property referred to by the given IdScheme.
+     * 
+     * @param idScheme the IdScheme.
+     * @return the value of the property referred to by the IdScheme.
+     */
+    public String getPropertyValue( IdScheme idScheme )
+    {
+        if ( idScheme.isNull() || idScheme.is( IdentifiableProperty.UID ) )
+        {
+            return uid;
+        }
+        else if ( idScheme.is( IdentifiableProperty.CODE ) )
+        {
+            return code;
+        }
+        else if ( idScheme.is( IdentifiableProperty.NAME ) )
+        {
+            return name;
+        }
+        else if ( idScheme.is( IdentifiableProperty.ID ) )
+        {
+            return id > 0 ? String.valueOf( id ) : null;
+        }
+        else if ( idScheme.is( IdentifiableProperty.ATTRIBUTE ) )
+        {
+            for ( AttributeValue attributeValue : attributeValues )
+            {
+                if ( idScheme.getAttribute().equals( attributeValue.getAttribute().getUid() ) )
+                {
+                    return attributeValue.getValue();
+                }
+            }
+        }
+        
+        return null;
+    }
 
     @Override
     public String toString()
     {
         return "{" +
             "\"class\":\"" + getClass() + "\", " +
-            "\"id\":\"" + id + "\", " +
-            "\"uid\":\"" + uid + "\", " +
-            "\"code\":\"" + code + "\", " +
-            "\"name\":\"" + name + "\", " +
-            "\"created\":\"" + created + "\", " +
-            "\"lastUpdated\":\"" + lastUpdated + "\" " +
+            "\"id\":\"" + getId() + "\", " +
+            "\"uid\":\"" + getUid() + "\", " +
+            "\"code\":\"" + getCode() + "\", " +
+            "\"name\":\"" + getName() + "\", " +
+            "\"created\":\"" + getCreated() + "\", " +
+            "\"lastUpdated\":\"" + getLastUpdated() + "\" " +
             "}";
     }
 

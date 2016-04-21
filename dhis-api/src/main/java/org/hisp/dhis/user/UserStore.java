@@ -55,4 +55,10 @@ public interface UserStore
      * @return number of users.
      */
     int getUserCount( UserQueryParams params );
+
+    /**
+     * Returns number of all users
+     * @return number of users
+     */
+    int getUserCount();
 }

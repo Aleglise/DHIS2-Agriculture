@@ -7,26 +7,27 @@ function performMaintenance() {
   var createSqlViews = $("#createSqlViews").is(":checked");
   var updateCategoryOptionCombos = $("#updateCategoryOptionCombos").is(":checked");
   var updateOrganisationUnitPaths = $("#updateOrganisationUnitPaths").is(":checked");
+  var clearApplicationCache = $("#clearApplicationCache").is(":checked");
 
-  if( clearAnalytics || zeroValues || 
-    prunePeriods || removeExpiredInvitations || dropSqlViews || createSqlViews || updateCategoryOptionCombos || updateOrganisationUnitPaths ) {
+  if( clearAnalytics || zeroValues || prunePeriods || removeExpiredInvitations || 
+    dropSqlViews || createSqlViews || updateCategoryOptionCombos || updateOrganisationUnitPaths || clearApplicationCache ) {
 
     setHeaderWaitMessage(i18n_performing_maintenance);
 
-    var params = "clearAnalytics=" + clearAnalytics +
-      "&zeroValues=" + zeroValues +
-      "&prunePeriods=" + prunePeriods +
-      "&removeExpiredInvitations=" + removeExpiredInvitations +
-      "&dropSqlViews=" + dropSqlViews +
-      "&createSqlViews=" + createSqlViews +
-      "&updateCategoryOptionCombos=" + updateCategoryOptionCombos +
-      "&updateOrganisationUnitPaths=" + updateOrganisationUnitPaths;
+    var params = "analyticsTableClear=" + clearAnalytics +
+      "&zeroDataValueRemoval=" + zeroValues +
+      "&periodPruning=" + prunePeriods +
+      "&expiredInvitationsClear=" + removeExpiredInvitations +
+      "&sqlViewsDrop=" + dropSqlViews +
+      "&sqlViewsCreate=" + createSqlViews +
+      "&categoryOptionComboUpdate=" + updateCategoryOptionCombos +
+      "&ouPathsUpdate=" + updateOrganisationUnitPaths +
+      "&cacheClear=" + clearApplicationCache;
 
     $.ajax({
-      type: "POST",
-      url: "performMaintenance.action",
+      type: "post",
+      url: "../api/maintenance",
       data: params,
-      dataType: "xml",
       success: function(result) {
         setHeaderDelayMessage(i18n_maintenance_performed);
       }

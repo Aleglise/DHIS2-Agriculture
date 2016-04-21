@@ -30,6 +30,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/**
+ * @author Zubair <rajazubair.asghar@gmail.com>
+ */
 public class ClickatellGatewayConfig
     extends SmsGatewayConfig
 {

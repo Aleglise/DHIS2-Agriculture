@@ -36,6 +36,7 @@ import com.google.common.collect.Lists;
 import org.hisp.dhis.common.DataDimensionItemType;
 import org.hisp.dhis.common.DimensionalItemObject;
 import org.hisp.dhis.dataelement.DataElement;
+import org.hisp.dhis.dataelement.DataElementCategoryCombo;
 import org.hisp.dhis.program.Program;
 import org.hisp.dhis.program.ProgramDataElement;
 import org.hisp.dhis.program.ProgramIndicator;
@@ -49,22 +50,23 @@ import java.util.Map;
 /**
  * @author Lars Helge Overland
  */
-public class AnalyticsUtilsTest extends DhisSpringTest
+public class AnalyticsUtilsTest 
+    extends DhisSpringTest
 {
     @Test
     public void testGetByDataDimensionType()
     {
         Program prA = createProgram( 'A' );
         
-        DataElement deA = createDataElement( 'A' );
-        DataElement deB = createDataElement( 'B' );
+        DataElement deA = createDataElement( 'A', new DataElementCategoryCombo() );
+        DataElement deB = createDataElement( 'B', new DataElementCategoryCombo() );
         ProgramDataElement pdeA = new ProgramDataElement( prA, deA );
         ProgramDataElement pdeB = new ProgramDataElement( prA, deB );
         ProgramIndicator piA = createProgramIndicator( 'A', prA, null, null );
         
         List<DimensionalItemObject> list = Lists.newArrayList( deA, deB, pdeA, pdeB, piA );
         
-        assertEquals( Lists.newArrayList( deA, deB ), AnalyticsUtils.getByDataDimensionType( DataDimensionItemType.AGGREGATE_DATA_ELEMENT, list ) );
+        assertEquals( Lists.newArrayList( deA, deB ), AnalyticsUtils.getByDataDimensionType( DataDimensionItemType.DATA_ELEMENT, list ) );
         assertEquals( Lists.newArrayList( pdeA, pdeB ), AnalyticsUtils.getByDataDimensionType( DataDimensionItemType.PROGRAM_DATA_ELEMENT, list ) );
         assertEquals( Lists.newArrayList( piA ), AnalyticsUtils.getByDataDimensionType( DataDimensionItemType.PROGRAM_INDICATOR, list ) );
         assertEquals( Lists.newArrayList(), AnalyticsUtils.getByDataDimensionType( DataDimensionItemType.PROGRAM_ATTRIBUTE, list ) );

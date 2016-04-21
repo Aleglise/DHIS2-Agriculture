@@ -36,6 +36,7 @@ import org.hisp.dhis.dataelement.DataElement;
 import org.hisp.dhis.dataelement.DataElementCategoryCombo;
 import org.hisp.dhis.dataelement.DataElementOperand;
 import org.hisp.dhis.indicator.Indicator;
+import org.hisp.dhis.legend.LegendSet;
 import org.hisp.dhis.organisationunit.OrganisationUnit;
 import org.hisp.dhis.system.deletion.DeletionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -117,6 +118,21 @@ public class DataSetDeletionHandler
         {
             dataSet.getSections().remove( section );
             idObjectManager.updateNoAcl( dataSet );
+        }
+    }
+    
+    @Override
+    public void deleteLegendSet( LegendSet legendSet )
+    {
+        Collection<DataSet> dataSets = idObjectManager.getAllNoAcl( DataSet.class );
+        
+        for ( DataSet dataSet : dataSets )
+        {
+            if ( legendSet.equals( dataSet.getLegendSet() ) )
+            {
+                dataSet.setLegendSet( null );
+                idObjectManager.updateNoAcl( dataSet );
+            }
         }
     }
     

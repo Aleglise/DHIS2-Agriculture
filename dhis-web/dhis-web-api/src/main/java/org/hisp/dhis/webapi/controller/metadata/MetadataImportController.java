@@ -28,6 +28,7 @@ package org.hisp.dhis.webapi.controller.metadata;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import org.hisp.dhis.commons.util.StreamUtils;
 import org.hisp.dhis.dxf2.metadata2.MetadataImportParams;
 import org.hisp.dhis.dxf2.metadata2.MetadataImportService;
 import org.hisp.dhis.dxf2.metadata2.feedback.ImportReport;
@@ -36,6 +37,7 @@ import org.hisp.dhis.render.RenderService;
 import org.hisp.dhis.webapi.service.ContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -48,7 +50,7 @@ import java.io.IOException;
  * @author Morten Olav Hansen <mortenoh@gmail.com>
  */
 @Controller
-@RequestMapping( "/metadata/import" )
+@RequestMapping( "/23/metadata" )
 public class MetadataImportController
 {
     @Autowired
@@ -60,11 +62,12 @@ public class MetadataImportController
     @Autowired
     private RenderService renderService;
 
+    @PreAuthorize( "hasRole('ALL')" )
     @RequestMapping( value = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE )
     public void postMetadata( HttpServletRequest request, HttpServletResponse response ) throws IOException
     {
         MetadataImportParams params = metadataImportService.getParamsFromMap( contextService.getParameterValuesMap() );
-        params.setObjects( renderService.fromMetadata( request.getInputStream(), RenderFormat.JSON ) );
+        params.setObjects( renderService.fromMetadata( StreamUtils.wrapAndCheckCompressionFormat( request.getInputStream() ), RenderFormat.JSON ) );
 
         ImportReport importReport = metadataImportService.importMetadata( params );
         renderService.toJson( response.getOutputStream(), importReport );

@@ -37,6 +37,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 import org.hisp.dhis.common.BaseDimensionalItemObject;
 import org.hisp.dhis.common.BaseIdentifiableObject;
+import org.hisp.dhis.common.DimensionItemType;
 import org.hisp.dhis.common.DxfNamespaces;
 import org.hisp.dhis.common.IdentifiableObject;
 import org.hisp.dhis.common.MergeMode;
@@ -122,6 +123,16 @@ public class OrganisationUnitGroup
         return symbol != null && !symbol.trim().isEmpty();
     }
 
+    // -------------------------------------------------------------------------
+    // DimensionalItemObject
+    // -------------------------------------------------------------------------
+
+    @Override
+    public DimensionItemType getDimensionItemType()
+    {
+        return DimensionItemType.ORGANISATION_UNIT_GROUP;
+    }
+    
     // -------------------------------------------------------------------------
     // Getters and setters
     // -------------------------------------------------------------------------

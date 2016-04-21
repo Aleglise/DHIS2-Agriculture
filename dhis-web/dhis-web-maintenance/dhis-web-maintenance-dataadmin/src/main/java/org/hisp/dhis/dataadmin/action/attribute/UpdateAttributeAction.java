@@ -231,41 +231,24 @@ public class UpdateAttributeAction
     {
         this.optionSetAttribute = optionSetAttribute;
     }
-    
-    private boolean projectAttribute;
 
-    public void setProjectAttribute( boolean projectAttribute )
-    {
-        this.projectAttribute = projectAttribute;
-    }
-
-    private boolean resultsFrameworkAttribute;
-    
-    public void setResultsFrameworkAttribute( boolean resultsFrameworkAttribute )
-    {
-        this.resultsFrameworkAttribute = resultsFrameworkAttribute;
-    }
-    
-    private boolean programmAttribute;
-    
-    public void setProgrammAttribute( boolean programmAttribute )
-    {
-        this.programmAttribute = programmAttribute;
-    }
-    
-    private boolean subProgrammAttribute;
-    
-    public void setSubProgrammAttribute( boolean subProgrammAttribute )
-    {
-        this.subProgrammAttribute = subProgrammAttribute;
-    }
-    
     private String optionSetUid;
 
     public void setOptionSetUid( String optionSetUid )
     {
         this.optionSetUid = optionSetUid;
     }
+
+    private boolean constantAttribute;
+
+    public void setConstantAttribute( boolean constantAttribute )
+    {
+        this.constantAttribute = constantAttribute;
+    }
+
+    private boolean legendSetAttribute;
+
+    public void setLegendSetAttribute( boolean legendSetAttribute ) { this.legendSetAttribute = legendSetAttribute; }
 
     // -------------------------------------------------------------------------
     // Action implementation
@@ -306,10 +289,9 @@ public class UpdateAttributeAction
             attribute.setDocumentAttribute( documentAttribute );
             attribute.setOptionAttribute( optionAttribute );
             attribute.setOptionSetAttribute( optionSetAttribute );
-            attribute.setProjectAttribute( projectAttribute );
-            attribute.setResultsFrameworkAttribute( resultsFrameworkAttribute );
-            attribute.setProgrammAttribute( programmAttribute );
-            attribute.setSubProgrammAttribute( subProgrammAttribute );
+            attribute.setConstantAttribute( constantAttribute );
+            attribute.setLegendSetAttribute( legendSetAttribute );
+
 
             attributeService.updateAttribute( attribute );
 

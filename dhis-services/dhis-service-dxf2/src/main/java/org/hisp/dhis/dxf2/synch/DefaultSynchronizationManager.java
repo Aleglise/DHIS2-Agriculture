@@ -214,15 +214,15 @@ public class DefaultSynchronizationManager
 
         log.info( "Remote server POST URL: " + url );
 
+        final String username = (String) systemSettingManager.getSystemSetting( SettingKey.REMOTE_INSTANCE_USERNAME );
+        final String password = (String) systemSettingManager.getSystemSetting( SettingKey.REMOTE_INSTANCE_PASSWORD );
+        
         final RequestCallback requestCallback = new RequestCallback()
         {
             @Override
             public void doWithRequest( ClientHttpRequest request )
                 throws IOException
-            {
-                String username = (String) systemSettingManager.getSystemSetting( SettingKey.REMOTE_INSTANCE_USERNAME );
-                String password = (String) systemSettingManager.getSystemSetting( SettingKey.REMOTE_INSTANCE_PASSWORD );
-                
+            {   
                 request.getHeaders().setContentType( MediaType.APPLICATION_JSON );
                 request.getHeaders().add( HEADER_AUTHORIZATION, CodecUtils.getBasicAuthString( username, password ) );
 

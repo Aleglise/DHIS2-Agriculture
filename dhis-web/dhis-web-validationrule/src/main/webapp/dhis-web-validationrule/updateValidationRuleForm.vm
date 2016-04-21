@@ -75,6 +75,10 @@
 		<td><label for="annualSampleCount">$i18n.getString( "annual_sample_count" )</label></td>
 		<td><input type="text" id="annualSampleCount" name="annualSampleCount" value="$!validationRule.annualSampleCount"></td>
 	</tr>
+	<tr id="sequentialSkipCountTR">
+		<td><label for="sequentialSkipCount">$i18n.getString( "sequential_skip_count" )</label></td>
+		<td><input type="text" id="sequentialSkipCount" name="sequentialSkipCount" value="$!validationRule.sequentialSkipCount"></td>
+	</tr>
 	<tr>
 		<td><label for="operatorId">$i18n.getString( "operator" ) <em title="$i18n.getString( "required" )" class="required">*</em></label></td>
 		<td>

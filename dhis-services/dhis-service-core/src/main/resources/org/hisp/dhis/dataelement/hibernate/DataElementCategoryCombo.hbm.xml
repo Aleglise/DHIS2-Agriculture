@@ -32,7 +32,7 @@
         foreign-key="fk_categorycombo_categoryoptioncomboid" unique="true" />
     </set>
     
-    <property name="dataDimensionType" column="datadimensiontype" type="org.hisp.dhis.common.DataDimensionTypeUserType" />
+    <property name="dataDimensionType" column="datadimensiontype" type="org.hisp.dhis.common.DataDimensionTypeUserType" not-null="true" />
 
     <property name="skipTotal" column="skiptotal" />
     

@@ -34,12 +34,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hisp.dhis.commons.timer.SystemTimer;
-import org.hisp.dhis.commons.timer.Timer;
 import org.hisp.dhis.dxf2.common.ImportOptions;
 import org.hisp.dhis.dxf2.importsummary.ImportSummaries;
 import org.hisp.dhis.scheduling.TaskId;
 import org.hisp.dhis.system.notification.NotificationLevel;
+import org.hisp.dhis.system.util.Clock;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StreamUtils;
 import org.springframework.util.StringUtils;
@@ -148,7 +147,7 @@ public class JacksonEventService extends AbstractEventService
             Events fromXml = fromXml( input, Events.class );
             events.addAll( fromXml.getEvents() );
         }
-        catch ( Exception ex )
+        catch ( JsonMappingException ex )
         {
             Event fromXml = fromXml( input, Event.class );
             events.add( fromXml );
@@ -174,10 +173,11 @@ public class JacksonEventService extends AbstractEventService
             Events fromJson = fromJson( input, Events.class );
             events.addAll( fromJson.getEvents() );
         }
-        catch ( Exception ex )
+        catch ( JsonMappingException ex )
         {
             Event fromJson = fromJson( input, Event.class );
             events.add( fromJson );
+            importOptions.setSendNotifications( true );
         }
 
         return addEvents( events, taskId, importOptions );
@@ -188,7 +188,7 @@ public class JacksonEventService extends AbstractEventService
         ImportSummaries importSummaries = new ImportSummaries();
 
         notifier.clear( taskId ).notify( taskId, "Importing events" );
-        Timer timer = new SystemTimer().start();
+        Clock clock = new Clock( log ).startClock();
 
         List<Event> create = new ArrayList<>();
         List<Event> update = new ArrayList<>();
@@ -234,12 +234,12 @@ public class JacksonEventService extends AbstractEventService
 
         if ( taskId != null )
         {
-            notifier.notify( taskId, NotificationLevel.INFO, "Import done. Completed in " + timer.toString() + ".", true ).
+            notifier.notify( taskId, NotificationLevel.INFO, "Import done. Completed in " + clock.time() + ".", true ).
                 addTaskSummary( taskId, importSummaries );
         }
         else
         {
-            log.info( "Import done. Completed in " + timer.toString() + "." );
+            clock.logTime( "Import done" );
         }
 
         return importSummaries;

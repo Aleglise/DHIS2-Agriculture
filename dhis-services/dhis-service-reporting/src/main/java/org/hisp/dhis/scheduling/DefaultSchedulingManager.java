@@ -34,14 +34,15 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hisp.dhis.common.ListMap;
+import org.hisp.dhis.datastatistics.DataStatisticsTask;
 import org.hisp.dhis.fileresource.FileResourceCleanUpTask;
 import org.hisp.dhis.setting.SettingKey;
 import org.hisp.dhis.setting.SystemSettingManager;
 import org.hisp.dhis.system.scheduling.ScheduledTaskStatus;
 import org.hisp.dhis.system.scheduling.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 
 /**
  * Cron refers to the cron expression used for scheduling. Key refers to the key
@@ -50,7 +51,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
  * @author Lars Helge Overland
  */
 public class DefaultSchedulingManager
-    implements ApplicationListener<ContextRefreshedEvent>, SchedulingManager
+    implements SchedulingManager
 {
     // -------------------------------------------------------------------------
     // Dependencies
@@ -80,14 +81,17 @@ public class DefaultSchedulingManager
     @Autowired
     private FileResourceCleanUpTask fileResourceCleanUpTask;
     
+    @Autowired
+    private DataStatisticsTask dataStatisticsTask;
+    
     // TODO Avoid map, use bean identifier directly and get bean from context
 
     // -------------------------------------------------------------------------
     // SchedulingManager implementation
     // -------------------------------------------------------------------------
 
-    @Override
-    public void onApplicationEvent( ContextRefreshedEvent contextRefreshedEvent )
+    @EventListener
+    public void handleContextRefresh( ContextRefreshedEvent contextRefreshedEvent )
     {
         scheduleTasks();
         scheduleFixedTasks();
@@ -109,9 +113,14 @@ public class DefaultSchedulingManager
         }
     }
     
+    /**
+     * Schedules fixed tasks, i.e. tasks which are required for various system
+     * functions to work.
+     */
     private void scheduleFixedTasks()
     {
         scheduler.scheduleTask( FileResourceCleanUpTask.KEY_TASK, fileResourceCleanUpTask, Scheduler.CRON_DAILY_2AM );
+        scheduler.scheduleTask( DataStatisticsTask.KEY_TASK, dataStatisticsTask, Scheduler.CRON_DAILY_2AM );
     }
     
     @Override

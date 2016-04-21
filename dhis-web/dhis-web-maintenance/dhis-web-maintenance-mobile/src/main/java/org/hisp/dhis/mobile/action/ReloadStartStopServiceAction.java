@@ -31,7 +31,6 @@ package org.hisp.dhis.mobile.action;
 import org.hisp.dhis.i18n.I18n;
 import org.hisp.dhis.sms.config.SmsConfigurationManager;
 import org.hisp.dhis.sms.incoming.SmsConsumerService;
-import org.hisp.dhis.sms.outbound.OutboundSmsTransportService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.opensymphony.xwork2.Action;
@@ -40,7 +39,6 @@ import com.opensymphony.xwork2.Action;
  * @author Dang Duy Hieu
  * @version $Id$
  */
-
 public class ReloadStartStopServiceAction
     implements Action
 {

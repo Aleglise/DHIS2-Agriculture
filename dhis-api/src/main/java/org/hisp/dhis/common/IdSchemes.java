@@ -40,6 +40,8 @@ public class IdSchemes
     private IdScheme dataElementIdScheme = IdScheme.UID;
 
     private IdScheme categoryOptionComboIdScheme = IdScheme.UID;
+    
+    private IdScheme categoryOptionIdScheme = IdScheme.UID;
 
     private IdScheme orgUnitIdScheme = IdScheme.UID;
 
@@ -90,6 +92,17 @@ public class IdSchemes
     public IdSchemes setCategoryOptionComboIdScheme( String idScheme )
     {
         this.categoryOptionComboIdScheme = IdScheme.from( idScheme );
+        return this;
+    }
+
+    public IdScheme getCategoryOptionIdScheme()
+    {
+        return getScheme( categoryOptionIdScheme );
+    }
+
+    public IdSchemes setCategoryOptionIdScheme( String idScheme )
+    {
+        this.categoryOptionIdScheme = IdScheme.from( idScheme );
         return this;
     }
 
@@ -191,6 +204,7 @@ public class IdSchemes
             .add( "idScheme", idScheme )
             .add( "dataElementIdScheme", dataElementIdScheme )
             .add( "categoryOptionComboIdScheme", categoryOptionComboIdScheme )
+            .add( "categoryOptionIdScheme", categoryOptionIdScheme )
             .add( "orgUnitIdScheme", orgUnitIdScheme )
             .add( "programIdScheme", programIdScheme )
             .add( "programStageIdScheme", programStageIdScheme )

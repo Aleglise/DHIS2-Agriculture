@@ -31,19 +31,26 @@ package org.hisp.dhis.preheat;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.hisp.dhis.DhisSpringTest;
+import org.hisp.dhis.attribute.Attribute;
+import org.hisp.dhis.attribute.AttributeService;
+import org.hisp.dhis.attribute.AttributeValue;
 import org.hisp.dhis.common.IdentifiableObject;
 import org.hisp.dhis.common.IdentifiableObjectManager;
+import org.hisp.dhis.common.ValueType;
 import org.hisp.dhis.dataelement.DataElement;
 import org.hisp.dhis.dataelement.DataElementCategoryCombo;
 import org.hisp.dhis.dataelement.DataElementGroup;
 import org.hisp.dhis.legend.LegendSet;
 import org.hisp.dhis.option.OptionSet;
+import org.hisp.dhis.render.RenderFormat;
 import org.hisp.dhis.render.RenderService;
 import org.hisp.dhis.user.User;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +72,9 @@ public class PreheatServiceTest
 
     @Autowired
     private RenderService _renderService;
+
+    @Autowired
+    private AttributeService attributeService;
 
     @Override
     protected void setUpTest() throws Exception
@@ -566,11 +576,71 @@ public class PreheatServiceTest
         assertEquals( "UserCodeA", dataElementGroup.getUser().getCode() );
     }
 
+    /**
+     * Fails with:
+     * java.lang.ClassCastException: java.util.HashMap cannot be cast to java.util.Set
+        at org.hisp.dhis.preheat.PreheatServiceTest.testPreheatWithAttributeValues(PreheatServiceTest.java:597)
+     * @throws IOException
+     */
+    @Ignore
+    @Test
+    public void testPreheatWithAttributeValues() throws IOException
+    {
+        defaultSetupWithAttributes();
+
+        Map<Class<? extends IdentifiableObject>, List<IdentifiableObject>> metadata = renderService.fromMetadata(
+            new ClassPathResource( "preheat/dataset_with_sections.json" ).getInputStream(), RenderFormat.JSON );
+
+        PreheatParams params = new PreheatParams();
+        params.setPreheatIdentifier( PreheatIdentifier.AUTO );
+        params.setPreheatMode( PreheatMode.REFERENCE );
+        params.setObjects( metadata );
+
+        preheatService.validate( params );
+        Preheat preheat = preheatService.preheat( params );
+
+        assertEquals( 1, preheat.getUniqueAttributeValues().get( DataElement.class ).size() );
+        List<String> keys = new ArrayList<>( preheat.getUniqueAttributeValues().get( DataElement.class ).keySet() );
+        assertEquals( 3, preheat.getUniqueAttributeValues().get( DataElement.class ).get( keys.get( 0 ) ).size() );
+
+        assertFalse( preheat.getMandatoryAttributes().isEmpty() );
+        assertEquals( 1, preheat.getMandatoryAttributes().get( DataElement.class ).size() );
+    }
+
     private void defaultSetup()
     {
         DataElement de1 = createDataElement( 'A' );
         DataElement de2 = createDataElement( 'B' );
         DataElement de3 = createDataElement( 'C' );
+
+        manager.save( de1 );
+        manager.save( de2 );
+        manager.save( de3 );
+
+        User user = createUser( 'A' );
+        manager.save( user );
+    }
+
+    private void defaultSetupWithAttributes()
+    {
+        Attribute attribute = new Attribute( "AttributeA", ValueType.TEXT );
+        attribute.setUnique( true );
+        attribute.setMandatory( true );
+        attribute.setDataElementAttribute( true );
+
+        manager.save( attribute );
+
+        AttributeValue attributeValue1 = new AttributeValue( "Value1", attribute );
+        AttributeValue attributeValue2 = new AttributeValue( "Value2", attribute );
+        AttributeValue attributeValue3 = new AttributeValue( "Value3", attribute );
+
+        DataElement de1 = createDataElement( 'A' );
+        DataElement de2 = createDataElement( 'B' );
+        DataElement de3 = createDataElement( 'C' );
+
+        attributeService.addAttributeValue( de1, attributeValue1 );
+        attributeService.addAttributeValue( de2, attributeValue2 );
+        attributeService.addAttributeValue( de3, attributeValue3 );
 
         manager.save( de1 );
         manager.save( de2 );

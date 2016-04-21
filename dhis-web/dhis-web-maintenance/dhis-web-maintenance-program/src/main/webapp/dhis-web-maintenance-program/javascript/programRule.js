@@ -429,18 +429,30 @@ $( document ).ajaxStop(function() {
 function sourceTypeOnChange()
 {
 	var sourceType = getFieldValue("sourceType");
-	if( sourceType == "DATAELEMENT_NEWEST_EVENT_PROGRAM" ){
+	if( sourceType === "DATAELEMENT_NEWEST_EVENT_PROGRAM" ){
 		setFieldValue( "programStageId", "" );
 		disable("programStageId");
 		$("[name='deSourceType']").show();
 		$("[name='teiAttrSourceType']").hide();		
 	}
-	else if( sourceType == "DATAELEMENT_NEWEST_EVENT_PROGRAM_STAGE" ){
+	else if( sourceType === "DATAELEMENT_NEWEST_EVENT_PROGRAM_STAGE" ){
 		enable("programStageId");
 		$("[name='deSourceType']").show();
 		$("[name='teiAttrSourceType']").hide();	
 	}
-	else if( sourceType == "TEI_ATTRIBUTE" ){
+        else if( sourceType === "DATAELEMENT_CURRENT_EVENT" ){
+		setFieldValue( "programStageId", "" );
+		disable("programStageId");
+		$("[name='deSourceType']").show();
+		$("[name='teiAttrSourceType']").hide();		
+	}
+        else if( sourceType === "DATAELEMENT_PREVIOUS_EVENT" ){
+		setFieldValue( "programStageId", "" );
+		disable("programStageId");
+		$("[name='deSourceType']").show();
+		$("[name='teiAttrSourceType']").hide();		
+	}
+	else if( sourceType === "TEI_ATTRIBUTE" ){
 		setFieldValue( "programStageId", "" );
 		disable("programStageId");
 		$("[name='deSourceType']").hide();

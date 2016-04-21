@@ -37,6 +37,7 @@ import org.hisp.dhis.dataset.DataSet;
 import org.hisp.dhis.indicator.Indicator;
 import org.hisp.dhis.organisationunit.OrganisationUnit;
 import org.hisp.dhis.period.Period;
+import org.hisp.dhis.program.ProgramIndicator;
 import org.hisp.dhis.system.deletion.DeletionHandler;
 
 /**
@@ -63,6 +64,12 @@ public abstract class GenericAnalyticalObjectDeletionHandler<T extends Analytica
     public void deleteDataSet( DataSet dataSet )
     {
         removeItem( getAnalyticalObjectService().getAnalyticalObjects( dataSet ), dataSet, ( ao, di ) -> ao.removeDataDimensionItem( di ) );
+    }
+    
+    @Override
+    public void deleteProgramIndicator( ProgramIndicator programIndicator )
+    {
+        removeItem( getAnalyticalObjectService().getAnalyticalObjects( programIndicator ), programIndicator, ( ao, di ) -> ao.removeDataDimensionItem( di ) );
     }
 
     @Override

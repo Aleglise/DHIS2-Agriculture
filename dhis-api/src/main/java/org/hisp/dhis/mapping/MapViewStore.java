@@ -1,5 +1,7 @@
 package org.hisp.dhis.mapping;
 
+import java.util.List;
+
 /*
  * Copyright (c) 2004-2016, University of Oslo
  * All rights reserved.
@@ -29,6 +31,7 @@ package org.hisp.dhis.mapping;
  */
 
 import org.hisp.dhis.common.AnalyticalObjectStore;
+import org.hisp.dhis.organisationunit.OrganisationUnitGroupSet;
 
 /**
  * @author Morten Olav Hansen <mortenoh@gmail.com>
@@ -36,4 +39,5 @@ import org.hisp.dhis.common.AnalyticalObjectStore;
 public interface MapViewStore
     extends AnalyticalObjectStore<MapView>
 {
+    List<MapView> getByOrganisationUnitGroupSet( OrganisationUnitGroupSet groupSet );
 }

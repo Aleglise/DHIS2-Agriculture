@@ -228,6 +228,7 @@
       "userGroupAccesses": [ ],
       "lastUpdated": "2016-03-08T07:29:15.719+0000",
       "name": "Gender",
+      "dataDimensionType": "DISAGGREGATION",
       "categories": [
         {
           "id": "XJGLlMAMCcn"
@@ -316,6 +317,7 @@
       ],
       "userGroupAccesses": [ ],
       "dataDimension": true,
+      "dataDimensionType": "DISAGGREGATION",
       "user": {
         "id": "T12jeH7KPzk"
       },

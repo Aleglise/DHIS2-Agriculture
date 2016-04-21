@@ -44,6 +44,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Morten Olav Hansen <mortenoh@gmail.com>
@@ -64,6 +65,12 @@ public class Preheat
 
     private Map<String, PeriodType> periodTypeMap = new HashMap<>();
 
+    private Map<Class<? extends IdentifiableObject>, Set<String>> mandatoryAttributes = new HashMap<>();
+
+    private Map<Class<? extends IdentifiableObject>, Set<String>> uniqueAttributes = new HashMap<>();
+
+    private Map<Class<? extends IdentifiableObject>, Map<String, Map<String, String>>> uniqueAttributeValues = new HashMap<>();
+
     public Preheat()
     {
     }
@@ -71,6 +78,11 @@ public class Preheat
     public User getUser()
     {
         return user;
+    }
+
+    public String getUsername()
+    {
+        return user != null ? user.getUsername() : "system-process";
     }
 
     public void setUser( User user )
@@ -427,5 +439,35 @@ public class Preheat
     public void setPeriodTypeMap( Map<String, PeriodType> periodTypeMap )
     {
         this.periodTypeMap = periodTypeMap;
+    }
+
+    public Map<Class<? extends IdentifiableObject>, Set<String>> getMandatoryAttributes()
+    {
+        return mandatoryAttributes;
+    }
+
+    public void setMandatoryAttributes( Map<Class<? extends IdentifiableObject>, Set<String>> mandatoryAttributes )
+    {
+        this.mandatoryAttributes = mandatoryAttributes;
+    }
+
+    public Map<Class<? extends IdentifiableObject>, Set<String>> getUniqueAttributes()
+    {
+        return uniqueAttributes;
+    }
+
+    public void setUniqueAttributes( Map<Class<? extends IdentifiableObject>, Set<String>> uniqueAttributes )
+    {
+        this.uniqueAttributes = uniqueAttributes;
+    }
+
+    public Map<Class<? extends IdentifiableObject>, Map<String, Map<String, String>>> getUniqueAttributeValues()
+    {
+        return uniqueAttributeValues;
+    }
+
+    public void setUniqueAttributeValues( Map<Class<? extends IdentifiableObject>, Map<String, Map<String, String>>> uniqueAttributeValues )
+    {
+        this.uniqueAttributeValues = uniqueAttributeValues;
     }
 }

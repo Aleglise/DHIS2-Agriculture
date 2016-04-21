@@ -4,6 +4,23 @@
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
     http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.1.xsd">
 
+  <!-- DataStatistics -->
+
+  <bean id="org.hisp.dhis.datastatistics.DataStatisticsEventStore" class="org.hisp.dhis.datastatistics.hibernate.HibernateDataStatisticsEventStore">
+    <property name="clazz" value="org.hisp.dhis.datastatistics.DataStatisticsEvent" />
+    <property name="sessionFactory" ref="sessionFactory" />
+  </bean>
+
+  <bean id="org.hisp.dhis.datastatistics.DataStatisticsService" class="org.hisp.dhis.datastatistics.DefaultDataStatisticsService">
+  </bean>
+
+  <bean id="org.hisp.dhis.datastatistics.DataStatisticsStore" class="org.hisp.dhis.datastatistics.hibernate.HibernateDataStatisticsStore">
+    <property name="clazz" value="org.hisp.dhis.datastatistics.DataStatistics"/>
+    <property name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+
+  <bean id="dataStatisticsTask" class="org.hisp.dhis.datastatistics.DataStatisticsTask" scope="prototype"/>
+
   <!-- ReportTable -->
 
   <bean id="org.hisp.dhis.reporttable.ReportTableService" class="org.hisp.dhis.reporttable.impl.DefaultReportTableService">
@@ -130,6 +147,7 @@
     <property name="scheduler" ref="scheduler" />
     <property name="tasks">
       <map>
+        <entry key="dataStatisticsTask" value-ref="dataStatisticsTask"/>
         <entry key="resourceTableTask" value-ref="resourceTableTask" />
         <entry key="resourceTable15MinTask" value-ref="resourceTable15MinTask" />
         <entry key="analyticsAllTask" value-ref="analyticsAllTask" />
@@ -170,18 +188,6 @@
     </property>
   </bean>
 
-  <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
-    <property name="targetObject" ref="org.hisp.dhis.system.startup.StartupRoutineExecutor" />
-    <property name="targetMethod" value="addStartupRoutines" />
-    <property name="arguments">
-      <list>
-        <list>
-          <ref bean="org.hisp.dhis.common.ReportingIdentityPopulator" />
-        </list>
-      </list>
-    </property>
-  </bean>
-
   <!-- DeletionHandler -->
 
   <bean id="org.hisp.dhis.report.ReportDeletionHandler" class="org.hisp.dhis.report.ReportDeletionHandler">
@@ -208,13 +214,11 @@
       <aop:before pointcut="execution( * org.hisp.dhis.report.ReportService.delete*(..) )" method="intercept" />
       <aop:before pointcut="execution( * org.hisp.dhis.chart.ChartService.delete*(..) )" method="intercept" />
       <aop:before pointcut="execution( * org.hisp.dhis.document.DocumentService.delete*(..) )" method="intercept" />
+      <aop:before pointcut="execution( * org.hisp.dhis.interpretation.InterpretationService.delete*(..) )" method="intercept" />
     </aop:aspect>
 
     <aop:aspect ref="statementInterceptor">
-      <aop:around pointcut="execution( * org.hisp.dhis.completeness.DataSetCompletenessService.exportDataSetCompleteness(..) )"
-        method="intercept" />
-      <aop:around pointcut="execution( * org.hisp.dhis.completeness.DataSetCompletenessService.getDataSetCompleteness(..) )"
-        method="intercept" />
+      <aop:around pointcut="execution( * org.hisp.dhis.completeness.DataSetCompletenessService.getDataSetCompleteness(..) )" method="intercept" />
     </aop:aspect>
 
   </aop:config>

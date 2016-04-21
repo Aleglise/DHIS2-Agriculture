@@ -34,6 +34,7 @@ import org.hisp.dhis.dataelement.CategoryOptionGroup;
 import org.hisp.dhis.dataelement.DataElement;
 import org.hisp.dhis.dataset.DataSet;
 import org.hisp.dhis.indicator.Indicator;
+import org.hisp.dhis.legend.LegendSet;
 import org.hisp.dhis.organisationunit.OrganisationUnit;
 import org.hisp.dhis.period.Period;
 import org.hisp.dhis.program.ProgramIndicator;
@@ -62,6 +63,8 @@ public interface AnalyticalObjectStore<T extends AnalyticalObject>
     List<T> getAnalyticalObjects( OrganisationUnit organisationUnit );
 
     List<T> getAnalyticalObjects( CategoryOptionGroup categoryOptionGroup );
+    
+    List<T> getAnalyticalObjects( LegendSet legendSet );
     
     int countAnalyticalObjects( Indicator indicator );
 

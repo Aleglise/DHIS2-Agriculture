@@ -32,12 +32,14 @@ function showValidationRuleDetails( context )
 			document.getElementById('organisationUnitLevelP').style.display = '';
 			document.getElementById('sequentialSampleCountP').style.display = '';
 			document.getElementById('annualSampleCountP').style.display = '';
+			document.getElementById('sequentialSkipCountP').style.display = '';
 		} 
 		else
 		{
 			document.getElementById('organisationUnitLevelP').style.display = 'none';
 			document.getElementById('sequentialSampleCountP').style.display = 'none';
 			document.getElementById('annualSampleCountP').style.display = 'none';
+			document.getElementById('sequentialSkipCountP').style.display = 'none';
 		}
 		
 		var leftSideDescription = json.validationRule.leftSideDescription;

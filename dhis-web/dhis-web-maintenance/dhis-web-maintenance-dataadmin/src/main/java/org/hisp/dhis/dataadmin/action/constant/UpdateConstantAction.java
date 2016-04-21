@@ -29,10 +29,13 @@ package org.hisp.dhis.dataadmin.action.constant;
  */
 
 import org.apache.commons.lang3.StringUtils;
+import org.hisp.dhis.attribute.AttributeService;
 import org.hisp.dhis.constant.Constant;
 import org.hisp.dhis.constant.ConstantService;
 
 import com.opensymphony.xwork2.Action;
+
+import java.util.List;
 
 /**
  * @author Dang Duy Hieu
@@ -46,6 +49,10 @@ public class UpdateConstantAction
     // -------------------------------------------------------------------------
 
     private ConstantService constantService;
+
+    public void setAttributeService( AttributeService attributeService ) { this.attributeService = attributeService; }
+
+    private AttributeService attributeService;
 
     public void setConstantService( ConstantService constantService )
     {
@@ -98,12 +105,19 @@ public class UpdateConstantAction
         this.value = value;
     }
 
+    private List<String> jsonAttributeValues;
+
+    public void setJsonAttributeValues( List<String> jsonAttributeValues )
+    {
+        this.jsonAttributeValues = jsonAttributeValues;
+    }
+
     // -------------------------------------------------------------------------
     // Action implementation
     // -------------------------------------------------------------------------
 
     @Override
-    public String execute()
+    public String execute() throws Exception
     {
         Constant constant = constantService.getConstant( id );
 
@@ -112,6 +126,11 @@ public class UpdateConstantAction
         constant.setCode( StringUtils.trimToNull( code ) );
         constant.setDescription( StringUtils.trimToNull( description ) );
         constant.setValue( Double.parseDouble( value ) );
+
+        if ( jsonAttributeValues != null )
+        {
+            attributeService.updateAttributeValues( constant, jsonAttributeValues );
+        }
 
         constantService.updateConstant( constant );
 

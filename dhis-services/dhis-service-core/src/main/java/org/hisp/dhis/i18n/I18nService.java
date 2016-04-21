@@ -77,9 +77,24 @@ public interface I18nService
     // Locale
     // -------------------------------------------------------------------------
 
+    /**
+     * Returns the currently selected database Locale.
+     * 
+     * @return a locale.
+     */
     Locale getCurrentLocale();
 
+    /**
+     * Indicates whether the currently selected Locale is the base Locale.
+     * 
+     * @return true if the currently selected Locale is the base Locale.
+     */
     boolean currentLocaleIsBase();
     
+    /**
+     * Returns all available database Locales.
+     * 
+     * @return all available database Locales.
+     */
     List<Locale> getAvailableLocales();
 }

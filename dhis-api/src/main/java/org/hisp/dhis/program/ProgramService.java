@@ -35,6 +35,7 @@ import java.util.regex.Pattern;
 
 import org.hisp.dhis.organisationunit.OrganisationUnit;
 import org.hisp.dhis.trackedentity.TrackedEntity;
+import org.hisp.dhis.user.User;
 
 /**
  * @author Abyot Asalefew
@@ -183,7 +184,9 @@ public interface ProgramService
      *
      * @return Immutable set of programs associated with the current user.
      */
-    Set<Program> getCurrentUserPrograms();
+    Set<Program> getUserPrograms();
+
+    Set<Program> getUserPrograms( User user );
 
     /**
      * Get {@link Program} by the current user and a certain type
@@ -193,7 +196,7 @@ public interface ProgramService
      *        Single event without registration.
      * @return Immutable set of programs associated with the current user.
      */
-    Set<Program> getCurrentUserPrograms( ProgramType programType );
+    Set<Program> getUserPrograms( ProgramType programType );
 
     /**
      * Sets the given merge organisation units on the given programs. Only 

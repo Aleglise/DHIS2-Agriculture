@@ -28,8 +28,6 @@ package org.hisp.dhis.mapgeneration;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import net.sf.json.JSONException;
-
 import org.geotools.geometry.jts.JTSFactoryFinder;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -80,7 +78,6 @@ public class GeoToolsPrimitiveFromJsonFactory
      * 
      * @param json the json array of polygons
      * @return the multi-polygon
-     * @throws JSONException
      */
     public static MultiPolygon createMultiPolygonFromJson( JsonNode json )
     {

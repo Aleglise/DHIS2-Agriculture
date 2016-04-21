@@ -220,7 +220,7 @@ public class DefaultPeriodService
 
         lastPeriod = periodStore.reloadForceAddPeriod( lastPeriod );
 
-        CalendarPeriodType periodType = (CalendarPeriodType) lastPeriod.getPeriodType();
+        PeriodType periodType = lastPeriod.getPeriodType();
 
         for ( int i = 0; i < historyLength; ++i )
         {

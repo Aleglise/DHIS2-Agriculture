@@ -170,6 +170,8 @@ public interface AttributeService
      */
     List<AttributeValue> getAllAttributeValues();
 
+    List<AttributeValue> getAllAttributeValuesByAttributes( List<Attribute> attributes );
+
     List<AttributeValue> getAllAttributeValuesByAttribute( Attribute attribute );
 
     List<AttributeValue> getAllAttributeValuesByAttributeAndValue( Attribute attribute, String value );

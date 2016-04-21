@@ -61,7 +61,12 @@ public class DimensionalObjectUtils
     public static final String NULL_REPLACEMENT = "[n/a]";
 
     private static final Pattern INT_PATTERN = Pattern.compile( "^(0|-?[1-9]\\d*)$" );
-    private static final Pattern COMPOSITE_DIM_OBJECT_PATTERN = Pattern.compile( "([a-zA-Z]\\w{10})\\.([a-zA-Z]\\w{10})" );
+    
+    /**
+     * Matching data element operand, program data element, program attribute,
+     * data set reporting rate metric.
+     */
+    private static final Pattern COMPOSITE_DIM_OBJECT_PATTERN = Pattern.compile( "([a-zA-Z]\\w{10})\\.(\\w{5,30})" );
     
     public static List<DimensionalObject> getCopies( List<DimensionalObject> dimensions )
     {
@@ -483,5 +488,18 @@ public class DimensionalObjectUtils
         }
         
         return set;
+    }
+    
+    /**
+     * Returns a dimension item identifier for the given data set identifier and
+     * reporting date metric.
+     * 
+     * @param uid data set identifier.
+     * @param metric reporting rate metric.
+     * @return a dimension item identifier.
+     */
+    public static String getDimensionItem( String uid, ReportingRateMetric metric )
+    {
+        return uid + COMPOSITE_DIM_OBJECT_PLAIN_SEP + metric.name();
     }
 }

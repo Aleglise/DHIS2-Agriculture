@@ -381,7 +381,7 @@ div#selectionTree a.locked
   width: 410px;
   background-color: #f8eab0;
   border: 1px solid #dbae56;
-  z-index: 21;
+  z-index: 1200;
   font-size: 9pt;
   text-align: center;
   border-radius: 3px;

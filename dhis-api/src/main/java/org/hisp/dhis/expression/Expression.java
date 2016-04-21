@@ -107,6 +107,12 @@ public class Expression
     @Scanned
     private Set<DataElement> dataElementsInExpression = new HashSet<>();
 
+    /**
+     * A reference to the DataElements in the Expression.
+     */
+    @Scanned
+    private Set<DataElement> sampleElementsInExpression = new HashSet<>();
+
     // -------------------------------------------------------------------------
     // Transient properties
     // -------------------------------------------------------------------------
@@ -131,11 +137,29 @@ public class Expression
      * @param description              A description of the Expression.
      * @param dataElementsInExpression A reference to the DataElements in the Expression.
      */
+    public Expression( String expression, String description, 
+		       Set<DataElement> dataElementsInExpression,
+		       Set<DataElement> sampleElementsInExpression )
+    {
+        this.expression = expression;
+        this.description = description;
+        this.dataElementsInExpression = dataElementsInExpression;
+        this.sampleElementsInExpression = sampleElementsInExpression;
+    }
+
+    /**
+     * Constructor without sample elements
+     *
+     * @param expression               The expression as a String
+     * @param description              A description of the Expression.
+     * @param dataElementsInExpression A reference to the DataElements in the Expression.
+     */
     public Expression( String expression, String description, Set<DataElement> dataElementsInExpression )
     {
         this.expression = expression;
         this.description = description;
         this.dataElementsInExpression = dataElementsInExpression;
+        this.sampleElementsInExpression = null;
     }
 
     // -------------------------------------------------------------------------
@@ -224,19 +248,45 @@ public class Expression
             "}";
     }
 
-    /* Parsing expressions */
-    public static int matchExpression(String s,int start){
-    	int i=start, depth=0, len=s.length();
-    	while (i<len) {
-	    char c=s.charAt(i);
-    		if ((c==')')||(c==']')) {
-    			if (depth==0) return i; else depth--;}
-    		else if ((c=='(')||(c=='[')) depth++;
-    		else if (c==',') {
-    			if (depth==0) return i;}
-    		else {}
-		i++;}
-    	return -1;}
+    public static int matchExpression( String s, int start )
+    {
+        int i = start, depth = 0, len = s.length();
+        
+        while ( i < len )
+        {
+            char c = s.charAt( i );
+            
+            if ( (c == ')') || (c == ']') )
+            {
+                if ( depth == 0 )
+                {
+                    return i;
+                }
+                else
+                {
+                    depth--;
+                }
+            }
+            else if ( (c == '(') || (c == '[') )
+            {
+                depth++;
+            }
+            else if ( c == ',' )
+            {
+                if ( depth == 0 )
+                {
+                    return i;
+                }
+            }
+            else
+            {
+            }
+            
+            i++;
+        }
+        
+        return -1;
+    }
 
     // -------------------------------------------------------------------------
     // Getters and setters
@@ -278,6 +328,21 @@ public class Expression
     public void setDataElementsInExpression( Set<DataElement> dataElementsInExpression )
     {
         this.dataElementsInExpression = dataElementsInExpression;
+    }
+
+    @JsonProperty(value = "sampleElements")
+    @JsonSerialize(contentAs = BaseIdentifiableObject.class)
+    @JsonView({ DetailedView.class, ExportView.class })
+    @JacksonXmlElementWrapper(localName = "sampleElements", namespace = DxfNamespaces.DXF_2_0)
+    @JacksonXmlProperty(localName = "sampleElement", namespace = DxfNamespaces.DXF_2_0)
+    public Set<DataElement> getSampleElementsInExpression()
+    {
+    	return sampleElementsInExpression;
+    }
+
+    public void setSampleElementsInExpression( Set<DataElement> sampleElementsInExpression )
+    {
+        this.sampleElementsInExpression = sampleElementsInExpression;
     }
 
     @JsonProperty
@@ -327,5 +392,7 @@ public class Expression
 
         dataElementsInExpression = other.getDataElementsInExpression() == null ?
             dataElementsInExpression : new HashSet<>( other.getDataElementsInExpression() );
+        sampleElementsInExpression = other.getSampleElementsInExpression() == null ?
+            sampleElementsInExpression : new HashSet<>( other.getSampleElementsInExpression() );
     }
 }

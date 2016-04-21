@@ -134,6 +134,8 @@ function programOnChange() {
     hideById('selectedList');
     hideById('programMessageTB');
 	disable('compulsaryIdentifier');
+	disable('displayFrontPageList');
+	disable('useFirstStageDuringRegistration');
 
     jQuery("[name=displayed]").attr("disabled", true);
     jQuery("[name=displayed]").removeAttr("checked");
@@ -153,6 +155,8 @@ function programOnChange() {
     showById('programMessageTB');
     showById("selectedList");
 	enable('compulsaryIdentifier');
+	enable('displayFrontPageList');
+	enable('useFirstStageDuringRegistration');
 
     jQuery("[name=nonAnonymous]").show();
     

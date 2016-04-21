@@ -55,30 +55,30 @@ public class QuarterlyPeriodTypeTest
     @Test
     public void testCreatePeriod()
     {
-        testDate = new DateTime(  2009, 8, 15, 0, 0 );
+        testDate = new DateTime( 2009, 8, 15, 0, 0 );
 
-        startDate = new DateTime(  2009, 7, 1, 0, 0 );
-        endDate = new DateTime(  2009, 9, 30, 0, 0 );
+        startDate = new DateTime( 2009, 7, 1, 0, 0 );
+        endDate = new DateTime( 2009, 9, 30, 0, 0 );
 
         Period period = periodType.createPeriod( testDate.toDate() );
 
         assertEquals( startDate.toDate(), period.getStartDate() );
         assertEquals( endDate.toDate(), period.getEndDate() );
 
-        testDate = new DateTime(  2009, 4, 15, 0, 0 );
+        testDate = new DateTime( 2009, 4, 15, 0, 0 );
 
-        startDate = new DateTime(  2009, 4, 1, 0, 0 );
-        endDate = new DateTime(  2009, 6, 30, 0, 0 );
+        startDate = new DateTime( 2009, 4, 1, 0, 0 );
+        endDate = new DateTime( 2009, 6, 30, 0, 0 );
 
         period = periodType.createPeriod( testDate.toDate() );
 
         assertEquals( startDate.toDate(), period.getStartDate() );
         assertEquals( endDate.toDate(), period.getEndDate() );
 
-        testDate = new DateTime(  2014, 11, 20, 0, 0 );
+        testDate = new DateTime( 2014, 11, 20, 0, 0 );
 
-        startDate = new DateTime(  2014, 10, 1, 0, 0 );
-        endDate = new DateTime(  2014, 12, 31, 0, 0 );
+        startDate = new DateTime( 2014, 10, 1, 0, 0 );
+        endDate = new DateTime( 2014, 12, 31, 0, 0 );
 
         period = periodType.createPeriod( testDate.toDate() );
 
@@ -89,20 +89,35 @@ public class QuarterlyPeriodTypeTest
     @Test
     public void testCreatePeriodOverflow()
     {
-
     }
 
     @Test
     public void testGetNextPeriod()
     {
-        testDate = new DateTime(  2009, 8, 15, 0, 0 );
+        testDate = new DateTime( 2009, 8, 15, 0, 0 );
 
         Period period = periodType.createPeriod( testDate.toDate() );
 
         period = periodType.getNextPeriod( period );
 
-        startDate = new DateTime(  2009, 10, 1, 0, 0 );
-        endDate = new DateTime(  2009, 12, 31, 0, 0 );
+        startDate = new DateTime( 2009, 10, 1, 0, 0 );
+        endDate = new DateTime( 2009, 12, 31, 0, 0 );
+
+        assertEquals( startDate.toDate(), period.getStartDate() );
+        assertEquals( endDate.toDate(), period.getEndDate() );
+    }
+
+    @Test
+    public void testGetNextPeriods()
+    {
+        testDate = new DateTime( 2009, 8, 15, 0, 0 );
+
+        Period period = periodType.createPeriod( testDate.toDate() );
+
+        period = periodType.getNextPeriod( period, 3 );
+
+        startDate = new DateTime( 2010, 4, 1, 0, 0 );
+        endDate = new DateTime( 2010, 6, 30, 0, 0 );
 
         assertEquals( startDate.toDate(), period.getStartDate() );
         assertEquals( endDate.toDate(), period.getEndDate() );
@@ -111,14 +126,14 @@ public class QuarterlyPeriodTypeTest
     @Test
     public void testGetPreviousPeriod()
     {
-        testDate = new DateTime(  2009, 8, 15, 0, 0 );
+        testDate = new DateTime( 2009, 8, 15, 0, 0 );
 
         Period period = periodType.createPeriod( testDate.toDate() );
 
         period = periodType.getPreviousPeriod( period );
 
-        startDate = new DateTime(  2009, 4, 1, 0, 0 );
-        endDate = new DateTime(  2009, 6, 30, 0, 0 );
+        startDate = new DateTime( 2009, 4, 1, 0, 0 );
+        endDate = new DateTime( 2009, 6, 30, 0, 0 );
 
         assertEquals( startDate.toDate(), period.getStartDate() );
         assertEquals( endDate.toDate(), period.getEndDate() );
@@ -127,7 +142,7 @@ public class QuarterlyPeriodTypeTest
     @Test
     public void testGeneratePeriods()
     {
-        testDate = new DateTime(  2009, 8, 15, 0, 0 );
+        testDate = new DateTime( 2009, 8, 15, 0, 0 );
 
         List<Period> periods = periodType.generatePeriods( testDate.toDate() );
 
@@ -141,7 +156,7 @@ public class QuarterlyPeriodTypeTest
     @Test
     public void testGenerateRollingPeriods()
     {
-        testDate = new DateTime(  2009, 8, 15, 0, 0 );
+        testDate = new DateTime( 2009, 8, 15, 0, 0 );
 
         List<Period> periods = periodType.generateRollingPeriods( testDate.toDate() );
 
@@ -155,7 +170,7 @@ public class QuarterlyPeriodTypeTest
     @Test
     public void testGenerateLast5Years()
     {
-        testDate = new DateTime(  2009, 8, 15, 0, 0 );
+        testDate = new DateTime( 2009, 8, 15, 0, 0 );
 
         List<Period> periods = periodType.generateLast5Years( testDate.toDate() );
 
@@ -169,8 +184,8 @@ public class QuarterlyPeriodTypeTest
     @Test
     public void testGeneratePeriodsBetweenDates()
     {
-        startDate = new DateTime(  2009, 8, 15, 0, 0 );
-        endDate = new DateTime(  2010, 2, 20, 0, 0 );
+        startDate = new DateTime( 2009, 8, 15, 0, 0 );
+        endDate = new DateTime( 2010, 2, 20, 0, 0 );
 
         List<Period> periods = periodType.generatePeriods( startDate.toDate(), endDate.toDate() );
 

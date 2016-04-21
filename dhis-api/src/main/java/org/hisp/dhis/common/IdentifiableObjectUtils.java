@@ -30,13 +30,11 @@ package org.hisp.dhis.common;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import org.apache.commons.lang3.StringUtils;
 import org.hisp.dhis.calendar.Calendar;
 import org.hisp.dhis.calendar.DateTimeUnit;
 import org.hisp.dhis.dataelement.DataElementCategory;
 import org.hisp.dhis.dataelement.DataElementCategoryCombo;
 import org.hisp.dhis.dataelement.DataElementCategoryOption;
-import org.hisp.dhis.organisationunit.OrganisationUnit;
 import org.hisp.dhis.period.Period;
 import org.hisp.dhis.period.PeriodType;
 
@@ -281,56 +279,24 @@ public class IdentifiableObjectUtils
     }
 
     /**
-     * Returns a map of identifiable properties and objects.
+     * Returns a map of the identifiable property specified by the given id scheme
+     * and the corresponding object.
      *
-     * @param objects  the objects.
-     * @param idScheme the id scheme to use.
+     * @param objects the objects.
+     * @param idScheme the id scheme.
      * @return a map.
      */
-    @SuppressWarnings( "unchecked" )
-    public static <T extends IdentifiableObject> Map<String, T> getMap( List<T> objects, IdScheme idScheme )
+    public static <T extends IdentifiableObject> Map<String, T> getIdMap( List<T> objects, IdScheme idScheme )
     {
         Map<String, T> map = new HashMap<>();
-        IdentifiableProperty property = idScheme.getIdentifiableProperty();
 
         for ( T object : objects )
         {
-            if ( IdentifiableProperty.ID.equals( property ) )
+            String value = object.getPropertyValue( idScheme );
+            
+            if ( value != null )
             {
-                if ( object.getId() > 0 )
-                {
-                    map.put( String.valueOf( object.getId() ), object );
-                }
-            }
-            else if ( IdentifiableProperty.UID.equals( property ) )
-            {
-                if ( object.getUid() != null )
-                {
-                    map.put( object.getUid(), object );
-                }
-            }
-            else if ( IdentifiableProperty.CODE.equals( property ) )
-            {
-                if ( object.getCode() != null )
-                {
-                    map.put( object.getCode(), object );
-                }
-            }
-            else if ( IdentifiableProperty.NAME.equals( property ) )
-            {
-                if ( object.getName() != null )
-                {
-                    map.put( object.getName(), object );
-                }
-            }
-            else if ( IdentifiableProperty.UUID.equals( property ) && OrganisationUnit.class.isAssignableFrom( object.getClass() ) )
-            {
-                OrganisationUnit organisationUnit = (OrganisationUnit) object;
-
-                if ( !StringUtils.isEmpty( organisationUnit.getUuid() ) )
-                {
-                    map.put( organisationUnit.getUuid(), (T) organisationUnit );
-                }
+                map.put( value, object );
             }
         }
 

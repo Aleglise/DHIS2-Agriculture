@@ -38,6 +38,7 @@ package org.hisp.dhis.common.cache;
 public enum CacheStrategy
 {
     NO_CACHE,
+    CACHE_15_MINUTES,
     CACHE_1_HOUR,
     CACHE_6AM_TOMORROW,
     CACHE_TWO_WEEKS,

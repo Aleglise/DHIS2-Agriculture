@@ -40,6 +40,7 @@ import org.apache.commons.logging.LogFactory;
 import org.hisp.dhis.analytics.AnalyticsService;
 import org.hisp.dhis.analytics.DataQueryParams;
 import org.hisp.dhis.analytics.DataQueryService;
+import org.hisp.dhis.common.IdScheme;
 import org.hisp.dhis.dataelement.DataElement;
 import org.hisp.dhis.dataelement.DataElementCategory;
 import org.hisp.dhis.dataset.DataSet;
@@ -93,7 +94,7 @@ public class AnalyticsDataSetReportStore
         
         if ( dimensions != null )
         {
-            params.setFilters( dataQueryService.getDimensionalObjects( dimensions, null, null, null ) );
+            params.setFilters( dataQueryService.getDimensionalObjects( dimensions, null, null, null, IdScheme.UID ) );
         }
         
         Map<String, Object> map = analyticsService.getAggregatedDataValueMapping( params );
@@ -148,7 +149,7 @@ public class AnalyticsDataSetReportStore
 
                 if ( dimensions != null )
                 {
-                    params.setFilters( dataQueryService.getDimensionalObjects( dimensions, null, null, null ) );
+                    params.setFilters( dataQueryService.getDimensionalObjects( dimensions, null, null, null, IdScheme.UID ) );
                 }
                 
                 Map<String, Object> map = analyticsService.getAggregatedDataValueMapping( params );
@@ -184,7 +185,7 @@ public class AnalyticsDataSetReportStore
 
         if ( dimensions != null )
         {
-            params.setFilters( dataQueryService.getDimensionalObjects( dimensions, null, null, null ) );
+            params.setFilters( dataQueryService.getDimensionalObjects( dimensions, null, null, null, IdScheme.UID ) );
         }
         
         Map<String, Object> map = analyticsService.getAggregatedDataValueMapping( params );
@@ -218,7 +219,7 @@ public class AnalyticsDataSetReportStore
 
         if ( dimensions != null )
         {
-            params.setFilters( dataQueryService.getDimensionalObjects( dimensions, null, null, null ) );
+            params.setFilters( dataQueryService.getDimensionalObjects( dimensions, null, null, null, IdScheme.UID ) );
         }
         
         Map<String, Object> map = analyticsService.getAggregatedDataValueMapping( params );

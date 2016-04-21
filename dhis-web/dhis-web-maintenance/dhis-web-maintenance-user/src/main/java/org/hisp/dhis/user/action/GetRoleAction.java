@@ -107,8 +107,8 @@ public class GetRoleAction
     {
         return availableDataSets;
     }
-    
-	private List<DataSet> roleDataSets;
+
+    private List<DataSet> roleDataSets;
 
     public List<DataSet> getRoleDataSets()
     {
@@ -117,18 +117,19 @@ public class GetRoleAction
 
     private List<Program> availablePrograms;
 
-    public List<Program> getAvailablePrograms() 
+    public List<Program> getAvailablePrograms()
     {
-		return availablePrograms;
-	}
+        return availablePrograms;
+    }
 
     private List<Program> rolePrograms;
-    
-    public List<Program> getRolePrograms() {
-		return rolePrograms;
-	}
 
-	private List<String> availableAuthorities;
+    public List<Program> getRolePrograms()
+    {
+        return rolePrograms;
+    }
+
+    private List<String> availableAuthorities;
 
     public List<String> getAvailableAuthorities()
     {
@@ -165,14 +166,12 @@ public class GetRoleAction
         roleDataSets = new ArrayList<>( userAuthorityGroup.getDataSets() );
 
         Collections.sort( roleDataSets, IdentifiableObjectNameComparator.INSTANCE );
-
         
         availablePrograms = new ArrayList<>( programService.getAllPrograms() );
 
         availablePrograms.removeAll( userAuthorityGroup.getPrograms() );
 
-        Collections.sort( availablePrograms, IdentifiableObjectNameComparator.INSTANCE );
-        
+        Collections.sort( availablePrograms, IdentifiableObjectNameComparator.INSTANCE );        
         
         rolePrograms = new ArrayList<>( userAuthorityGroup.getPrograms() );
 

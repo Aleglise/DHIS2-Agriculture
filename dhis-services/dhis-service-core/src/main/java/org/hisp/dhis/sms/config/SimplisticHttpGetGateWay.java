@@ -43,7 +43,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hisp.dhis.sms.outbound.OutboundSms;
 
-
 /**
  * Simplistic http gateway sending smses through a get to a url constructed from
  * the provided urlTemplate and map of static parameters.
@@ -73,12 +72,6 @@ import org.hisp.dhis.sms.outbound.OutboundSms;
 public class SimplisticHttpGetGateWay
 {
     private static final Log log = LogFactory.getLog( SimplisticHttpGetGateWay.class );
-
-    private static final String SENDER = "sender";
-
-    private static final String RECIPIENT = "recipient";
-
-    private static final String MESSAGE = "message";
 
     private Map<String, String> parameters;
 
@@ -134,7 +127,10 @@ public class SimplisticHttpGetGateWay
                 return false;
             }
 
-            reader.close();
+            if ( reader != null )
+            {
+                reader.close();
+            }
 
         }
         catch ( IOException e )
@@ -144,12 +140,15 @@ public class SimplisticHttpGetGateWay
         }
         finally
         {
-            reader.close();
+            if ( reader != null )
+            {
+                reader.close();
+            }
         }
 
         return true;
     }
-    
+
     private String getGatewayId()
     {
         return null;

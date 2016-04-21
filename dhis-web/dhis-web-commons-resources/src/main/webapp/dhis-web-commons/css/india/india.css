@@ -57,7 +57,7 @@ input[type=text],input[type=password],input[type=email],textarea
   background-color: #ea5911;
   height: 44px;
   position: fixed;
-  z-index: 10;
+  z-index: 1100;
   top: 0px;
   left: 0px;
   right: 0px;

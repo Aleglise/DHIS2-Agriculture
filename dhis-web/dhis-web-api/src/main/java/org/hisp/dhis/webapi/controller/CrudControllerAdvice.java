@@ -40,6 +40,7 @@ import org.hisp.dhis.dxf2.metadata2.MetadataImportException;
 import org.hisp.dhis.dxf2.webmessage.WebMessageException;
 import org.hisp.dhis.query.QueryException;
 import org.hisp.dhis.query.QueryParserException;
+import org.hisp.dhis.sms.SmsServiceNotEnabledException;
 import org.hisp.dhis.system.util.DateUtils;
 import org.hisp.dhis.webapi.controller.exception.NotAuthenticatedException;
 import org.hisp.dhis.webapi.controller.exception.NotFoundException;
@@ -106,7 +107,7 @@ public class CrudControllerAdvice
         webMessageService.send( WebMessageUtils.unprocessableEntity( ex.getMessage() ), response, request );
     }
 
-    @ExceptionHandler( { IllegalQueryException.class, DeleteNotAllowedException.class, InvalidIdentifierReferenceException.class } )
+    @ExceptionHandler( { IllegalQueryException.class, DeleteNotAllowedException.class, InvalidIdentifierReferenceException.class, SmsServiceNotEnabledException.class } )
     public void conflictsExceptionHandler( Exception ex, HttpServletResponse response, HttpServletRequest request )
     {
         webMessageService.send( WebMessageUtils.conflict( ex.getMessage() ), response, request );

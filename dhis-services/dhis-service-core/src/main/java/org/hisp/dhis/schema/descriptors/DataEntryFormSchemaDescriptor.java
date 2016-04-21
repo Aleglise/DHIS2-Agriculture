@@ -31,12 +31,10 @@ package org.hisp.dhis.schema.descriptors;
 import org.hisp.dhis.dataentryform.DataEntryForm;
 import org.hisp.dhis.schema.Schema;
 import org.hisp.dhis.schema.SchemaDescriptor;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Morten Olav Hansen <mortenoh@gmail.com>
  */
-@Component
 public class DataEntryFormSchemaDescriptor implements SchemaDescriptor
 {
     public static final String SINGULAR = "dataEntryForm";

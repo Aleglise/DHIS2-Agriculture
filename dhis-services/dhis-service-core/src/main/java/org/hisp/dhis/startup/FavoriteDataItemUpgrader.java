@@ -42,14 +42,13 @@ import org.hisp.dhis.dataset.DataSet;
 import org.hisp.dhis.indicator.Indicator;
 import org.hisp.dhis.mapping.MapView;
 import org.hisp.dhis.reporttable.ReportTable;
-import org.hisp.dhis.system.startup.AbstractStartupRoutine;
+import org.hisp.dhis.system.startup.TransactionContextStartupRoutine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
-import org.springframework.transaction.annotation.Transactional;
 
 public class FavoriteDataItemUpgrader
-    extends AbstractStartupRoutine
+    extends TransactionContextStartupRoutine
 {
     private static final Log log = LogFactory.getLog( FavoriteDataItemUpgrader.class );
 
@@ -64,8 +63,7 @@ public class FavoriteDataItemUpgrader
     private IdentifiableObjectManager idObjectManager;
 
     @Override
-    @Transactional
-    public void execute()
+    public void executeInTransaction()
     {
         try
         {

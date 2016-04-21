@@ -37,6 +37,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.hisp.dhis.render.RenderService;
+import org.apache.commons.lang.StringUtils;
 import org.hisp.dhis.dxf2.webmessage.WebMessageException;
 import org.hisp.dhis.setting.SettingKey;
 import org.hisp.dhis.setting.SystemSettingManager;
@@ -122,7 +123,7 @@ public class SystemSettingController
     {
         if ( systemSettingManager.isConfidential( key ) )
         {
-            return "";
+            return StringUtils.EMPTY;
         }
         else
         {

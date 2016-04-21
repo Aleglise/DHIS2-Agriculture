@@ -86,14 +86,8 @@
     <sec:intercept-url pattern="/api/**" access="isAuthenticated()" />
   </sec:http>
   -->
-<!--<bean id="org.hisp.dhis.security.action.SessionRegistryImpl" class="org.hisp.dhis.security.action.SessionRegistryImpl" />-->
-<!-- add for Active user List -->
-<bean id="org.hisp.dhis.useraccount.action.ActiveUsersListAction" class="org.hisp.dhis.useraccount.action.ActiveUsersListAction" />
-	<sec:http access-decision-manager-ref="accessDecisionManager" use-expressions="true" realm="DHIS2">
-    	<sec:session-management>
-      		<sec:concurrency-control max-sessions="10" expired-url="/dhis-web-commons-security/logout.action" session-registry-alias="sessionRegistry" />
-    	</sec:session-management>
-  
+
+  <sec:http access-decision-manager-ref="accessDecisionManager" use-expressions="true" realm="DHIS2">
     <sec:openid-login user-service-ref="userDetailsService" default-target-url="/" always-use-default-target="false"
       authentication-failure-handler-ref="securityExceptionTranslationHandler"
       login-processing-url="/dhis-web-commons-security/openid.action"
@@ -108,13 +102,12 @@
 
     <sec:headers>
       <sec:content-type-options />
-      <sec:frame-options />
+      <sec:frame-options policy="SAMEORIGIN" />
       <sec:xss-protection />
     </sec:headers>
-	
+
     <sec:http-basic />
-    <!--<sec:logout logout-url="/dhis-web-commons-security/logout.action" />-->
-    <sec:logout logout-url="/dhis-web-commons-security/logout.action" delete-cookies="JSESSIONID"/>
+    <sec:logout logout-url="/dhis-web-commons-security/logout.action" />
     <sec:intercept-url pattern="/dhis-web-commons/i18nJavaScript.action" access="permitAll()" />
     <sec:intercept-url pattern="/dhis-web-commons/security/**" access="permitAll()" />
     <sec:intercept-url pattern="/api/account/username" access="permitAll()" />

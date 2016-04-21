@@ -37,12 +37,15 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 /**
  * Super class for gateway configurations
+ * 
+ * @author Zubair <rajazubair.asghar@gmail.com>
  */
-@SuppressWarnings( "serial" )
 @JacksonXmlRootElement( localName = "smsgatewayconfig", namespace = DxfNamespaces.DXF_2_0 )
 public abstract class SmsGatewayConfig
     implements Serializable
 {
+    private static final long serialVersionUID = -4288220735161151632L;
+
     private String uid;
 
     private String name;

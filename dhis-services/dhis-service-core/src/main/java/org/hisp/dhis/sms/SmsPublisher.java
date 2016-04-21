@@ -35,7 +35,6 @@ import org.springframework.scheduling.TaskScheduler;
 
 public class SmsPublisher
 {
-
     @Autowired
     private MessageQueue messageQueue;
 

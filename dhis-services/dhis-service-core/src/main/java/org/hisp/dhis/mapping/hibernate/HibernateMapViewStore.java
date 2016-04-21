@@ -1,5 +1,9 @@
 package org.hisp.dhis.mapping.hibernate;
 
+import java.util.List;
+
+import org.hibernate.criterion.Restrictions;
+
 /*
  * Copyright (c) 2004-2016, University of Oslo
  * All rights reserved.
@@ -31,6 +35,7 @@ package org.hisp.dhis.mapping.hibernate;
 import org.hisp.dhis.common.hibernate.HibernateAnalyticalObjectStore;
 import org.hisp.dhis.mapping.MapView;
 import org.hisp.dhis.mapping.MapViewStore;
+import org.hisp.dhis.organisationunit.OrganisationUnitGroupSet;
 
 /**
  * @author Morten Olav Hansen <mortenoh@gmail.com>
@@ -38,4 +43,9 @@ import org.hisp.dhis.mapping.MapViewStore;
 public class HibernateMapViewStore
     extends HibernateAnalyticalObjectStore<MapView> implements MapViewStore
 {
+    @SuppressWarnings("unchecked")
+    public List<MapView> getByOrganisationUnitGroupSet( OrganisationUnitGroupSet groupSet )
+    {
+        return getCriteria( Restrictions.eq( "organisationUnitGroupSet", groupSet ) ).list();
+    }
 }

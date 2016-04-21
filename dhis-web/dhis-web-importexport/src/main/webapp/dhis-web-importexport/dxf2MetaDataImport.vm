@@ -31,6 +31,7 @@
         <option value="organisationunitgroup">$i18n.getString( "organisation_unit_group" )</option>
         <option value="validationrule">$i18n.getString( "validation_rule" )</option>
         <option value="optionset">$i18n.getString( "option_set" )</option>
+        <option value="translation">$i18n.getString( "translation" )</option>
     </select></td>
 </tr>
 <tr>

@@ -32,13 +32,9 @@ import org.amplecode.quick.StatementHolder;
 import org.amplecode.quick.StatementManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hisp.dhis.dataelement.DataElementService;
 import org.hisp.dhis.jdbc.StatementBuilder;
-import org.hisp.dhis.program.ProgramExpression;
-import org.hisp.dhis.program.ProgramStageService;
 import org.hisp.dhis.system.startup.AbstractStartupRoutine;
 import org.hisp.dhis.system.util.DateUtils;
-import org.hisp.dhis.system.util.ValidationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,10 +42,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static org.hisp.dhis.program.ProgramExpression.*;
 
 /**
  * @author Chau Thu Tran
@@ -79,12 +71,6 @@ public class TableAlteror
 
     @Autowired
     private StatementBuilder statementBuilder;
-
-    @Autowired
-    private ProgramStageService programStageService;
-
-    @Autowired
-    private DataElementService dataElementService;
 
     // -------------------------------------------------------------------------
     // Action Implementation
@@ -154,6 +140,7 @@ public class TableAlteror
         executeSql( "update program set remindCompleted=false where remindCompleted is null" );
         executeSql( "UPDATE program SET skipoffline=false where skipoffline is null" );
         executeSql( "UPDATE program SET displayfrontpagelist=false where displayfrontpagelist is null" );
+        executeSql( "UPDATE program SET usefirststageduringregistration=false where usefirststageduringregistration is null" );
 
         executeSql( "UPDATE programinstance SET followup=false where followup is null" );
 
@@ -184,8 +171,6 @@ public class TableAlteror
         executeSql( "update programstage set autoGenerateEvent=true where programid in ( select programid from program where type=2 )" );
 
         executeSql( "ALTER TABLE programstageinstance ALTER COLUMN executiondate TYPE timestamp" );
-
-        updateCoordinatesProgramStageInstance();
 
         executeSql( "ALTER TABLE program DROP COLUMN useBirthDateAsIncidentDate" );
         executeSql( "ALTER TABLE program DROP COLUMN useBirthDateAsEnrollmentDate" );
@@ -318,8 +303,6 @@ public class TableAlteror
 
         executeSql( "update userroleauthorities set authority='F_ADD_TRACKED_ENTITY_FORM' where authority='F_TRACKED_ENTITY_FORM_ADD'" );
 
-        updateProgramExpressionUid();
-
         // TODO fix
         // executeSql( "DROP TABLE programstage_programindicators" );
     }
@@ -344,38 +327,6 @@ public class TableAlteror
 
         // Drop the column with name as completed
         executeSql( "ALTER TABLE programinstance DROP COLUMN completed" );
-    }
-
-    private void updateCoordinatesProgramStageInstance()
-    {
-        StatementHolder holder = statementManager.getHolder();
-
-        try
-        {
-            Statement statement = holder.getStatement();
-
-            ResultSet resultSet = statement
-                .executeQuery( "SELECT programstageinstanceid, coordinates FROM programstageinstance where coordinates is not null" );
-
-            while ( resultSet.next() )
-            {
-                String coordinates = resultSet.getString( "coordinates" );
-                String longitude = ValidationUtils.getLongitude( coordinates );
-                String latitude = ValidationUtils.getLatitude( coordinates );
-                executeSql( "UPDATE programstageinstance SET longitude='" + longitude + "', latitude='" + latitude
-                    + "'  WHERE programstageinstanceid=" + resultSet.getInt( "programstageinstanceid" ) );
-            }
-
-            executeSql( "ALTER TABLE programstageinstance DROP COLUMN coordinates" );
-        }
-        catch ( Exception ex )
-        {
-            log.debug( ex );
-        }
-        finally
-        {
-            holder.close();
-        }
     }
 
     private void createPersonTrackedEntity()
@@ -466,69 +417,6 @@ public class TableAlteror
                 executeSql( "UPDATE program_attributes SET sort_order=" + index + " WHERE programtrackedentityattributeid="
                     + resultSet.getInt( "programtrackedentityattributeid" ) );
                 index++;
-            }
-        }
-        catch ( Exception ex )
-        {
-            log.debug( ex );
-        }
-        finally
-        {
-            holder.close();
-        }
-    }
-
-    private void updateProgramExpressionUid()
-    {
-        String regExp = "\\[(" + OBJECT_PROGRAM_STAGE_DATAELEMENT + "|" + OBJECT_PROGRAM_STAGE + ")" + SEPARATOR_OBJECT
-            + "([0-9]+[" + SEPARATOR_ID + "[a-zA-z0-9]+]*)\\]";
-
-        StatementHolder holder = statementManager.getHolder();
-
-        try
-        {
-            Statement statement = holder.getStatement();
-
-            ResultSet resultSet = statement
-                .executeQuery( "select programexpressionid, expression from programexpression" );
-
-            while ( resultSet.next() )
-            {
-                int id = resultSet.getInt( "programexpressionid" );
-                String expression = resultSet.getString( "expression" );
-                String result = expression;
-
-                Pattern pattern = Pattern.compile( regExp );
-                Matcher matcher = pattern.matcher( expression );
-                while ( matcher.find() )
-                {
-                    String group = matcher.group();
-                    String key = matcher.group( 1 );
-                    if ( key.equals( OBJECT_PROGRAM_STAGE_DATAELEMENT ) )
-                    {
-                        String[] ids = matcher.group( 2 ).split( SEPARATOR_ID );
-
-                        int programStageId = Integer.parseInt( ids[0] );
-                        int deId = Integer.parseInt( ids[1] );
-
-                        String programStageUid = programStageService.getProgramStage( programStageId ).getUid();
-                        String deUid = dataElementService.getDataElement( deId ).getUid();
-
-                        result = result.replace( group, "[" + ProgramExpression.OBJECT_PROGRAM_STAGE_DATAELEMENT
-                            + ProgramExpression.SEPARATOR_OBJECT + programStageUid + "." + deUid + "]" );
-                    }
-                    else
-                    {
-                        String[] ids = matcher.group( 2 ).split( SEPARATOR_ID );
-                        int programStageId = Integer.parseInt( ids[0] );
-                        String programStageUid = programStageService.getProgramStage( programStageId ).getUid();
-
-                        result = result.replace( group, "[" + OBJECT_PROGRAM_STAGE + ProgramExpression.SEPARATOR_OBJECT
-                            + programStageUid + "." + ids[1] + "]" );
-                    }
-                }
-
-                executeSql( "UPDATE programexpression SET expression='" + result + "' WHERE programexpressionid=" + id );
             }
         }
         catch ( Exception ex )

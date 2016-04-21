@@ -551,8 +551,8 @@
       "id": "bjDvmb4bfuf",
       "created": "2016-03-17T01:40:08.002+0000",
       "name": "default",
-      "publicAccess": "--------",
       "dataDimensionType": "DISAGGREGATION",
+      "publicAccess": "--------",
       "lastUpdated": "2016-03-17T01:40:08.004+0000",
       "code": "default"
     },
@@ -570,6 +570,7 @@
       "userGroupAccesses": [ ],
       "created": "2016-03-17T01:54:04.875+0000",
       "name": "Gender",
+      "dataDimensionType": "DISAGGREGATION",
       "user": {
         "id": "M5zQapPyTZI"
       }

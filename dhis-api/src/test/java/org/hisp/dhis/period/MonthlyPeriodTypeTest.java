@@ -29,6 +29,8 @@ package org.hisp.dhis.period;
  */
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import java.util.List;
 
@@ -116,6 +118,22 @@ public class MonthlyPeriodTypeTest
     }
     
     @Test
+    public void testGetNextPeriods()
+    {
+        testDate = new DateTime( 2009, 8, 15, 0, 0 );
+
+        Period period = periodType.createPeriod( testDate.toDate() );
+        
+        period = periodType.getNextPeriod( period, 3 );
+
+        startDate = new DateTime( 2009, 11, 1, 0, 0 );
+        endDate = new DateTime( 2009, 11, 30, 0, 0 );
+
+        assertEquals( startDate.toDate(), period.getStartDate() );
+        assertEquals( endDate.toDate(), period.getEndDate() );
+    }
+    
+    @Test
     public void testGetPreviousPeriod()
     {
         testDate = new DateTime( 2009, 8, 15, 0, 0 );
@@ -129,6 +147,17 @@ public class MonthlyPeriodTypeTest
 
         assertEquals( startDate.toDate(), period.getStartDate() );
         assertEquals( endDate.toDate(), period.getEndDate() );
+    }
+
+    @Test
+    public void testIsAfter()
+    {
+        Period april = periodType.createPeriod( new DateTime( 2009, 4, 1, 0, 0 ).toDate() );
+        Period may = periodType.createPeriod( new DateTime( 2009, 5, 1, 0, 0 ).toDate() );
+        
+        assertTrue( may.isAfter( april ) );
+        assertFalse( april.isAfter( may ) );
+        assertFalse( may.isAfter( null ) );
     }
     
     @Test

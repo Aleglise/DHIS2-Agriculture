@@ -103,7 +103,8 @@ public class PartitionUtils
         return partitions.prunePartitions( validPartitions );
     }
 
-    public static Partitions getPartitions( List<DimensionalItemObject> periods, String tablePrefix, String tableSuffix, Set<String> validPartitions )
+    public static Partitions getPartitions( List<DimensionalItemObject> periods, 
+        String tablePrefix, String tableSuffix, Set<String> validPartitions )
     {
         UniqueArrayList<String> partitions = new UniqueArrayList<>();
 
@@ -115,7 +116,8 @@ public class PartitionUtils
         return new Partitions( new ArrayList<>( partitions ) ).prunePartitions( validPartitions );
     }
 
-    public static ListMap<Partitions, DimensionalItemObject> getPartitionPeriodMap( List<DimensionalItemObject> periods, String tablePrefix, String tableSuffix, Set<String> validPartitions )
+    public static ListMap<Partitions, DimensionalItemObject> getPartitionPeriodMap( 
+        List<DimensionalItemObject> periods, String tablePrefix, String tableSuffix, Set<String> validPartitions )
     {
         ListMap<Partitions, DimensionalItemObject> map = new ListMap<>();
 

@@ -93,8 +93,7 @@ public class HibernateDatabaseInfoProvider
         
         if ( url != null && url.lastIndexOf( DEL_B ) != -1 )
         {
-            int startPos = url.lastIndexOf( DEL_A ) != -1 ? url.lastIndexOf( DEL_A ) : url.lastIndexOf( DEL_B );
-            
+            int startPos = url.lastIndexOf( DEL_A ) != -1 ? url.lastIndexOf( DEL_A ) : url.lastIndexOf( DEL_B );            
             int endPos = url.lastIndexOf( DEL_C ) != -1 ? url.lastIndexOf( DEL_C ) : url.length();
                     
             info.setName( url.substring( startPos + 1, endPos ) );
@@ -128,11 +127,23 @@ public class HibernateDatabaseInfoProvider
     // Supportive methods
     // -------------------------------------------------------------------------
 
+    /**
+     * Attempts to create a spatial database extension. Checks if spatial operations
+     * are supported.
+     */
     private boolean isSpatialSupport()
     {
         try
         {
-            String version = jdbcTemplate.queryForObject( "select postgis_full_version()", String.class );
+            jdbcTemplate.execute( "create extension postgis;" );
+        }
+        catch ( Exception ex )
+        {
+        }
+        
+        try
+        {
+            String version = jdbcTemplate.queryForObject( "select postgis_full_version();", String.class );
             return version != null;
         }
         catch ( Exception ex )

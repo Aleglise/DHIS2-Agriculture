@@ -28,18 +28,23 @@ package org.hisp.dhis.system.startup;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.util.Collection;
-
 /**
  * Executes a collection of StartupRoutines when the system is started.
  * 
  * @author <a href="mailto:torgeilo@gmail.com">Torgeir Lorange Ostby</a>
  */
 public interface StartupRoutineExecutor
-    extends StartupRoutine
 {
     String ID = StartupRoutineExecutor.class.getName();
 
+    /**
+     * Executes the StartupRoutines.
+     *
+     * @throws Exception on execution failure.
+     */
+    void execute()
+        throws Exception;
+    
     /**
      * Executes the StartupRoutines for testing.
      *
@@ -47,18 +52,4 @@ public interface StartupRoutineExecutor
      */
     void executeForTesting()
         throws Exception;
-
-    /**
-     * Adds a StartupRoutine for execution on system startup.
-     *
-     * @param routine the StartupRoutine to add.
-     */
-    void addStartupRoutine( StartupRoutine routine );
-
-    /**
-     * Adds a Collection of StartupRoutines for execution on system startup.
-     *
-     * @param routines the Collection of StartupRotines to add.
-     */
-    void addStartupRoutines( Collection<StartupRoutine> routines );
 }

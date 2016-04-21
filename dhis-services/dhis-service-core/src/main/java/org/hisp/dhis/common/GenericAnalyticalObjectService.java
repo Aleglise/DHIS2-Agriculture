@@ -34,6 +34,7 @@ import org.hisp.dhis.dataelement.CategoryOptionGroup;
 import org.hisp.dhis.dataelement.DataElement;
 import org.hisp.dhis.dataset.DataSet;
 import org.hisp.dhis.indicator.Indicator;
+import org.hisp.dhis.legend.LegendSet;
 import org.hisp.dhis.organisationunit.OrganisationUnit;
 import org.hisp.dhis.period.Period;
 import org.hisp.dhis.program.ProgramIndicator;
@@ -104,6 +105,12 @@ public abstract class GenericAnalyticalObjectService<T extends AnalyticalObject>
     public List<T> getAnalyticalObjects( CategoryOptionGroup categoryOptionGroup )
     {
         return getAnalyticalObjectStore().getAnalyticalObjects( categoryOptionGroup );
+    }
+    
+    @Override
+    public List<T> getAnalyticalObjects( LegendSet legendSet )
+    {
+        return getAnalyticalObjectStore().getAnalyticalObjects( legendSet );
     }
 
     @Override

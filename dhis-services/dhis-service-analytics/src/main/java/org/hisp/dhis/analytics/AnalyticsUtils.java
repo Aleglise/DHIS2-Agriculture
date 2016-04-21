@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hisp.dhis.common.DataDimensionItemType;
@@ -50,6 +50,8 @@ import org.hisp.dhis.organisationunit.OrganisationUnit;
 import org.hisp.dhis.period.Period;
 import org.hisp.dhis.system.util.MathUtils;
 import org.hisp.dhis.system.util.ReflectionUtils;
+
+import com.google.common.collect.Maps;
 
 /**
  * @author Lars Helge Overland
@@ -187,8 +189,15 @@ public class AnalyticsUtils
      */
     public static <T> Map<String, T> convertDxToOperand( Map<String, T> valueMap )
     {
-        return valueMap.entrySet().stream().collect( Collectors.toMap( e -> e.getKey().replaceFirst( 
-            DimensionalObject.DIMENSION_SEP, DimensionalObjectUtils.COMPOSITE_DIM_OBJECT_PLAIN_SEP ), e -> e.getValue() ) );
+        Map<String, T> map = Maps.newHashMap();
+        
+        for ( Entry<String, T> entry : valueMap.entrySet() )
+        {
+            map.put( entry.getKey().replaceFirst( DimensionalObject.DIMENSION_SEP, 
+                DimensionalObjectUtils.COMPOSITE_DIM_OBJECT_PLAIN_SEP ), entry.getValue() );
+        }
+        
+        return map;
     }
 
     /**

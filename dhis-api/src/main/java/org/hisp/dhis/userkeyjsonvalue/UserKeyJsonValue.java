@@ -51,12 +51,28 @@ public class UserKeyJsonValue
     /**
      * A value referenced by a key, namespace and user, JSON-formatted data stored as a string
      */
-    private String value;
+    private String plainValue;
+
+    /**
+     * The encrypted value of the object, if encrypted is true
+     */
+    private String encryptedValue;
 
     /**
      * A namespace is a collection of keys for a given user
      */
     private String namespace;
+
+    /**
+     * Indicates whether the value should be encypted or not.
+     */
+    private Boolean encrypted = false;
+
+    /**
+     * Temporary variable to hold any new values set during session; Will be made into the corrent type
+     * when being persisted (encrypted or plain)
+     */
+    private String value;
 
     public String getNamespace()
     {
@@ -93,11 +109,41 @@ public class UserKeyJsonValue
     @JsonProperty
     public String getValue()
     {
-        return value;
+        return (encrypted ? encryptedValue : plainValue);
     }
 
     public void setValue( String value )
     {
         this.value = value;
+    }
+
+    public String getPlainValue()
+    {
+        return (!encrypted && value != null ? value : plainValue);
+    }
+
+    public void setPlainValue( String plainValue )
+    {
+        this.plainValue = plainValue;
+    }
+
+    public String getEncryptedValue()
+    {
+        return (encrypted && value != null ? value : encryptedValue);
+    }
+
+    public void setEncryptedValue( String encryptedValue )
+    {
+        this.encryptedValue = encryptedValue;
+    }
+
+    public boolean getEncrypted()
+    {
+        return encrypted;
+    }
+
+    public void setEncrypted( boolean encrypted )
+    {
+        this.encrypted = encrypted;
     }
 }

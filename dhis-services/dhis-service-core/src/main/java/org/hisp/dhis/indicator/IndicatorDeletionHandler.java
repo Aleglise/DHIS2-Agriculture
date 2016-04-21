@@ -35,6 +35,7 @@ import org.hisp.dhis.dataelement.DataElementCategoryCombo;
 import org.hisp.dhis.dataelement.DataElementCategoryOptionCombo;
 import org.hisp.dhis.dataset.DataSet;
 import org.hisp.dhis.expression.ExpressionService;
+import org.hisp.dhis.legend.LegendSet;
 import org.hisp.dhis.system.deletion.DeletionHandler;
 
 /**
@@ -103,6 +104,19 @@ public class IndicatorDeletionHandler
         {
             indicator.getDataSets().remove( dataSet );
             indicatorService.updateIndicator( indicator );
+        }
+    }
+    
+    @Override
+    public void deleteLegendSet( LegendSet legendSet )
+    {
+        for ( Indicator indicator : indicatorService.getAllIndicators() )
+        {
+            if ( legendSet.equals( indicator.getLegendSet() ) )
+            {
+                indicator.setLegendSet( null );
+                indicatorService.updateIndicator( indicator );
+            }
         }
     }
 

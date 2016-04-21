@@ -402,12 +402,6 @@ public class UserCredentials
         return user != null ? user.getName() : username;
     }
 
-    @Override
-    public String getCode()
-    {
-        return username;
-    }
-
     /**
      * Sets the last login property to the current date.
      */
@@ -453,7 +447,7 @@ public class UserCredentials
 
         for ( CategoryOptionGroupSet cogs : cogsDimensionConstraints )
         {
-            cogs.setDimensionType( DimensionType.CATEGORYOPTION_GROUPSET );
+            cogs.setDimensionType( DimensionType.CATEGORY_OPTION_GROUP_SET );
             constraints.add( cogs );
         }
 

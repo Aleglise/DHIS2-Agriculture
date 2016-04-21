@@ -20,6 +20,8 @@
 
     <property name="layer" not-null="true" />
 
+    <!-- AnalyticalObject -->
+
     <list name="dataDimensionItems" table="mapview_datadimensionitems" cascade="all, delete-orphan">
       <cache usage="read-write" />
       <key column="mapviewid" foreign-key="fk_mapview_datadimensionitems_mapviewid" />
@@ -61,15 +63,45 @@
       <many-to-many column="orgunitgroupid" class="org.hisp.dhis.organisationunit.OrganisationUnitGroup"
         foreign-key="fk_mapview_itemorgunitgroups_orgunitgroupid" />
     </list>
+    
+    <!-- EventAnalyticalObject -->
+    
+    <list name="attributeDimensions" table="mapview_attributedimensions" cascade="all, delete-orphan">
+      <key column="mapviewid" foreign-key="fk_mapview_attributedimensions_mapviewid" />
+      <list-index column="sort_order" base="0" />
+      <many-to-many column="trackedentityattributedimensionid" class="org.hisp.dhis.trackedentity.TrackedEntityAttributeDimension"
+        foreign-key="fk_mapview_attributedimensions_attributedimensionid" />
+    </list>
 
-    <many-to-one name="program" class="org.hisp.dhis.program.Program" column="programid"
-      foreign-key="fk_reporttable_programid" />
+    <list name="dataElementDimensions" table="mapview_dataelementdimensions" cascade="all, delete-orphan">
+      <key column="mapviewid" foreign-key="fk_mapview_dataelementdimensions_mapviewid" />
+      <list-index column="sort_order" base="0" />
+      <many-to-many column="trackedentitydataelementdimensionid" class="org.hisp.dhis.trackedentity.TrackedEntityDataElementDimension"
+        foreign-key="fk_mapview_dataelementdimensions_dataelementdimensionid" />
+    </list>    
 
+    <list name="columnDimensions" table="mapview_columns">
+      <cache usage="read-write" />
+      <key column="mapviewid" foreign-key="fk_mapview_columns_mapviewid" />
+      <list-index column="sort_order" base="0" />
+      <element type="string" column="dimension" />
+    </list>
+    
     <property name="userOrganisationUnit" />
 
     <property name="userOrganisationUnitChildren" />
 
     <property name="userOrganisationUnitGrandChildren" />
+
+    <many-to-one name="program" class="org.hisp.dhis.program.Program"
+      column="programid" foreign-key="fk_mapview_programid" />
+
+    <many-to-one name="programStage" class="org.hisp.dhis.program.ProgramStage"
+      column="programstageid" foreign-key="fk_mapview_programstageid" />
+
+    <property name="startDate" column="startdate" />
+
+    <property name="endDate" column="enddate" />
 
     <property name="method" />
 
@@ -104,6 +136,12 @@
     <property name="labelFontStyle" />
 
     <property name="labelFontColor" />
+    
+    <property name="eventClustering" />
+    
+    <property name="eventPointColor" />
+    
+    <property name="eventPointRadius" />
 
   </class>
 </hibernate-mapping>

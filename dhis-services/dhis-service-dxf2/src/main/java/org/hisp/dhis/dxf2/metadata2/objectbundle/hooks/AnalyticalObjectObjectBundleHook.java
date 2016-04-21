@@ -40,44 +40,42 @@ import org.hisp.dhis.trackedentity.TrackedEntityAttributeDimension;
 import org.hisp.dhis.trackedentity.TrackedEntityDataElementDimension;
 import org.hisp.dhis.trackedentity.TrackedEntityProgramIndicatorDimension;
 import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Morten Olav Hansen <mortenoh@gmail.com>
  */
 @Order( 10 )
-@Component
 public class AnalyticalObjectObjectBundleHook
     extends AbstractObjectBundleHook
 {
     @Override
-    public void preCreate( IdentifiableObject identifiableObject, ObjectBundle objectBundle )
+    public void preCreate( IdentifiableObject identifiableObject, ObjectBundle bundle )
     {
         if ( !AnalyticalObject.class.isInstance( identifiableObject ) ) return;
         BaseAnalyticalObject analyticalObject = (BaseAnalyticalObject) identifiableObject;
         Schema schema = schemaService.getDynamicSchema( analyticalObject.getClass() );
         Session session = sessionFactory.getCurrentSession();
 
-        handleDataDimensionItems( session, schema, analyticalObject, objectBundle );
-        handleCategoryDimensions( session, schema, analyticalObject, objectBundle );
-        handleDataElementDimensions( session, schema, analyticalObject, objectBundle );
-        handleAttributeDimensions( session, schema, analyticalObject, objectBundle );
-        handleProgramIndicatorDimensions( session, schema, analyticalObject, objectBundle );
+        handleDataDimensionItems( session, schema, analyticalObject, bundle );
+        handleCategoryDimensions( session, schema, analyticalObject, bundle );
+        handleDataElementDimensions( session, schema, analyticalObject, bundle );
+        handleAttributeDimensions( session, schema, analyticalObject, bundle );
+        handleProgramIndicatorDimensions( session, schema, analyticalObject, bundle );
     }
 
     @Override
-    public void preUpdate( IdentifiableObject identifiableObject, ObjectBundle objectBundle )
+    public void preUpdate( IdentifiableObject identifiableObject, ObjectBundle bundle )
     {
         if ( !AnalyticalObject.class.isInstance( identifiableObject ) ) return;
         BaseAnalyticalObject analyticalObject = (BaseAnalyticalObject) identifiableObject;
         Schema schema = schemaService.getDynamicSchema( analyticalObject.getClass() );
         Session session = sessionFactory.getCurrentSession();
 
-        handleDataDimensionItems( session, schema, analyticalObject, objectBundle );
-        handleCategoryDimensions( session, schema, analyticalObject, objectBundle );
-        handleDataElementDimensions( session, schema, analyticalObject, objectBundle );
-        handleAttributeDimensions( session, schema, analyticalObject, objectBundle );
-        handleProgramIndicatorDimensions( session, schema, analyticalObject, objectBundle );
+        handleDataDimensionItems( session, schema, analyticalObject, bundle );
+        handleCategoryDimensions( session, schema, analyticalObject, bundle );
+        handleDataElementDimensions( session, schema, analyticalObject, bundle );
+        handleAttributeDimensions( session, schema, analyticalObject, bundle );
+        handleProgramIndicatorDimensions( session, schema, analyticalObject, bundle );
     }
 
     private void handleDataDimensionItems( Session session, Schema schema, BaseAnalyticalObject analyticalObject, ObjectBundle bundle )
@@ -90,6 +88,11 @@ public class AnalyticalObjectObjectBundleHook
             {
                 preheatService.connectReferences( dataDimensionItem.getDataElementOperand(), bundle.getPreheat(), bundle.getPreheatIdentifier() );
                 session.save( dataDimensionItem.getDataElementOperand() );
+            }
+
+            if ( dataDimensionItem.getReportingRate() != null )
+            {
+                preheatService.connectReferences( dataDimensionItem.getReportingRate(), bundle.getPreheat(), bundle.getPreheatIdentifier() );
             }
 
             preheatService.connectReferences( dataDimensionItem, bundle.getPreheat(), bundle.getPreheatIdentifier() );

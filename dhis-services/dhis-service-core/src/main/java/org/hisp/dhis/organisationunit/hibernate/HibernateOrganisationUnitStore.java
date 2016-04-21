@@ -123,7 +123,7 @@ public class HibernateOrganisationUnitStore
 
         String hql = "select o from OrganisationUnit o ";
 
-        if ( params.getQuery() != null )
+        if ( params.hasQuery() )
         {
             hql += hlp.whereAnd() + " (lower(o.name) like :queryLower or o.code = :query or o.uid = :query) ";
         }
@@ -166,7 +166,7 @@ public class HibernateOrganisationUnitStore
 
         Query query = getQuery( hql );
 
-        if ( params.getQuery() != null )
+        if ( params.hasQuery() )
         {
             query.setString( "queryLower", "%" + params.getQuery().toLowerCase() + "%" );
             query.setString( "query", params.getQuery() );

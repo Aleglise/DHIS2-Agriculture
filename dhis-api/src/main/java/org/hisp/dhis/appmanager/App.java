@@ -28,10 +28,10 @@ package org.hisp.dhis.appmanager;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.io.Serializable;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.io.Serializable;
 
 /**
  * @author Saptarshi
@@ -47,67 +47,56 @@ public class App
     /**
      * Required.
      */
-    @JsonProperty
     private String version;
 
-    @JsonProperty
     private String name;
 
-    @JsonProperty( "launch_path" )
+    private AppType appType = AppType.APP;
+
     private String launchPath;
 
-    @JsonProperty( "installs_allowed_from" )
     private String[] installsAllowedFrom;
 
-    @JsonProperty( "default_locale" )
     private String defaultLocale;
 
     /**
      * Optional.
      */
-    @JsonProperty
     private String description;
 
-    @JsonProperty
     private AppIcons icons;
 
-    @JsonProperty
     private AppDeveloper developer;
 
-    @JsonIgnore
     private String locales;
 
-    @JsonProperty
     private AppActivities activities;
-    
-    @JsonProperty
+
     private String folderName;
 
-    @JsonProperty
     private String launchUrl;
-    
-    @JsonIgnore
+
     private String baseUrl;
 
     // -------------------------------------------------------------------------
     // Logic
     // -------------------------------------------------------------------------
-    
+
     /**
      * Initializes the app. Sets the launchUrl property.
-     * 
+     *
      * @param contextPath the context path of this instance.
      */
     public void init( String contextPath )
     {
         this.baseUrl = contextPath + "/api/apps";
-        
+
         if ( contextPath != null && folderName != null && launchPath != null )
         {
             launchUrl = baseUrl + "/" + folderName + "/" + launchPath;
         }
     }
-        
+
     /**
      * Alias for folder name.
      */
@@ -120,7 +109,7 @@ public class App
     // -------------------------------------------------------------------------
     // Get and set methods
     // -------------------------------------------------------------------------
-    
+    @JsonProperty
     public String getVersion()
     {
         return version;
@@ -131,6 +120,7 @@ public class App
         this.version = version;
     }
 
+    @JsonProperty
     public String getName()
     {
         return name;
@@ -141,6 +131,18 @@ public class App
         this.name = name;
     }
 
+    @JsonProperty
+    public AppType getAppType()
+    {
+        return appType;
+    }
+
+    public void setAppType( AppType appType )
+    {
+        this.appType = appType;
+    }
+
+    @JsonProperty( "launch_path" )
     public String getLaunchPath()
     {
         return launchPath;
@@ -151,6 +153,7 @@ public class App
         this.launchPath = launchPath;
     }
 
+    @JsonProperty( "installs_allowed_from" )
     public String[] getInstallsAllowedFrom()
     {
         return installsAllowedFrom;
@@ -161,6 +164,7 @@ public class App
         this.installsAllowedFrom = installsAllowedFrom;
     }
 
+    @JsonProperty( "default_locale" )
     public String getDefaultLocale()
     {
         return defaultLocale;
@@ -171,6 +175,7 @@ public class App
         this.defaultLocale = defaultLocale;
     }
 
+    @JsonProperty
     public String getDescription()
     {
         return description;
@@ -181,6 +186,7 @@ public class App
         this.description = description;
     }
 
+    @JsonProperty
     public AppDeveloper getDeveloper()
     {
         return developer;
@@ -191,6 +197,7 @@ public class App
         this.developer = developer;
     }
 
+    @JsonProperty
     public AppIcons getIcons()
     {
         return icons;
@@ -201,6 +208,7 @@ public class App
         this.icons = icons;
     }
 
+    @JsonIgnore
     public String getLocales()
     {
         return locales;
@@ -211,6 +219,7 @@ public class App
         this.locales = locales;
     }
 
+    @JsonProperty
     public AppActivities getActivities()
     {
         return activities;
@@ -221,6 +230,7 @@ public class App
         this.activities = activities;
     }
 
+    @JsonProperty
     public String getFolderName()
     {
         return folderName;
@@ -231,6 +241,7 @@ public class App
         this.folderName = folderName;
     }
 
+    @JsonProperty
     public String getLaunchUrl()
     {
         return launchUrl;
@@ -241,6 +252,7 @@ public class App
         this.launchUrl = launchUrl;
     }
 
+    @JsonIgnore
     public String getBaseUrl()
     {
         return baseUrl;
@@ -254,7 +266,7 @@ public class App
     // -------------------------------------------------------------------------
     // hashCode, equals, toString
     // -------------------------------------------------------------------------
-    
+
     @Override
     public int hashCode()
     {
@@ -275,28 +287,29 @@ public class App
         {
             return false;
         }
-        
+
         if ( getClass() != obj.getClass() )
         {
             return false;
         }
-        
+
         final App other = (App) obj;
-        
+
         if ( (this.name == null) ? (other.name != null) : !this.name.equals( other.name ) )
         {
             return false;
         }
-        
+
         return true;
     }
-    
+
     @Override
     public String toString()
     {
         return "{" +
             "\"version:\"" + version + "\", " +
             "\"name:\"" + name + "\", " +
+            "\"appType:\"" + appType + "\", " +
             "\"launchPath:\"" + launchPath + "\" " +
             "}";
     }

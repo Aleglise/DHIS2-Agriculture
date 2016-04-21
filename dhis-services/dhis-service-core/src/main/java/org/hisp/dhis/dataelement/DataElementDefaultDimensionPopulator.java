@@ -32,8 +32,7 @@ import java.util.Collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hisp.dhis.system.startup.AbstractStartupRoutine;
-import org.springframework.transaction.annotation.Transactional;
+import org.hisp.dhis.system.startup.TransactionContextStartupRoutine;
 
 /**
  * When storing DataValues without associated dimensions there is a need to
@@ -48,7 +47,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @version $Id$
  */
 public class DataElementDefaultDimensionPopulator
-    extends AbstractStartupRoutine
+    extends TransactionContextStartupRoutine
 {
     private static final Log log = LogFactory.getLog( DataElementDefaultDimensionPopulator.class );
 
@@ -75,9 +74,7 @@ public class DataElementDefaultDimensionPopulator
     // -------------------------------------------------------------------------
 
     @Override
-    @Transactional
-    public void execute()
-        throws Exception
+    public void executeInTransaction()
     {
         DataElementCategory defaultCategory = categoryService.getDataElementCategoryByName( DataElementCategory.DEFAULT_NAME );
 

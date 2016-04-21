@@ -48,4 +48,6 @@ public interface TrackedEntityDataValueAuditStore
         List<ProgramStageInstance> programStageInstances, AuditType auditType, int first, int max );
 
     int countTrackedEntityDataValueAudits( List<DataElement> dataElements, List<ProgramStageInstance> programStageInstances, AuditType auditType );
+    
+    void deleteTrackedEntityDataValueAudits( ProgramStageInstance programStageInstance );
 }

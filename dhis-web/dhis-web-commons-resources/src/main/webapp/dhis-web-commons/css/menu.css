@@ -247,7 +247,10 @@ input.apps-search[type="text"] {
     height: 44px;
     line-height: 44px;
     text-align: center;
-    width: 105px;
+    margin-left: 30px;
+}
+.menu-link:last-child{
+    margin-left: 0px;
 }
 
 .menu-link i.fa

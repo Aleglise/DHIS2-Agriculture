@@ -25,5 +25,12 @@
       <many-to-many column="maplegendid" class="org.hisp.dhis.legend.Legend" foreign-key="fk_maplegendset_maplegend" />
     </set>
 
+    <!-- Dynamic attribute values -->
+    <set name="attributeValues" table="legendsetattributevalues" cascade="delete-orphan">
+      <cache usage="read-write" />
+      <key column="legendsetid" />
+      <many-to-many class="org.hisp.dhis.attribute.AttributeValue" column="attributevalueid" unique="true" />
+    </set>
+
   </class>
 </hibernate-mapping>

@@ -188,7 +188,7 @@ public class DataValueController
                 "Category option combo: " + categoryOptionCombo.getUid() + " must be part of category combo of data element: " + dataElement.getUid() ) );
         }
         
-        if ( strictOrgUnits && !dataElement.hasDataSetOrganisationUnit( organisationUnit ) )
+        if ( strictOrgUnits && !organisationUnit.hasDataElement( dataElement ) )
         {
             throw new WebMessageException( WebMessageUtils.conflict( 
                 "Data element: " + dataElement.getUid() + " must be assigned through data sets to organisation unit: " + organisationUnit.getUid() ) );
@@ -578,7 +578,7 @@ public class DataValueController
     private DataElementCategoryOptionCombo getAndValidateAttributeOptionCombo( String cc, String cp )
         throws WebMessageException
     {
-        DataElementCategoryOptionCombo attributeOptionCombo = inputUtils.getAttributeOptionCombo( cc, cp );
+        DataElementCategoryOptionCombo attributeOptionCombo = inputUtils.getAttributeOptionCombo( cc, cp, false );
 
         if ( attributeOptionCombo == null )
         {
@@ -624,12 +624,12 @@ public class DataValueController
     private void validateInvalidFuturePeriod( Period period, DataElement dataElement )
         throws WebMessageException
     {
-        boolean invalidFuturePeriod = period.isFuture() && dataElement.getOpenFuturePeriods() <= 0;
-
-        if ( invalidFuturePeriod )
+        Period latestFuturePeriod = dataElement.getLatestOpenFuturePeriod();
+        
+        if ( period.isAfter( latestFuturePeriod ) )
         {
-            throw new WebMessageException(
-                WebMessageUtils.conflict( "One or more data sets for data element does not allow future periods: " + dataElement.getUid() ) );
+            throw new WebMessageException( WebMessageUtils.conflict( "Period: " + 
+                period.getIsoDate() + " is after latest open future period: " + latestFuturePeriod.getIsoDate() + " for data element: " + dataElement.getUid() ) );
         }
     }
 

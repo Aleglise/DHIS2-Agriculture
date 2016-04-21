@@ -32,6 +32,7 @@ import static org.hisp.dhis.dataelement.DataElementCategoryCombo.DEFAULT_CATEGOR
 
 import org.hisp.dhis.common.IdentifiableObjectManager;
 import org.hisp.dhis.dataset.DataSet;
+import org.hisp.dhis.legend.LegendSet;
 import org.hisp.dhis.option.OptionSet;
 import org.hisp.dhis.system.deletion.DeletionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,6 +101,19 @@ public class DataElementDeletionHandler
         {
             element.getGroups().remove( group );
             idObjectManager.updateNoAcl( element );
+        }
+    }
+
+    @Override
+    public void deleteLegendSet( LegendSet legendSet )
+    {
+        for ( DataElement element : idObjectManager.getAllNoAcl( DataElement.class ) )
+        {
+            if ( legendSet.equals( element.getLegendSet() ) )
+            {
+                element.setLegendSet( null );
+                idObjectManager.updateNoAcl( element );
+            }
         }
     }
     

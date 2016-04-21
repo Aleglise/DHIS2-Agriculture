@@ -30,14 +30,16 @@ package org.hisp.dhis.schema;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.google.common.base.CaseFormat;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.hibernate.SessionFactory;
+import org.hisp.dhis.schema.descriptors.*;
 import org.hisp.dhis.system.util.AnnotationUtils;
 import org.hisp.dhis.system.util.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.OrderComparator;
 import org.springframework.util.StringUtils;
 
@@ -48,11 +50,90 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Morten Olav Hansen <mortenoh@gmail.com>
+ * @author Morten Olav Hansen <mortenoh@gmail.com> descriptors
  */
 public class DefaultSchemaService
-    implements ApplicationListener<ContextRefreshedEvent>, SchemaService
+    implements SchemaService
 {
+    private ImmutableList<SchemaDescriptor> descriptors = new ImmutableList.Builder<SchemaDescriptor>().
+        add( new AttributeSchemaDescriptor() ).
+        add( new CategoryComboSchemaDescriptor() ).
+        add( new CategoryOptionComboSchemaDescriptor() ).
+        add( new CategoryOptionGroupSchemaDescriptor() ).
+        add( new CategoryOptionGroupSetSchemaDescriptor() ).
+        add( new CategoryOptionSchemaDescriptor() ).
+        add( new CategorySchemaDescriptor() ).
+        add( new ChartSchemaDescriptor() ).
+        add( new ColorSchemaDescriptor() ).
+        add( new ColorSetSchemaDescriptor() ).
+        add( new ConstantSchemaDescriptor() ).
+        add( new DashboardItemSchemaDescriptor() ).
+        add( new DashboardSchemaDescriptor() ).
+        add( new DataApprovalLevelSchemaDescriptor() ).
+        add( new DataApprovalWorkflowSchemaDescriptor() ).
+        add( new DataElementGroupSchemaDescriptor() ).
+        add( new DataElementGroupSetSchemaDescriptor() ).
+        add( new DataElementOperandSchemaDescriptor() ).
+        add( new DataElementSchemaDescriptor() ).
+        add( new DataEntryFormSchemaDescriptor() ).
+        add( new DataSetSchemaDescriptor() ).
+        add( new DocumentSchemaDescriptor() ).
+        add( new EventChartSchemaDescriptor() ).
+        add( new EventReportSchemaDescriptor() ).
+        add( new FileResourceSchemaDescriptor() ).
+        add( new IndicatorGroupSchemaDescriptor() ).
+        add( new IndicatorGroupSetSchemaDescriptor() ).
+        add( new IndicatorSchemaDescriptor() ).
+        add( new IndicatorTypeSchemaDescriptor() ).
+        add( new InterpretationCommentSchemaDescriptor() ).
+        add( new InterpretationSchemaDescriptor() ).
+        add( new LegendSchemaDescriptor() ).
+        add( new LegendSetSchemaDescriptor() ).
+        add( new MapLayerSchemaDescriptor() ).
+        add( new MapSchemaDescriptor() ).
+        add( new MapViewSchemaDescriptor() ).
+        add( new MessageConversationSchemaDescriptor() ).
+        add( new MetaDataFilterSchemaDescriptor() ).
+        add( new OAuth2ClientSchemaDescriptor() ).
+        add( new OptionSchemaDescriptor() ).
+        add( new OptionSetSchemaDescriptor() ).
+        add( new OrganisationUnitGroupSchemaDescriptor() ).
+        add( new OrganisationUnitGroupSetSchemaDescriptor() ).
+        add( new OrganisationUnitLevelSchemaDescriptor() ).
+        add( new OrganisationUnitSchemaDescriptor() ).
+        add( new ProgramIndicatorSchemaDescriptor() ).
+        add( new ProgramRuleActionSchemaDescriptor() ).
+        add( new ProgramRuleSchemaDescriptor() ).
+        add( new ProgramRuleVariableSchemaDescriptor() ).
+        add( new ProgramSchemaDescriptor() ).
+        add( new ProgramStageDataElementSchemaDescriptor() ).
+        add( new ProgramStageSchemaDescriptor() ).
+        add( new ProgramStageSectionSchemaDescriptor() ).
+        add( new ProgramTrackedEntityAttributeSchemaDescriptor() ).
+        add( new ProgramValidationSchemaDescriptor() ).
+        add( new RelationshipTypeSchemaDescriptor() ).
+        add( new ReportSchemaDescriptor() ).
+        add( new ReportTableSchemaDescriptor() ).
+        add( new SectionSchemaDescriptor() ).
+        add( new SqlViewSchemaDescriptor() ).
+        add( new TrackedEntityAttributeGroupSchemaDescriptor() ).
+        add( new TrackedEntityAttributeSchemaDescriptor() ).
+        add( new TrackedEntityInstanceSchemaDescriptor() ).
+        add( new TrackedEntitySchemaDescriptor() ).
+        add( new TranslationSchemaDescriptor() ).
+        add( new UserCredentialsSchemaDescriptor() ).
+        add( new UserGroupSchemaDescriptor() ).
+        add( new UserRoleSchemaDescriptor() ).
+        add( new UserSchemaDescriptor() ).
+        add( new ValidationCriteriaSchemaDescriptor() ).
+        add( new ValidationRuleGroupSchemaDescriptor() ).
+        add( new ValidationRuleSchemaDescriptor() ).
+        add( new ResultsFrameworkSchemaDescriptor() ).
+        add( new ProgrammSchemaDescriptor() ).
+        add( new SubProgrammSchemaDescriptor() ).
+        add( new ProjectSchemaDescriptor() ).
+        build();
+    
     private Map<Class<?>, Schema> classSchemaMap = new HashMap<>();
 
     private Map<String, Schema> singularSchemaMap = new HashMap<>();
@@ -65,13 +146,10 @@ public class DefaultSchemaService
     private PropertyIntrospectorService propertyIntrospectorService;
 
     @Autowired
-    private List<SchemaDescriptor> descriptors = Lists.newArrayList();
-
-    @Autowired
     private SessionFactory sessionFactory;
 
-    @Override
-    public void onApplicationEvent( ContextRefreshedEvent contextRefreshedEvent )
+    @EventListener
+    public void handleContextRefresh( ContextRefreshedEvent contextRefreshedEvent )
     {
         for ( SchemaDescriptor descriptor : descriptors )
         {

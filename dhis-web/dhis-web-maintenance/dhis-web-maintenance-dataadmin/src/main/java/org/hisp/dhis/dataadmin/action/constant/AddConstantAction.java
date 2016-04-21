@@ -29,10 +29,13 @@ package org.hisp.dhis.dataadmin.action.constant;
  */
 
 import org.apache.commons.lang3.StringUtils;
+import org.hisp.dhis.attribute.AttributeService;
 import org.hisp.dhis.constant.Constant;
 import org.hisp.dhis.constant.ConstantService;
 
 import com.opensymphony.xwork2.Action;
+
+import java.util.List;
 
 /**
  * @author Dang Duy Hieu
@@ -47,11 +50,27 @@ public class AddConstantAction
 
     private ConstantService constantService;
 
+    private AttributeService attributeService;
+
+    public ConstantService getConstantService()
+    {
+        return constantService;
+    }
+
     public void setConstantService( ConstantService constantService )
     {
         this.constantService = constantService;
     }
 
+    public AttributeService getAttributeService()
+    {
+        return attributeService;
+    }
+
+    public void setAttributeService( AttributeService attributeService )
+    {
+        this.attributeService = attributeService;
+    }
     // -------------------------------------------------------------------------
     // Input
     // -------------------------------------------------------------------------
@@ -91,17 +110,29 @@ public class AddConstantAction
         this.value = value;
     }
 
+    private List<String> jsonAttributeValues;
+
+    public void setJsonAttributeValues( List<String> jsonAttributeValues )
+    {
+        this.jsonAttributeValues = jsonAttributeValues;
+    }
+
     // -------------------------------------------------------------------------
     // Action implementation
     // -------------------------------------------------------------------------
 
     @Override
-    public String execute()
+    public String execute() throws Exception
     {
         Constant constant = new Constant( StringUtils.trimToNull( name ), Double.parseDouble( value ) );
         constant.setShortName( StringUtils.trimToNull( shortName ) );
         constant.setCode( StringUtils.trimToNull( code ) );
         constant.setDescription( StringUtils.trimToNull( description ) );
+
+        if ( jsonAttributeValues != null )
+        {
+            attributeService.updateAttributeValues( constant, jsonAttributeValues );
+        }
         
         constantService.saveConstant( constant );
 

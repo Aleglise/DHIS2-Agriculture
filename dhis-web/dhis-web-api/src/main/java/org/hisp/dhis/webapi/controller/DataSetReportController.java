@@ -60,7 +60,7 @@ import java.util.*;
  * @author Stian Sandvold
  */
 @Controller
-@RequestMapping( value = "/datasetreport" )
+@RequestMapping( value = "/dataSetReport" )
 public class DataSetReportController
 {
     // -------------------------------------------------------------------------

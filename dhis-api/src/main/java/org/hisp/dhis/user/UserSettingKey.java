@@ -45,11 +45,10 @@ public enum UserSettingKey
     UI_LOCALE( "keyUiLocale", Locale.class ),
     DB_LOCALE( "keyDbLocale", Locale.class ),
     ANALYSIS_DISPLAY_PROPERTY( "keyAnalysisDisplayProperty", String.class ),
-    CURRENT_DOMAIN_TYPE( "keyCurrentDomainType" ),
+    TRACKER_DASHBOARD_LAYOUT( "keyTrackerDashboardLayout" ),
     AUTO_SAVE_CASE_ENTRY_FORM( "keyAutoSaveCaseEntryForm", Boolean.class ),
     AUTO_SAVE_TRACKED_ENTITY_REGISTRATION_ENTRY_FORM( "keyAutoSavetTrackedEntityForm", Boolean.class ),
-    AUTO_SAVE_DATA_ENTRY_FORM( "keyAutoSaveDataEntryForm", Boolean.class ),
-    TRACKER_DASHBOARD_LAYOUT( "keyTrackerDashboardLayout" );
+    AUTO_SAVE_DATA_ENTRY_FORM( "keyAutoSaveDataEntryForm", Boolean.class );
     
     private final String name;
     

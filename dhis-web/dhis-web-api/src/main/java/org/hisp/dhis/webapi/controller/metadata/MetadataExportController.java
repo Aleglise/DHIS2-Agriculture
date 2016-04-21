@@ -42,7 +42,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @author Morten Olav Hansen <mortenoh@gmail.com>
  */
 @Controller
-@RequestMapping( "/metadata/export" )
+@RequestMapping( "/23/metadata" )
 public class MetadataExportController
 {
     @Autowired

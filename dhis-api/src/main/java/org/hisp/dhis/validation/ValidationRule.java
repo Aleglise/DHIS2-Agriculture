@@ -103,6 +103,12 @@ public class ValidationRule
     private Expression rightSide;
 
     /**
+     * When non-empty, this is a boolean valued expression which
+     * indicates when this rule should be skipped
+     */
+    private Expression sampleSkipTest;
+
+    /**
      * The set of ValidationRuleGroups to which this ValidationRule belongs.
      */
     private Set<ValidationRuleGroup> groups = new HashSet<>();
@@ -114,7 +120,7 @@ public class ValidationRule
     private Integer organisationUnitLevel;
 
     /**
-     * The number of sequential right-side periods from which to collect samples
+     * The number of sequential periods from which to collect samples
      * to average (Monitoring-type rules only). Sequential periods are those
      * immediately preceding (or immediately following in previous years) the
      * selected period.
@@ -122,12 +128,18 @@ public class ValidationRule
     private Integer sequentialSampleCount;
 
     /**
-     * The number of annual right-side periods from which to collect samples to
+     * The number of annual periods from which to collect samples to
      * average (Monitoring-type rules only). Annual periods are from previous
      * years. Samples collected from previous years can also include sequential
      * periods adjacent to the equivalent period in previous years.
      */
     private Integer annualSampleCount;
+
+    /**
+     * The number of immediate sequential periods to skip (in the current year)
+     * when collecting samples for aggregate functions
+     */
+    private Integer sequentialSkipCount;
 
     // -------------------------------------------------------------------------
     // Constructors
@@ -146,6 +158,18 @@ public class ValidationRule
         this.operator = operator;
         this.leftSide = leftSide;
         this.rightSide = rightSide;
+        this.sampleSkipTest = null;
+    }
+
+    public ValidationRule( String name, String description, Operator operator, Expression leftSide,
+        Expression rightSide, Expression skipTest )
+    {
+        this.name = name;
+        this.description = description;
+        this.operator = operator;
+        this.leftSide = leftSide;
+        this.rightSide = rightSide;
+        this.sampleSkipTest = skipTest;
     }
 
     // -------------------------------------------------------------------------
@@ -161,6 +185,7 @@ public class ValidationRule
     {
         this.leftSide = null;
         this.rightSide = null;
+        this.sampleSkipTest = null;
     }
 
     /**
@@ -205,12 +230,13 @@ public class ValidationRule
      */
     public Set<DataElement> getCurrentDataElements()
     {
-        Set<DataElement> currentDataElements = leftSide.getDataElementsInExpression();
+        Set<DataElement> currentDataElements =
+            new HashSet<>( leftSide.getDataElementsInExpression() );
 
-        if ( ruleType == RuleType.VALIDATION )
+        currentDataElements.addAll( rightSide.getDataElementsInExpression() );
+        if ( sampleSkipTest != null )
         {
-            currentDataElements = new HashSet<>( currentDataElements );
-            currentDataElements.addAll( rightSide.getDataElementsInExpression() );
+            currentDataElements.addAll( sampleSkipTest.getDataElementsInExpression() );
         }
 
         return currentDataElements;
@@ -225,7 +251,36 @@ public class ValidationRule
      */
     public Set<DataElement> getPastDataElements()
     {
-        return ruleType == RuleType.VALIDATION ? null : rightSide.getDataElementsInExpression();
+        HashSet<DataElement> past = new HashSet<DataElement>();
+        Set<DataElement> elts = leftSide.getSampleElementsInExpression();
+        
+        if ( elts != null )
+        {
+            past.addAll( elts );
+        }
+        
+        elts = rightSide.getSampleElementsInExpression();
+        
+        if ( elts != null )
+        {
+            past.addAll( elts );
+        }
+        
+        if ( sampleSkipTest == null )
+        {
+            elts = null;
+        }
+        else
+        {
+            elts = sampleSkipTest.getSampleElementsInExpression();
+        }
+        
+        if ( elts != null )
+        {
+            past.addAll( elts );
+        }
+        
+        return past;
     }
 
     /**
@@ -383,6 +438,19 @@ public class ValidationRule
     @JsonProperty
     @JsonView( { DetailedView.class, ExportView.class } )
     @JacksonXmlProperty( namespace = DxfNamespaces.DXF_2_0 )
+    public Integer getSequentialSkipCount()
+    {
+        return sequentialSkipCount;
+    }
+
+    public void setSequentialSkipCount( Integer sequentialSkipCount )
+    {
+        this.sequentialSkipCount = sequentialSkipCount;
+    }
+
+    @JsonProperty
+    @JsonView( { DetailedView.class, ExportView.class } )
+    @JacksonXmlProperty( namespace = DxfNamespaces.DXF_2_0 )
     public Operator getOperator()
     {
         return operator;
@@ -404,6 +472,19 @@ public class ValidationRule
     public void setLeftSide( Expression leftSide )
     {
         this.leftSide = leftSide;
+    }
+
+    @JsonProperty
+    @JsonView( { DetailedView.class, ExportView.class } )
+    @JacksonXmlProperty( namespace = DxfNamespaces.DXF_2_0 )
+    public Expression getSampleSkipTest()
+    {
+        return sampleSkipTest;
+    }
+
+    public void setSampleSkipTest( Expression sampleSkipTest )
+    {
+        this.sampleSkipTest = sampleSkipTest;
     }
 
     @JsonProperty

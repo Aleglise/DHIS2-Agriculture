@@ -198,7 +198,7 @@ public class OrganisationUnitGroupSet
     @Override
     public DimensionType getDimensionType()
     {
-        return DimensionType.ORGANISATIONUNIT_GROUPSET;
+        return DimensionType.ORGANISATION_UNIT_GROUP_SET;
     }
 
     // -------------------------------------------------------------------------

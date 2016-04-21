@@ -308,7 +308,7 @@ public class DefaultDataIntegrityService
 
                 if ( operands != null )
                 {
-                    if ( operands.size() > 2000 )
+                    if ( operands.size() > 1000 )
                     {
                         log.warn( "Skipped integrity check for data set: " + dataSet.getName() + ", too many operands: " + operands.size() );
                         continue;
@@ -318,12 +318,16 @@ public class DefaultDataIntegrityService
                     {
                         DataElement dataElement = dataElementService.getDataElement( operand.getDataElementId() );
                         DataElementCategoryOptionCombo optionCombo = categoryService.getDataElementCategoryOptionCombo( operand.getOptionComboId() );
-                        Set<DataElementCategoryOptionCombo> optionCombos = dataElement.getCategoryCombo() != null ? dataElement.getCategoryCombo().getOptionCombos() : null;
-
-                        if ( optionCombos == null || !optionCombos.contains( optionCombo ) )
+                        
+                        if ( dataElement != null && optionCombo != null )
                         {
-                            DataElementOperand persistedOperand = new DataElementOperand( dataElement, optionCombo );
-                            map.putValue( dataSet, persistedOperand );
+                            Set<DataElementCategoryOptionCombo> optionCombos = dataElement.getCategoryCombo() != null ? dataElement.getCategoryCombo().getOptionCombos() : null;
+    
+                            if ( optionCombos == null || !optionCombos.contains( optionCombo ) )
+                            {
+                                DataElementOperand persistedOperand = new DataElementOperand( dataElement, optionCombo );
+                                map.putValue( dataSet, persistedOperand );
+                            }
                         }
                     }
                 }

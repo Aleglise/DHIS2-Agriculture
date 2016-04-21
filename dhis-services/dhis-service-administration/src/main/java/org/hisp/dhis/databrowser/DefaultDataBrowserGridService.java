@@ -39,7 +39,6 @@ import java.util.List;
 import org.hisp.dhis.common.Grid;
 import org.hisp.dhis.i18n.I18n;
 import org.hisp.dhis.i18n.I18nFormat;
-import org.hisp.dhis.period.CalendarPeriodType;
 import org.hisp.dhis.period.Period;
 import org.hisp.dhis.period.PeriodService;
 import org.hisp.dhis.period.PeriodType;
@@ -222,9 +221,8 @@ public class DefaultDataBrowserGridService
         try
         {
             Date date = dateFormat.parse( dateString );
-            CalendarPeriodType calendarPeriodType = (CalendarPeriodType) periodType;
 
-            return format.formatPeriod( calendarPeriodType.createPeriod( date ) );
+            return format.formatPeriod( periodType.createPeriod( date ) );
         }
         catch ( ParseException pe )
         {
@@ -320,10 +318,8 @@ public class DefaultDataBrowserGridService
 
             if ( periods.isEmpty() )
             {
-                CalendarPeriodType calendarPeriodType = (CalendarPeriodType) periodType;
-
-                periods.add( calendarPeriodType.createPeriod( date1 ) );
-                periods.add( calendarPeriodType.createPeriod( date2 ) );
+                periods.add( periodType.createPeriod( date1 ) );
+                periods.add( periodType.createPeriod( date2 ) );
             }
 
             Collections.sort( periods, new AscendingPeriodComparator() );

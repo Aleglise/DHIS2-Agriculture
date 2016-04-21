@@ -131,8 +131,9 @@ public class DefaultDataApprovalService
             {
                 if ( status.getState().isApproved() ) // If approved already, approve at next level up (lower level number)
                 {
-                    da.setDataApprovalLevel( dataApprovalLevelService.getDataApprovalLevelByLevelNumber(
-                        status.getActionLevel().getLevel() - 1 ) );
+                    log.debug( "approveData: approved. Moving up from level " + status.getActionLevel().getLevel() );
+
+                    da.setDataApprovalLevel( nextHigherLevel( status.getActionLevel(), da.getWorkflow() ) );
                 }
                 else
                 {
@@ -410,6 +411,24 @@ public class DefaultDataApprovalService
     // -------------------------------------------------------------------------
     // Supportive methods
     // -------------------------------------------------------------------------
+
+    /**
+     * Returns the next higher (lower number) level within a workflow.
+     */
+    private DataApprovalLevel nextHigherLevel( DataApprovalLevel level, DataApprovalWorkflow workflow )
+    {
+        List<DataApprovalLevel> sortedLevels = workflow.getSortedLevels();
+
+        for ( int i = 0; i < sortedLevels.size(); i++ )
+        {
+            if ( i > 0 && sortedLevels.get( i ) == level )
+            {
+                return sortedLevels.get( i - 1 );
+            }
+        }
+        
+        return level;
+    }
 
     /**
      * Returns a mapping from data approval key to data approval status for the given

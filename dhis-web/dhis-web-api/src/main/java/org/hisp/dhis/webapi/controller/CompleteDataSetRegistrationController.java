@@ -195,7 +195,7 @@ public class CompleteDataSetRegistrationController
             throw new WebMessageException( WebMessageUtils.conflict( "Illegal organisation unit identifier: " + ou ) );
         }
 
-        DataElementCategoryOptionCombo attributeOptionCombo = inputUtils.getAttributeOptionCombo( cc, cp );
+        DataElementCategoryOptionCombo attributeOptionCombo = inputUtils.getAttributeOptionCombo( cc, cp, false );
 
         if ( attributeOptionCombo == null )
         {
@@ -288,7 +288,7 @@ public class CompleteDataSetRegistrationController
 
             String cc = completeDataSetRegistrationRequest.getCc();
             String cp = completeDataSetRegistrationRequest.getCp();
-            DataElementCategoryOptionCombo attributeOptionCombo = inputUtils.getAttributeOptionCombo( cc, cp );
+            DataElementCategoryOptionCombo attributeOptionCombo = inputUtils.getAttributeOptionCombo( cc, cp, false );
 
             if ( attributeOptionCombo == null )
             {
@@ -375,7 +375,7 @@ public class CompleteDataSetRegistrationController
             throw new WebMessageException( WebMessageUtils.conflict( "Illegal organisation unit identifier: " + ou ) );
         }
 
-        DataElementCategoryOptionCombo attributeOptionCombo = inputUtils.getAttributeOptionCombo( cc, cp );
+        DataElementCategoryOptionCombo attributeOptionCombo = inputUtils.getAttributeOptionCombo( cc, cp, false );
 
         if ( attributeOptionCombo == null )
         {

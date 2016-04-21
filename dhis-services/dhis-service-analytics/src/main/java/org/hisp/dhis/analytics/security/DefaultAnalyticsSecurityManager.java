@@ -185,7 +185,7 @@ public class DefaultAnalyticsSecurityManager
 
         List<OrganisationUnit> orgUnits = new ArrayList<>( user.getDataViewOrganisationUnits() );
 
-        DimensionalObject constraint = new BaseDimensionalObject( DimensionalObject.ORGUNIT_DIM_ID, DimensionType.ORGANISATIONUNIT, orgUnits );
+        DimensionalObject constraint = new BaseDimensionalObject( DimensionalObject.ORGUNIT_DIM_ID, DimensionType.ORGANISATION_UNIT, orgUnits );
         
         params.getFilters().add( constraint );
 

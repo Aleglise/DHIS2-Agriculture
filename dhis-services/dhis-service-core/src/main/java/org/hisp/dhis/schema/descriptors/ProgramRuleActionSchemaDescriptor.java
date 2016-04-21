@@ -29,18 +29,15 @@ package org.hisp.dhis.schema.descriptors;
  */
 
 import com.google.common.collect.Lists;
-import org.hisp.dhis.security.Authority;
-import org.hisp.dhis.security.AuthorityType;
+import org.hisp.dhis.programrule.ProgramRuleAction;
 import org.hisp.dhis.schema.Schema;
 import org.hisp.dhis.schema.SchemaDescriptor;
-import org.hisp.dhis.programrule.ProgramRuleAction;
-import org.springframework.stereotype.Component;
+import org.hisp.dhis.security.Authority;
+import org.hisp.dhis.security.AuthorityType;
 
 /**
- *
  * @author markusbekken
  */
-@Component
 public class ProgramRuleActionSchemaDescriptor implements SchemaDescriptor
 {
     public static final String SINGULAR = "programRuleAction";
@@ -54,7 +51,7 @@ public class ProgramRuleActionSchemaDescriptor implements SchemaDescriptor
     {
         Schema schema = new Schema( ProgramRuleAction.class, SINGULAR, PLURAL );
         schema.setRelativeApiEndpoint( API_ENDPOINT );
-        schema.setOrder( 1392 );
+        schema.setOrder( 1610 );
 
         schema.getAuthorities().add( new Authority( AuthorityType.CREATE, Lists.newArrayList( "F_PROGRAMRULEACTION_ADD" ) ) );
         schema.getAuthorities().add( new Authority( AuthorityType.DELETE, Lists.newArrayList( "F_PROGRAMRULEACTION_DELETE" ) ) );

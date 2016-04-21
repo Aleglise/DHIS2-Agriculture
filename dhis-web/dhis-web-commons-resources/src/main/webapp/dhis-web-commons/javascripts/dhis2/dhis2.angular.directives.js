@@ -110,7 +110,7 @@ var d2Directives = angular.module('d2Directives', [])
     };
 })
 
-.directive('d2PopOver', function ($compile, $templateCache) {
+.directive('d2PopOver', function ($compile, $templateCache, $translate) {
 
     return {
         restrict: 'EA',
@@ -130,7 +130,7 @@ var d2Directives = angular.module('d2Directives', [])
                 placement: scope.placement ? scope.placement : 'auto',
                 trigger: scope.trigger ? scope.trigger : 'hover',
                 html: true,
-                title: scope.title
+                title: $translate.instant('_details')
             };
             element.popover(options);            
             
@@ -435,8 +435,7 @@ var d2Directives = angular.module('d2Directives', [])
         }
     };
 })
-
-.directive('d2Audit', function () {
+.directive('d2Audit', function (CurrentSelection, MetaDataFactory ) {
     return {
         restrict: 'E',
         template: '<span class="hideInPrint audit-icon" title="{{\'audit_history\' | translate}}" data-ng-click="showAuditHistory()">' +
@@ -449,23 +448,44 @@ var d2Directives = angular.module('d2Directives', [])
         },
         controller: function ($scope, $modal) {
             $scope.showAuditHistory = function () {
-                $modal.open({
-                    templateUrl: "../dhis-web-commons/angular-forms/audit-history.html",
-                    controller: "AuditHistoryController",
-                    resolve: {
-                        eventId: function () {
-                            return $scope.eventId;
-                        },
-                        dataType: function () {
-                            return $scope.type;
-                        },
-                        nameIdMap: function () {
-                            return $scope.nameIdMap;
+                
+                var openModal = function( ops ){
+                    $modal.open({
+                        templateUrl: "../dhis-web-commons/angular-forms/audit-history.html",
+                        controller: "AuditHistoryController",
+                        resolve: {
+                            eventId: function () {
+                                return $scope.eventId;
+                            },
+                            dataType: function () {
+                                return $scope.type;
+                            },
+                            nameIdMap: function () {
+                                return $scope.nameIdMap;
+                            },
+                            optionSets: function(){
+                                return ops;
+                            }
                         }
-                    }
-                })
-            }
-        },
+                    });
+                };
+                
+                var optionSets = CurrentSelection.getOptionSets();
+                if(!optionSets){
+                    optionSets = [];
+                    MetaDataFactory.getAll('optionSets').then(function(optionSets){
+                        angular.forEach(optionSets, function(optionSet){  
+                            optionSets[optionSet.id] = optionSet;
+                        });
+                        CurrentSelection.setOptionSets(optionSets);
+                        openModal(optionSets);
+                    });                
+                }
+                else{
+                    openModal(optionSets);
+                }                
+            };
+        }
     };
 })
 .directive('d2RadioButton', function (){  
@@ -558,7 +578,13 @@ var d2Directives = angular.module('d2Directives', [])
                             if(scope.clickedButton === buttonValue){
                                 return 'radio-save-success';
                             }
+                        }                                            
+                    //different solution with text chosen
+                    /*else if(scope.status === "error"){
+                        if(scope.clickedButton === buttonValue){
+                            return 'radio-save-error';
                         }
+                    }*/
                     }
                 }                
                 return 'radio-white';
