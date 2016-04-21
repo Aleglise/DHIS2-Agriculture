@@ -125,7 +125,7 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
 
 
 /* Factory to fetch programs */
-.factory('DataSetFactory', function($q, $rootScope, SessionStorageService, RFStorageService, orderByFilter, CommonUtils) { 
+.factory('DataSetFactory', function($q, $rootScope, $filter, SessionStorageService, RFStorageService, orderByFilter, CommonUtils) { 
   
     return {        
         getAll: function(){            
@@ -169,6 +169,55 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
             
             RFStorageService.currentStore.open().done(function(){
                 RFStorageService.currentStore.getAll('dataSets').done(function(dss){
+                    var dataSets = [];
+                    angular.forEach(dss, function(ds){                            
+                        if(ds.organisationUnits.hasOwnProperty( ou.id ) && CommonUtils.userHasValidRole(ds,'dataSets', userRoles)){
+                            dataSets.push(ds);
+                        }
+                    });
+                    
+                    dataSets = orderByFilter(dataSets, '-displayName').reverse();
+                    
+                    if(dataSets.length === 0){
+                        selectedDataSet = null;
+                    }
+                    else if(dataSets.length === 1){
+                        selectedDataSet = dataSets[0];
+                    } 
+                    else{
+                        if(selectedDataSet){
+                            var continueLoop = true;
+                            for(var i=0; i<dataSets.length && continueLoop; i++){
+                                if(dataSets[i].id === selectedDataSet.id){                                
+                                    selectedDataSet = dataSets[i];
+                                    continueLoop = false;
+                                }
+                            }
+                            if(continueLoop){
+                                selectedDataSet = null;
+                            }
+                        }
+                    }
+                                        
+                    if(!selectedDataSet || angular.isUndefined(selectedDataSet) && dataSets.legth > 0){
+                        selectedDataSet = dataSets[0];
+                    }
+                    
+                    $rootScope.$apply(function(){
+                        def.resolve({dataSets: dataSets, selectedDataSet: selectedDataSet});
+                    });                      
+                });
+            });            
+            return def.promise;
+        },
+        getBaselineDataSetsByOu: function(ou, selectedDataSet){
+            var roles = SessionStorageService.get('USER_ROLES');
+            var userRoles = roles && roles.userCredentials && roles.userCredentials.userRoles ? roles.userCredentials.userRoles : [];
+            var def = $q.defer();
+            
+            RFStorageService.currentStore.open().done(function(){
+                RFStorageService.currentStore.getAll('dataSets').done(function(dss){
+                    dss = $filter('filter')(dss, {baseline: true});
                     var dataSets = [];
                     angular.forEach(dss, function(ds){                            
                         if(ds.organisationUnits.hasOwnProperty( ou.id ) && CommonUtils.userHasValidRole(ds,'dataSets', userRoles)){

@@ -1259,18 +1259,17 @@ function displayPeriods()
     
     if( dhis2.de.dataSets[dataSetId].attributeValues.length )
     {
-        //baseLine
+        //baseline
         var isBaseline = false;
         $.safeEach( dhis2.de.dataSets[dataSetId].attributeValues, function( idx, item ) 
         {
-            if( item.hasOwnProperty( 'baseline') ){
+            if( item.baseline ){
                 isBaseline = true;
                 return false;
             }
         } );
         
-        if( isBaseline ){
-            //console.log('baseline periods:  ', generateBaselinePeriods( periods ));
+        if( isBaseline ){            
             periods = generateBaselinePeriods( periods );
         }        
     }

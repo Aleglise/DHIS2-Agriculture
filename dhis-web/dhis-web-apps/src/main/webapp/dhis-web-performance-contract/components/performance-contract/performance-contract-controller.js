@@ -32,7 +32,7 @@ var resultsFrameworkControllers = angular.module('resultsFrameworkControllers', 
         $scope.selectedOrgUnit = orgUnit;
         
         if (angular.isObject($scope.selectedOrgUnit)) {            
-            DataSetFactory.getDataSetsByOu($scope.selectedOrgUnit, $scope.selectedDataSet).then(function(response){
+            DataSetFactory.getBaselineDataSetsByOu($scope.selectedOrgUnit, $scope.selectedDataSet).then(function(response){
                 $scope.model.dataSets = response.dataSets;
                 $scope.model.selectedDataSet = response.selectedDataSet;
             });
@@ -48,7 +48,7 @@ var resultsFrameworkControllers = angular.module('resultsFrameworkControllers', 
     
     $scope.loadDataSetDetails = function(){
         if( $scope.model.selectedDataSet && $scope.model.selectedDataSet.id && $scope.model.selectedDataSet.periodType){            
-            $scope.model.periods = PeriodService.getPeriods($scope.model.selectedDataSet.periodType, $scope.model.periodOffset);
+            $scope.model.periods = PeriodService.getPeriods('Yearly', $scope.model.periodOffset);
             
             if(!$scope.model.selectedDataSet.dataElements || $scope.model.selectedDataSet.dataElements.length < 1){
                 var dialogOptions = {
@@ -97,12 +97,12 @@ var resultsFrameworkControllers = angular.module('resultsFrameworkControllers', 
         if( mode === 'NXT'){
             $scope.periodOffset = $scope.periodOffset + 1;
             $scope.model.selectedPeriod = null;
-            $scope.model.periods = PeriodService.getPeriods($scope.model.selectedDataSet.periodType, $scope.periodOffset);
+            $scope.model.periods = PeriodService.getPeriods('Yearly', $scope.periodOffset);
         }
         else{
             $scope.periodOffset = $scope.periodOffset - 1;
             $scope.model.selectedPeriod = null;
-            $scope.model.periods = PeriodService.getPeriods($scope.model.selectedDataSet.periodType, $scope.periodOffset);
+            $scope.model.periods = PeriodService.getPeriods('Yearly', $scope.periodOffset);
         }
     };
 });
