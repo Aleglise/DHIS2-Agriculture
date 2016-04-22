@@ -1001,6 +1001,27 @@
                     description: ""
                 },
                 {
+                    name: "about_dhis2",
+                    namespace: "/dhis-web-commons-about",
+                    defaultAction: "../dhis-web-commons-about/about.action",
+                    icon: "../icons/function-about-dhis2.png",
+                    description: ""
+                },
+                {
+                    name: "help",
+                    namespace: "/dhis-web-commons-about",
+                    defaultAction: helpPageLink.defaultAction || "", //FIXME: This sets the help url to an empty string when the ajax call failed. We should find an alternative.
+                    icon: "../icons/function-help-center.png",
+                    description: ""
+                },
+                {
+                	name: "active_user_list",
+                	namespace: "/dhis-web-commons-about",
+                	defaultAction: "../dhis-web-commons-about/activeUserList.action",
+                	icon: "../icons/function-accounts.png",
+                	description: ""	
+                },
+                {
                     name: "profile",
                     namespace: "/dhis-web-commons-about",
                     defaultAction: "../dhis-web-commons-about/showUpdateUserProfileForm.action",
@@ -1015,24 +1036,10 @@
                     description: ""
                 },
                 {
-                    name: "help",
-                    namespace: "/dhis-web-commons-about",
-                    defaultAction: helpPageLink.defaultAction || "", //FIXME: This sets the help url to an empty string when the ajax call failed. We should find an alternative.
-                    icon: "../icons/function-help.png",
-                    description: ""
-                },
-                {
                     name: "log_out",
                     namespace: "/dhis-web-commons-about",
                     defaultAction: "../dhis-web-commons-security/logout.action",
                     icon: "../icons/function-log-out.png",
-                    description: ""
-                },
-                {
-                    name: "about_dhis2",
-                    namespace: "/dhis-web-commons-about",
-                    defaultAction: "../dhis-web-commons-about/about.action",
-                    icon: "../icons/function-about-dhis2.png",
                     description: ""
                 }
             ],

@@ -137,6 +137,10 @@
   <listener>
     <listener-class>org.hisp.dhis.system.startup.StartupListener</listener-class>
   </listener>
+  <!-- add for Active user List -->
+  <listener>
+  	<listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
+  </listener>
 
   <!-- Servlets -->
   <servlet>
