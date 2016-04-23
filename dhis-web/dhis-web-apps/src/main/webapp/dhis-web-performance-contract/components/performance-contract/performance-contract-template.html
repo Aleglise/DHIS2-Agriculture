@@ -40,7 +40,9 @@
                             {{getSum(model.report[de.id][op.id].annualTarget, model.report[de.id].baseline)}}
                         </span>
                         <span ng-switch-when="annualProgress">
-                            {{getPercent(model.report[de.id][model.progressOption.id].annualTarget,model.report[de.id][model.targetOption.id].annualTarget)}}
+                            <span ng-if="op.id === model.progressOption.id">
+                                {{getPercent(model.report[de.id][model.progressOption.id].annualTarget,model.report[de.id][model.targetOption.id].annualTarget)}}
+                            </span>                            
                         </span>
                     </span>
                 </td>
