@@ -56,9 +56,6 @@ $(document).ready(function()
     });
 
     $('#loaderSpan').show();
-    
-    
-    downloadMetaData();
 });
 
 $(document).bind('dhis2.online', function(event, loggedIn)

@@ -21,26 +21,39 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
 .service('GridService', function($translate){
     
     return {
-        generateLayout: function( templateRows ){
-            var layout = {columns: [], rows: []};
+        generateLayout: function( templateRows, periods ){
+            var layout = {prefixColumns: [], postfixColumns: [], columns: [], rows: []};
             
-            layout.columns.push({id: 'frameworkColId', name: 'ASIP-2 Result', order: 0});
-            layout.columns.push({id: 'indicatorColId', name: 'INDICATOR', order: 1});
-            layout.columns.push({id: 'categoryColId', name: 'T/P', order: 2});
-            layout.columns.push({id: 'baseLineColId', name: $translate.instant('base_line'), order: 3});
-            layout.columns.push({id: 'q1Id', name: $translate.instant('q1'), order: 4});
-            layout.columns.push({id: 'd2Id', name: $translate.instant('q2'), order: 5});
-            layout.columns.push({id: 'q3Id', name: $translate.instant('q3'), order: 6});
-            layout.columns.push({id: 'q4Id', name: $translate.instant('q4'), order: 7});
-            layout.columns.push({id: 'annualTargetColId', name: $translate.instant('annual_target'), order: 8});
-            layout.columns.push({id: 'finalTargetColId', name: $translate.instant('final_target'), order: 9});
-            layout.columns.push({id: 'annualProgressColId', name: $translate.instant('annual_progress'), order: 10});
+            //layout.columns.push({id: 'frameworkColId', name: 'ASIP-2 Result', order: 0});
+            layout.prefixColumns.push({id: 'indicatorColId', name: 'INDICATOR', order: 1});
+            layout.prefixColumns.push({id: 'categoryColId', name: 'T/P', order: 2});
+            layout.prefixColumns.push({id: 'baseLineColId', name: $translate.instant('base_line'), order: 3});
             
-            var index = 0;
-            angular.forEach(templateRows, function(r){                
-                layout.rows.push({id: r.id, name: r.name, order: index});
-                index++;
-            });
+            for(var i=0; i<periods.length; i++){
+                layout.columns.push({id: periods[i], name: periods[i].slice(4), order: 4 + i});
+            }
+            
+            layout.postfixColumns.push({id: 'annualTargetColId', name: $translate.instant('annual_target'), order: 8});
+            layout.postfixColumns.push({id: 'finalTargetColId', name: $translate.instant('final_target'), order: 9});
+            layout.postfixColumns.push({id: 'annualProgressColId', name: $translate.instant('annual_progress'), order: 10});
+            
+            for(var i=0; i<templateRows.length; i++){
+                layout.rows.push({id: templateRows[i].id, name: templateRows[i].name, order: i});
+            }
+            
+            return layout;
+        },
+        generateColumns: function(){
+            var layout = {prefixColumns: [], postfixColumns: [], rows: []};
+            
+            //layout.columns.push({id: 'frameworkColId', name: 'ASIP-2 Result', order: 0});
+            layout.prefixColumns.push({id: 'indicatorColId', name: 'INDICATOR', order: 1});
+            layout.prefixColumns.push({id: 'categoryColId', name: 'T/P', order: 2});
+            layout.prefixColumns.push({id: 'baseLineColId', name: $translate.instant('base_line'), order: 3});
+            
+            layout.postfixColumns.push({id: 'annualTargetColId', name: $translate.instant('annual_target'), order: 8});
+            layout.postfixColumns.push({id: 'finalTargetColId', name: $translate.instant('final_target'), order: 9});
+            layout.postfixColumns.push({id: 'annualProgressColId', name: $translate.instant('annual_progress'), order: 10});
             
             return layout;
         }
@@ -341,6 +354,48 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
             var promise = $http.put('../api/resultsFrameworks/' + resultsFramework.id, resultsFramework).then(function(response){
                 return response.data;         
             });
+            return promise;
+        }
+    };    
+})
+
+.service('AnalyticsService', function($http, DialogService, $translate) {   
+    
+    var errorNotifier = function(response){
+        if( response && response.data && response.data.status === 'ERROR'){
+            var dialogOptions = {
+                headerText: response.data.status,
+                bodyText: response.data.message ? response.data.message : $translate.instant('unable_to_fetch_data_from_server')
+            };		
+            DialogService.showDialog({}, dialogOptions);
+        }
+    };
+    
+    return {
+        
+        fetchData: function(url){
+            var promise = $http.get('../api/analytics.json?' + url).then(function(response){
+                
+                response.data.report = {};
+                
+                angular.forEach(response.data.rows, function(row){
+                    
+                    if( !response.data.report[row[0]] ){
+                        response.data.report[row[0]] = {};
+                    }
+                    
+                    if( !response.data.report[row[0]][row[1]] ){
+                        response.data.report[row[0]][row[1]] = {};
+                    }
+                    
+                    response.data.report[row[0]][row[1]][row[2]] = row[3];
+                });
+                
+                return response.data;
+                
+            }, function(response){
+                errorNotifier(response);
+            });            
             return promise;
         }
     };    

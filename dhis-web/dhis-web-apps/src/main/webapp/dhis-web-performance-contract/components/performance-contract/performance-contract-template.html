@@ -2,38 +2,38 @@
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th class="pull-center" ng-repeat="header in model.templateLayout.columns">
+                <th class="pull-center" ng-repeat="header in model.templateLayout.prefixColumns">
+                    {{header.name}}
+                </th>
+                <th class="pull-center" ng-repeat="header in model.analyticsPeriods">
+                    {{header.name}}
+                </th>
+                <th class="pull-center" ng-repeat="header in model.templateLayout.postfixColumns">
                     {{header.name}}
                 </th>
             </tr>
         </thead>
-        <tbody ng-repeat="row in model.templateLayout.rows">
-            <tr>
-                <td colspan="{{model.templateLayout.columns.length}}">
-                    {{row.name}}
-                </td>
-            </tr>
-        </tbody>
-        <tbody>
-            <tr ng-repeat="de in model.data">
-                <td class="vertical-center" rowspan="{{model.data.length}}" ng-if="$index===0">
-                    {{model.selectedDataSet.displayName}}
-                </td>
-                <td class="vertical-center" ng-if="$index % 2 === 0" rowspan="2">
+        <tbody ng-repeat="de in model.selectedDataSet.dataElements | orderBy: 'name'" ng-init="deIndex=$index">
+            <tr ng-repeat="op in model.selectedCategoryCombo.categories[0].categoryOptions" ng-if="op.id !== model.baselineOption.id" ng-init="opIndex=$index">
+                <td ng-repeat="header in model.templateLayout.prefixColumns" 
+                    ng-if="$index===0">
                     {{de.name}}
                 </td>
-                <td class="vertical-center" ng-if="$index % 2 === 0">
-                    Target
+                <td class="pull-center" ng-repeat="header in model.templateLayout.prefixColumns" 
+                    ng-if="$index!==0">
+                    <span ng-if="header.name === 'BASELINE' ">
+                        
+                    </span>
+                    <span ng-if="header.name !== 'BASELINE' ">
+                        {{op.name}}
+                    </span>                    
                 </td>
-                <td class="vertical-center" ng-if="$index % 2 > 0">
-                    Progress
+                <td class="pull-center" ng-repeat="pe in model.analyticsPeriods">
+                    {{model.report[de.id][pe.id][op.id]}}
                 </td>
-                <td class="vertical-center" ng-repeat="header in model.templateLayout.columns" ng-if="header.id !== 'frameworkColId' && header.id !== 'categoryColId' && header.id !== 'indicatorColId'">
-                    {{header.value}}
+                <td class="pull-center" ng-repeat="header in model.templateLayout.postfixColumns">
                 </td>
-            </tr>            
-        </tbody>            
-    </table>
-    
-    
+            </tr>
+        </tbody>        
+    </table>    
 </div> 
