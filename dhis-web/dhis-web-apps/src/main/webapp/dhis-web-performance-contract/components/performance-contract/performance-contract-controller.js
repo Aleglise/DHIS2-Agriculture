@@ -8,6 +8,7 @@ var resultsFrameworkControllers = angular.module('resultsFrameworkControllers', 
 //Controller for settings page
 .controller('PerformanceContractController',
         function($scope,
+                $translate,
                 SessionStorageService,
                 DialogService,
                 DataSetFactory,
@@ -100,8 +101,7 @@ var resultsFrameworkControllers = angular.module('resultsFrameworkControllers', 
     };
     
     $scope.loadDataSetDetails = function(){
-        if( $scope.model.selectedDataSet && $scope.model.selectedDataSet.id && $scope.model.selectedDataSet.periodType){
-            
+        if( $scope.model.selectedDataSet && $scope.model.selectedDataSet.id && $scope.model.selectedDataSet.periodType){            
             
             if( $scope.model.selectedDataSet.periodType === 'Daily' ||
                 $scope.model.selectedDataSet.periodType === 'Weekly' ||   
@@ -211,9 +211,18 @@ var resultsFrameworkControllers = angular.module('resultsFrameworkControllers', 
         }
     };
     
-    $scope.sum = function(op1, op2){        
+    $scope.getSum = function(op1, op2){        
         op1 = dhis2.validation.isNumber(op1) ? parseInt(op1) : 0;
         op2 = dhis2.validation.isNumber(op2) ? parseInt(op2) : 0;        
         return op1 + op2;
     };
+    
+    $scope.getPercent = function(op1, op2){        
+        op1 = dhis2.validation.isNumber(op1) ? parseInt(op1) : 0;
+        op2 = dhis2.validation.isNumber(op2) ? parseInt(op2) : 0;        
+        if( op2 === 0 ){
+            return 0;
+        }        
+        return parseFloat((op1 / op2)*100).toFixed(2) + '%';
+    };    
 });
