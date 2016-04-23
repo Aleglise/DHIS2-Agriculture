@@ -16,7 +16,8 @@
         <tbody ng-repeat="de in model.selectedDataSet.dataElements | orderBy: 'name'" ng-init="deIndex=$index">
             <tr ng-repeat="op in model.selectedCategoryCombo.categories[0].categoryOptions" ng-if="op.id !== model.baselineOption.id" ng-init="opIndex=$index">
                 <td ng-repeat="header in model.templateLayout.prefixColumns" 
-                    ng-if="$index===0">
+                    rowspan="2" 
+                    ng-if="$index===0 && opIndex=== 1">
                     {{de.name}}
                 </td>
                 <td class="pull-center" ng-repeat="header in model.templateLayout.prefixColumns" 
