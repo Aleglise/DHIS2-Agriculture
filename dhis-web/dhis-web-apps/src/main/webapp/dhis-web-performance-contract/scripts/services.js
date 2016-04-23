@@ -27,15 +27,15 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
             //layout.columns.push({id: 'frameworkColId', name: 'ASIP-2 Result', order: 0});
             layout.prefixColumns.push({id: 'indicatorColId', name: 'INDICATOR', order: 1});
             layout.prefixColumns.push({id: 'categoryColId', name: 'T/P', order: 2});
-            layout.prefixColumns.push({id: 'baseLineColId', name: $translate.instant('base_line'), order: 3});
+            layout.prefixColumns.push({id: 'baseline', name: $translate.instant('base_line'), order: 3});
             
             for(var i=0; i<periods.length; i++){
                 layout.columns.push({id: periods[i], name: periods[i].slice(4), order: 4 + i});
             }
             
-            layout.postfixColumns.push({id: 'annualTargetColId', name: $translate.instant('annual_target'), order: 8});
-            layout.postfixColumns.push({id: 'finalTargetColId', name: $translate.instant('final_target'), order: 9});
-            layout.postfixColumns.push({id: 'annualProgressColId', name: $translate.instant('annual_progress'), order: 10});
+            layout.postfixColumns.push({id: 'annualTarget', name: $translate.instant('annual_target'), order: 8});
+            layout.postfixColumns.push({id: 'finalTarget', name: $translate.instant('final_target'), order: 9});
+            layout.postfixColumns.push({id: 'annualProgress', name: $translate.instant('annual_progress'), order: 10});
             
             for(var i=0; i<templateRows.length; i++){
                 layout.rows.push({id: templateRows[i].id, name: templateRows[i].name, order: i});
@@ -49,11 +49,11 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
             //layout.columns.push({id: 'frameworkColId', name: 'ASIP-2 Result', order: 0});
             layout.prefixColumns.push({id: 'indicatorColId', name: 'INDICATOR', order: 1});
             layout.prefixColumns.push({id: 'categoryColId', name: 'T/P', order: 2});
-            layout.prefixColumns.push({id: 'baseLineColId', name: $translate.instant('base_line'), order: 3});
+            layout.prefixColumns.push({id: 'baseline', name: $translate.instant('base_line'), order: 3});
             
-            layout.postfixColumns.push({id: 'annualTargetColId', name: $translate.instant('annual_target'), order: 8});
-            layout.postfixColumns.push({id: 'finalTargetColId', name: $translate.instant('final_target'), order: 9});
-            layout.postfixColumns.push({id: 'annualProgressColId', name: $translate.instant('annual_progress'), order: 10});
+            layout.postfixColumns.push({id: 'annualTarget', name: $translate.instant('annual_target'), order: 8});
+            layout.postfixColumns.push({id: 'finalTarget', name: $translate.instant('final_target'), order: 9});
+            layout.postfixColumns.push({id: 'annualProgress', name: $translate.instant('annual_progress'), order: 10});
             
             return layout;
         }
@@ -373,7 +373,7 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
     
     return {
         
-        fetchData: function(url){
+        fetchData: function(url, baselineDimension, progressDimension, targetDimension){
             var promise = $http.get('../api/analytics.json?' + url).then(function(response){
                 
                 response.data.report = {};
@@ -381,14 +381,33 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
                 angular.forEach(response.data.rows, function(row){
                     
                     if( !response.data.report[row[0]] ){
-                        response.data.report[row[0]] = {};
+                        response.data.report[row[0]] = {baseline: 0};
                     }
                     
                     if( !response.data.report[row[0]][row[1]] ){
                         response.data.report[row[0]][row[1]] = {};
                     }
                     
-                    response.data.report[row[0]][row[1]][row[2]] = row[3];
+                    if( row[2] === baselineDimension.id ){
+                        response.data.report[row[0]].baseline = row[3];
+                    }
+                    else{
+                        
+                        if( !response.data.report[row[0]][row[2]] ){
+                            response.data.report[row[0]][row[2]] = {annualTarget: 0};
+                        }
+                    
+                        response.data.report[row[0]][row[2]].annualTarget += parseInt( row[3] );
+                        
+                        /*if( row[2] === progressDimension.id ){
+                            response.data.report[row[0]].annualTarget += row[3];
+                        }
+                        if( row[2] === targetDimension.id ){
+                            response.data.report[row[0]].annualTarget += row[3];
+                        }*/
+                        
+                        response.data.report[row[0]][row[1]][row[2]] = row[3];
+                    }                    
                 });
                 
                 return response.data;

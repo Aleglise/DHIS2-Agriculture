@@ -21,8 +21,8 @@
                 </td>
                 <td class="pull-center" ng-repeat="header in model.templateLayout.prefixColumns" 
                     ng-if="$index!==0">
-                    <span ng-if="header.name === 'BASELINE' ">
-                        
+                    <span ng-if="header.name === 'BASELINE' && op.name==='Progress'">
+                        {{model.report[de.id][header.id]}}
                     </span>
                     <span ng-if="header.name !== 'BASELINE' ">
                         {{op.name}}
@@ -32,6 +32,17 @@
                     {{model.report[de.id][pe.id][op.id]}}
                 </td>
                 <td class="pull-center" ng-repeat="header in model.templateLayout.postfixColumns">
+                    <span ng-switch="header.id">
+                        <span ng-switch-when="annualTarget">
+                            {{model.report[de.id][op.id][header.id]}}
+                        </span>
+                        <span ng-switch-when="finalTarget">
+                            {{sum(model.report[de.id][op.id].annualTarget, model.report[de.id].baseline)}}
+                        </span>
+                        <span ng-switch-when="annualProgress">
+                            
+                        </span>
+                    </span>
                 </td>
             </tr>
         </tbody>        

@@ -92,7 +92,7 @@ var resultsFrameworkControllers = angular.module('resultsFrameworkControllers', 
         
         if( !invalidPeriod ){
             $scope.model.periodUrl = $scope.model.periodUrl.slice(0,-1);            
-            AnalyticsService.fetchData( $scope.model.periodUrl + '&' + $scope.model.dimensionUrl ).then(function(response){
+            AnalyticsService.fetchData( $scope.model.periodUrl + '&' + $scope.model.dimensionUrl, $scope.model.baselineOption, $scope.model.progressOption, $scope.model.targetOption ).then(function(response){
                 $scope.model.report = response.report;
                 $scope.model.templateLayout = GridService.generateColumns();                
             });            
@@ -148,13 +148,22 @@ var resultsFrameworkControllers = angular.module('resultsFrameworkControllers', 
                         
                         $scope.model.optionUrl +=  op.id + ';';
                         
-                        if( op.attributeValues && op.attributeValues.length > 0){
+                        if( op.name === 'Baseline' ){
+                            $scope.model.baselineOption = op;
+                        }
+                        else if( op.name === 'Target' ){
+                            $scope.model.targetOption = op;
+                        }
+                        else if( op.name === 'Progress' ){
+                            $scope.model.progressOption = op;
+                        }
+                        /*if( op.attributeValues && op.attributeValues.length > 0){
                             for(var i=0; i<op.attributeValues.length && !$scope.model.baselineOption; i++){
                                 if( op.attributeValues[i].value && op.attributeValues[i].attribute.code === 'baseline'){
                                     $scope.model.baselineOption = op;
                                 }
                             }
-                        }
+                        }*/
                     });                    
                 }
                 else{
@@ -200,5 +209,11 @@ var resultsFrameworkControllers = angular.module('resultsFrameworkControllers', 
             $scope.model.selectedPeriod = null;
             $scope.model.periods = PeriodService.getPeriods('Yearly', $scope.periodOffset);
         }
+    };
+    
+    $scope.sum = function(op1, op2){        
+        op1 = dhis2.validation.isNumber(op1) ? parseInt(op1) : 0;
+        op2 = dhis2.validation.isNumber(op2) ? parseInt(op2) : 0;        
+        return op1 + op2;
     };
 });
