@@ -9,7 +9,7 @@
             {{'project'| translate}}
         </div>
         <div class="input-group col-sm-10">
-            <input type="text" name="searchText" placeholder="{{'search' | translate}}" class="form-control" ng-disabled="model.showEditProject || model.showAddProjectDiv" ng-model="model.searchText" ng-blur="loadProjects()" d2-enter="loadProjects()"/>
+            <input type="text" name="searchText" placeholder="{{'search_by_name' | translate}}" class="form-control" ng-disabled="model.showEditProject || model.showAddProjectDiv" ng-model="model.searchText" ng-blur="loadProjects()" d2-enter="loadProjects()"/>
             <div class="input-group-btn">                
                 <button class="btn btn-success" type="button" title="{{'search'| translate}}" ng-disabled="model.showEditProject || model.showAddProjectDiv" ng-click="loadProjects()"><i class="fa fa-search"></i></button>
                 <button class="btn btn-primary" type="button" title="{{'add_new'| translate}}" ng-disabled="model.showEditProject || model.showAddProjectDiv" ng-click="showAddProject()"><i class="fa fa-plus"></i></button>
@@ -36,15 +36,15 @@
                 <div ng-if="model.projects.length > 0">
                     <table class="listTable dhis2-table-striped-border dhis2-table-hover">
                         <thead>
-                            <tr>
-                                <th>
-                                    {{'name'| translate}}
-                                </th>
-                                <th>
-                                    {{'code'| translate}}
-                                </th>
-                                <th>
-                                    {{'description'| translate}}
+                            <tr>                                
+                                <th class="bold" ng-repeat="col in model.gridColumns" ng-click="sortGrid(col)">                                    
+                                    <!-- sort icon begins -->                                
+                                    <span class="fa-stack">
+                                        <span ng-class="{true: 'red'} [model.sortColumn === col && !model.reverse]"><i class="fa fa-sort-asc fa-stack-1x"></i></span>
+                                        <span ng-class="{true: 'red'} [model.sortColumn === col && model.reverse]"><i class="fa fa-sort-desc fa-stack-1x"></i></span>
+                                    </span>
+                                    <!-- sort icon ends -->
+                                    {{col | translate}}
                                 </th>
                             </tr>
                         </thead>
@@ -54,14 +54,13 @@
                                 ng-repeat="project in model.projects | filter: {name: model.searchText} | orderBy: 'name'"
                                 d2-context-menu 
                                 selected-item={{project}}>
-                                <td>
-                                    {{project.name}}
-                                </td>
-                                <td>
-                                    {{project.code}}
-                                </td>
-                                <td>
-                                    {{project.description}}
+                                <td ng-repeat="col in model.gridColumns">
+                                    <span ng-if="col !== 'lastUpdated'">
+                                        {{project[col]}}
+                                    </span>
+                                    <span ng-if="col === 'lastUpdated'">
+                                        {{project[col] | d2LastUpdated}}
+                                    </span>
                                 </td>
                             </tr>
                         </tbody>

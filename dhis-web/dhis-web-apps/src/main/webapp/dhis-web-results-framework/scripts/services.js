@@ -250,7 +250,7 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
     return {
 
         get: function(uid){
-            var promise = $http.get('../api/resultsFrameworks/' + uid + '.json?fields=id,name,code,description,active,impacts[id,name,indicators[name]],outcomes[id,name,indicators[name]],outputs[id,name,indicators[name]],programms[id,name,code,description,outcomes[id,name,indicators[name]],outputs[id,name,indicators[name]],subProgramms[id,name,code,description,outputs[id,name,indicators[name]]]],attributeValues[value,attribute[id,name,code]]').then(function(response){
+            var promise = $http.get('../api/resultsFrameworks/' + uid + '.json?fields=id,name,code,description,lastUpdated,active,impacts[id,name,indicators[name]],outcomes[id,name,indicators[name]],outputs[id,name,indicators[name]],programms[id,name,code,description,outcomes[id,name,indicators[name]],outputs[id,name,indicators[name]],subProgramms[id,name,code,description,outputs[id,name,indicators[name]]]],attributeValues[value,attribute[id,name,code]]').then(function(response){
                 return response.data;
             }, function(response){
                 RfUtils.errorNotifier(response);
@@ -258,7 +258,7 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
             return promise;
         },
         getActive: function(){
-            var promise = $http.get('../api/resultsFrameworks.json?filter=active:eq:true&fields=id,name,code,description,active,impacts[id,name],outcomes[id,name],outputs[id,name],programms[id,name,code,description,outcomes[id,name],outputs[id,name],subProgramms[id,name,code,description,outputs[id,name]]],attributeValues[value,attribute[id,name,code]]&paging=false').then(function(response){
+            var promise = $http.get('../api/resultsFrameworks.json?filter=active:eq:true&fields=id,name,code,description,lastUpdated,active,impacts[id,name],outcomes[id,name],outputs[id,name],programms[id,name,code,description,outcomes[id,name],outputs[id,name],subProgramms[id,name,code,description,outputs[id,name]]],attributeValues[value,attribute[id,name,code]]&paging=false').then(function(response){
                 return response.data;
             }, function(response){
                 RfUtils.errorNotifier(response);
@@ -266,7 +266,7 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
             return promise;
         },
         getAll: function(){
-            var promise = $http.get('../api/resultsFrameworks.json?fields=id,name,code,description,active,impacts[id,name],outcomes[id,name],outputs[id,name],programms[id,name,code,description,outcomes[id,name],outputs[id,name],subProgramms[id,name,code,description,outputs[id,name]]],attributeValues[value,attribute[id,name,code]]&paging=false').then(function(response){
+            var promise = $http.get('../api/resultsFrameworks.json?fields=id,name,code,description,lastUpdated,active,impacts[id,name],outcomes[id,name],outputs[id,name],programms[id,name,code,description,outcomes[id,name],outputs[id,name],subProgramms[id,name,code,description,outputs[id,name]]],attributeValues[value,attribute[id,name,code]]&paging=false').then(function(response){
                 return response.data;
             }, function(response){
                 RfUtils.errorNotifier(response);
@@ -299,7 +299,7 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
     return {
 
         get: function(uid){
-            var promise = $http.get('../api/programms/' + uid + '.json?fields=id,name,code,description,outcomes[id,name],outputs[id,name],subProgramms[id,name,code,description,sortOrder,outputs[id,name],programm[id]],attributeValues[value,attribute[id,name,code]]').then(function(response){
+            var promise = $http.get('../api/programms/' + uid + '.json?fields=id,name,code,description,lastUpdated,outcomes[id,name],outputs[id,name],subProgramms[id,name,code,lastUpdated,description,sortOrder,outputs[id,name],programm[id]],attributeValues[value,attribute[id,name,code]]').then(function(response){
                 return response.data;
             }, function(response){
                 RfUtils.errorNotifier(response);
@@ -307,7 +307,7 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
             return promise;
         },
         getAll: function(){
-            var promise = $http.get('../api/programms.json?fields=id,name,code,description,outcomes[id,name],outputs[id,name],subProgramms[id,name,code,description,sortOrder,outputs[id,name],programm[id]],attributeValues[value,attribute[id,name,code]]&paging=false').then(function(response){
+            var promise = $http.get('../api/programms.json?fields=id,name,code,description,lastUpdated,outcomes[id,name],outputs[id,name],subProgramms[id,name,code,lastUpdated,description,sortOrder,outputs[id,name],programm[id]],attributeValues[value,attribute[id,name,code]]&paging=false').then(function(response){
                 return response.data;
             }, function(response){
                 RfUtils.errorNotifier(response);
@@ -340,7 +340,7 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
     return {
 
         get: function(uid){
-            var promise = $http.get('../api/subProgramms/' + uid + '.json?fields=id,name,code,description,sortOrder,programm[id],outputs[id,name],dataSets[id,name],attributeValues[value,attribute[id,name,code]]').then(function(response){
+            var promise = $http.get('../api/subProgramms/' + uid + '.json?fields=id,name,code,description,lastUpdated,sortOrder,programm[id],outputs[id,name],dataSets[id,name],attributeValues[value,attribute[id,name,code]]').then(function(response){
                 return response.data;
             }, function(response){
                 RfUtils.errorNotifier(response);
@@ -348,7 +348,7 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
             return promise;
         },
         getAll: function(){
-            var promise = $http.get('../api/subProgramms.json?fields=id,name,code,description,sortOrder,program[id],outputs[id,name],attributeValues[value,attribute[id,name,code]]&paging=false').then(function(response){
+            var promise = $http.get('../api/subProgramms.json?fields=id,name,code,description,lastUpdated,sortOrder,program[id],outputs[id,name],attributeValues[value,attribute[id,name,code]]&paging=false').then(function(response){
                 return response.data;
             }, function(response){
                 RfUtils.errorNotifier(response);
@@ -381,16 +381,20 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
     return {
 
         get: function(uid){
-            var promise = $http.get('../api/projects/' + uid + '.json?fields=id,name,code,totalCost,costByGovernment,costByLeadDonor,costByOthers,leadDonor,startDate,endDate,extensionPossible,description,contactName,contactPhone,contactEmail,status,budgetForecastDataSet[id,name],budgetExecutionDataSet[id,name],subProgramms[id,name,code,description],attributeValues[value,attribute[id,name,code]]').then(function(response){
+            var promise = $http.get('../api/projects/' + uid + '.json?fields=id,name,code,lastUpdated,totalCost,costByGovernment,costByLeadDonor,costByOthers,leadDonor,startDate,endDate,extensionPossible,description,contactName,contactPhone,contactEmail,status,budgetForecastDataSet[id,name],budgetExecutionDataSet[id,name],subProgramms[id,name,code,description],attributeValues[value,attribute[id,name,code]]').then(function(response){
                 return response.data;
             }, function(response){
                 RfUtils.errorNotifier(response);
             });
             return promise;
         },
-        getAll: function(paging, pager, filter){
+        getAll: function(paging, pager, filter, sortProperty, order){
             
-            var url = '../api/projects.json?fields=id,name,code,totalCost,costByGovernment,costByLeadDonor,costByOthers,leadDonor,startDate,endDate,extensionPossible,description,contactName,contactPhone,contactEmail,status,budgetForecastDataSet[id,name],budgetExecutionDataSet[id,name],subProgramms[id,name,code,description],attributeValues[value,attribute[id,name,code]]';
+            var sortingParam = '&order='+sortProperty;
+            sortingParam += order ? ':asc' : ':desc';
+            
+            console.log('sortingParam:  ', sortingParam, ' - ', sortProperty);
+            var url = '../api/projects.json?fields=id,name,code,lastUpdated,totalCost,costByGovernment,costByLeadDonor,costByOthers,leadDonor,startDate,endDate,extensionPossible,description,contactName,contactPhone,contactEmail,status,budgetForecastDataSet[id,name],budgetExecutionDataSet[id,name],subProgramms[id,name,code,description],attributeValues[value,attribute[id,name,code]]' + sortingParam;
                         
             url = RfUtils.applyPagingOnUrl( url, paging, pager, filter);
             

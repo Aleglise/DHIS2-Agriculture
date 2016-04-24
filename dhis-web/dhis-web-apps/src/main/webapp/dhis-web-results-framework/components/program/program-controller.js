@@ -32,6 +32,8 @@ resultsFramework.controller('ProgramController',
     $scope.programForm = {submitted: false};
     $scope.fileNames = [];
     
+    $scope.model.gridColumns = ['name', 'code', 'lastUpdated'];
+    
     MetaDataFactory.getAll('indicatorGroups').then(function(idgs){
         $scope.model.impactIndicatorGroups = $filter('filter')(idgs, {indicatorGroupType: "IMPACT"});
         $scope.model.outcomeIndicatorGroups = $filter('filter')(idgs, {indicatorGroupType: "OUTCOME"});
@@ -178,7 +180,7 @@ resultsFramework.controller('ProgramController',
                 
                 //add the new program to the grid
                 var pr = angular.copy($scope.model.selectedProgram);
-                
+                pr.lastUpdated = moment();
                 pr.id = $scope.model.selectedProgram.id = data.response.lastImported;
                 $scope.model.programs.splice(0,0,pr);
                     

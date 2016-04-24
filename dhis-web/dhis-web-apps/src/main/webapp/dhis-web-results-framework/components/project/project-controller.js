@@ -3,6 +3,7 @@
 //Controller for the header section
 resultsFramework.controller('ProjectController',
         function($scope,
+                $rootScope,
                 $filter,
                 $translate,
                 $modal,
@@ -17,7 +18,8 @@ resultsFramework.controller('ProjectController',
                 Paginator) {
     
     //Paging
-    $scope.pager = {pageSize: 10, page: 1, toolBarDisplay: 5};
+    $scope.pager = {pageSize: $rootScope.pageSize, page: 1, toolBarDisplay: 5};
+    
     
     $scope.fileNames = [];
     $scope.model = {    showAddProjectDiv: false,
@@ -34,11 +36,13 @@ resultsFramework.controller('ProjectController',
                         metaAttributesById: [],
                         gridColumns: ['name', 'code', 'description'],
                         sortColumn: 'name',
+                        reverse: false,
                         metaAttributeValues: {}
                     };
 
     $scope.projectForm = {submitted: false};
-
+    $scope.model.gridColumns = ['name', 'code', 'lastUpdated'];
+    
     MetaDataFactory.getAll('indicatorGroups').then(function(idgs){
         $scope.model.impactIndicatorGroups = $filter('filter')(idgs, {indicatorGroupType: "IMPACT"});
         $scope.model.outcomeIndicatorGroups = $filter('filter')(idgs, {indicatorGroupType: "OUTCOME"});
@@ -70,7 +74,7 @@ resultsFramework.controller('ProjectController',
         
         DataSetFactory.getAll().then(function(dss){
             
-            ProjectFactory.getAll( true, $scope.pager, $scope.model.searchText ).then(function(response){
+            ProjectFactory.getAll( true, $scope.pager, $scope.model.searchText, $scope.model.sortColumn, $scope.model.reverse ).then(function(response){
                 if( response.pager ){
                     response.pager.pageSize = response.pager.pageSize ? response.pager.pageSize : $scope.pager.pageSize;
                     $scope.pager = response.pager;
@@ -348,6 +352,17 @@ resultsFramework.controller('ProjectController',
     
     $scope.getPage = function(page){    
         $scope.pager.page = page;
+        $scope.loadProjects();
+    };
+    
+    $scope.sortGrid = function(col){
+        if ($scope.model.sortColumn && $scope.model.sortColumn === col){
+            $scope.model.reverse = !$scope.model.reverse;            
+        }
+        else{
+            $scope.model.sortColumn = col;
+            $scope.model.reverse = false;
+        }        
         $scope.loadProjects();
     };
 });

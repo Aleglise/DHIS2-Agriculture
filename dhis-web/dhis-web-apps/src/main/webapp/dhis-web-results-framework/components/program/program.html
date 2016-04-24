@@ -22,28 +22,27 @@
                 <div ng-if="model.programs.length > 0">
                     <table class="listTable dhis2-table-striped-border dhis2-table-hover">
                         <thead>
-                            <tr>
-                                <th>
-                                    {{'name'| translate}}
-                                </th>
-                                <th>
-                                    {{'code'| translate}}
-                                </th>
-                                <th>
-                                    {{'description'| translate}}
+                            <tr>                                
+                                <th class="bold" ng-repeat="col in model.gridColumns" ng-click="sortGrid(col)">                                    
+                                    <!-- sort icon begins -->                                
+                                    <span class="fa-stack">
+                                        <span ng-class="{true: 'red'} [model.sortHeader === col && !reverse]"><i class="fa fa-sort-asc fa-stack-1x"></i></span>
+                                        <span ng-class="{true: 'red'} [model.sortHeader === col && reverse]"><i class="fa fa-sort-desc fa-stack-1x"></i></span>
+                                    </span>
+                                    <!-- sort icon ends -->
+                                    {{col | translate}}                           
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr title="{{'edit'| translate}}" ng-click="showEditProgram(program)" ng-repeat="program in model.programs | orderBy: 'name'">
-                                <td>
-                                    {{program.name}}
-                                </td>
-                                <td>
-                                    {{program.code}}
-                                </td>
-                                <td>
-                                    {{program.description}}
+                                <td ng-repeat="col in model.gridColumns">
+                                    <span ng-if="col !== 'lastUpdated'">
+                                        {{program[col]}}
+                                    </span>
+                                    <span ng-if="col === 'lastUpdated'">
+                                        {{program[col] | d2LastUpdated}}
+                                    </span>
                                 </td>
                             </tr>
                         </tbody>
@@ -57,7 +56,7 @@
         <form name="programForm" novalidate>
             <div class="col-sm-12">
                 <div ng-if="model.showAddProgramDiv || model.showEditProgramDiv">
-                    <div ng-include="'components/program/program-form.html'"></div>                    
+                    <div ng-include="'components/program/program-form.html'"></div>
                 </div>
             </div>
             <div class="col-sm-12">

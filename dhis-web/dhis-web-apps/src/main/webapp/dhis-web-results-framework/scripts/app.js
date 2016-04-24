@@ -50,4 +50,5 @@ var resultsFramework = angular.module('resultsFramework',
 .run(function($rootScope){    
     $rootScope.maxOptionSize = 50;
     $rootScope.yearRange = 25;
+    $rootScope.pageSize = 15;
 });

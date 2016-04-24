@@ -42,11 +42,14 @@
                                     {{'name'| translate}}
                                 </th>
                                 <th>
-                                    {{'description'| translate}}
-                                </th>
+                                    {{'code'| translate}}
+                                </th>                                 
                                 <th>
                                     {{'status'| translate}}
-                                </th>                            
+                                </th>
+                                <th>
+                                    {{'lastUpdated'| translate}}
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -57,13 +60,16 @@
                                 selected-item={{resultsFramework}}>
                                 <td>
                                     {{resultsFramework.name}}
-                                </td>                            
+                                </td>
                                 <td>
-                                    {{resultsFramework.description}}
+                                    {{resultsFramework.code}}
                                 </td>
                                 <td>
                                     {{resultsFramework.active ? 'active' : 'inactive' | translate}}
                                 </td>
+                                <td>
+                                    {{resultsFramework.lastUpdated | d2LastUpdated}}
+                                </td>                                
                             </tr>
                         </tbody>
                     </table>
