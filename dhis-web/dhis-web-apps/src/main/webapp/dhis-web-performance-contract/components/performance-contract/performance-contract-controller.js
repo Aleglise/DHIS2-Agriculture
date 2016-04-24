@@ -8,7 +8,6 @@ var resultsFrameworkControllers = angular.module('resultsFrameworkControllers', 
 //Controller for settings page
 .controller('PerformanceContractController',
         function($scope,
-                $translate,
                 SessionStorageService,
                 DialogService,
                 DataSetFactory,

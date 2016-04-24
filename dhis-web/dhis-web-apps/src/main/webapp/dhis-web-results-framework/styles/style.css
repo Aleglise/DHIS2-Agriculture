@@ -708,8 +708,12 @@ div#orgUnitTree {
 }
 
 .form-control-checkbox {
-    height: 24px;
+    height: 12px;
     width: 24px;
-    padding-top: 3px;
-    padding-bottom: 3px;
+    padding: 0;
+}
+
+.scroll {
+    height: 400px;
+    overflow: auto;
 }

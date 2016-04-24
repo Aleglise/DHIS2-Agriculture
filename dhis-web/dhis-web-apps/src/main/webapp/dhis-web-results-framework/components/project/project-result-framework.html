@@ -5,40 +5,43 @@
     <div class="alert alert-info">
         {{model.activeResultsFramework.name}}
     </div>
-    <form name="subProgramForm" novalidate>
-        <div class="table-responsive">
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <td class="col-sm-2 active">
-                            {{'select'| translate}}
-                        </td>
-                        <td class="col-sm-10 active">
-                            {{'sub_program'| translate}}
-                        </td>
-                    </tr>
-                </thead>
-                <tbody ng-repeat="program in model.activeResultsFramework.programms | orderBy: 'name'">
-                    <tr>
-                        <td colspan="2">
-                            {{program.name}}
-                        </td>
-                    </tr>
-                    <tr ng-repeat="subProgram in program.subProgramms | orderBy: 'name'">
-                        <td>
-                            <input type="checkbox"
-                                   ng-model="model.selectedSubPrograms[subProgram.id]"
-                                   class="form-control-checkbox"
-                                   name="foo"/>
-                        </td>
-                        <td>
-                            {{subProgram.name}}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </form>
+    <div class="scroll">
+        <form name="subProgramForm" novalidate>
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <td class="col-sm-2 active">
+                                {{'select'| translate}}
+                            </td>
+                            <td class="col-sm-10 active">
+                                {{'sub_program'| translate}}
+                            </td>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="program in model.activeResultsFramework.programms | orderBy: 'name'">
+                        <tr>
+                            <td colspan="2">
+                                {{program.name}}
+                            </td>
+                        </tr>
+                        <tr ng-repeat="subProgram in program.subProgramms | orderBy: 'name'">
+                            <td>
+                                <input type="checkbox"
+                                       ng-model="model.selectedSubPrograms[subProgram.id]"
+                                       class="form-control-checkbox"
+                                       name="foo"/>
+                            </td>
+                            <td>
+                                {{subProgram.name}}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </div>
+    
 </div>
 <div class="modal-footer">
     <div class="pull-left">
