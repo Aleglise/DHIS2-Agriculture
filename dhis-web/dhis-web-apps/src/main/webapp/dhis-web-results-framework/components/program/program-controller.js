@@ -130,9 +130,14 @@ resultsFramework.controller('ProgramController',
             }
         });
 
-        modalInstance.result.then(function (program) {
-            if (angular.isObject(program)) {
-                $scope.model.selectedProgram = program;
+        modalInstance.result.then(function (obj) {
+            if (angular.isObject(obj)) {
+                if( obj.program ){
+                    $scope.model.selectedProgram = obj.program;
+                }
+                if( obj.outputIndicatorGroups ){
+                    $scope.model.outputIndicatorGroups = obj.outputIndicatorGroups;
+                }                
             }
         }, function () {
         });

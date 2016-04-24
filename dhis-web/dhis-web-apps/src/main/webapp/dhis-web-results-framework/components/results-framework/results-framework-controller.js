@@ -36,7 +36,7 @@ resultsFramework.controller('ResultsFrameworkController',
                     
     $scope.resultsFrameworkForm = {submitted: false};
     
-    //watch for changes in ou mode - mode could be selected without notifcation to grid column generator
+    //watch for changes in metadata download complete
     $scope.$watch('model.metaDataCached', function() {
         if( $scope.model.metaDataCached ){            
             MetaDataFactory.getAll('indicatorGroups').then(function(idgs){

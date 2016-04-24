@@ -2,16 +2,16 @@
 
 /* App Module */
 
-var resultsFramework = angular.module('resultsFramework',
+var performanceContract = angular.module('performanceContract',
         ['ui.bootstrap', 
          'ngRoute', 
          'ngCookies',
          'ngSanitize',
          'ngMessages',
-         'resultsFrameworkServices',
-         'resultsFrameworkFilters',
-         'resultsFrameworkDirectives', 
-         'resultsFrameworkControllers',
+         'performanceContractServices',
+         'performanceContractFilters',
+         'performanceContractDirectives', 
+         'performanceContractControllers',
          'd2Directives',
          'd2Filters',
          'd2Services',

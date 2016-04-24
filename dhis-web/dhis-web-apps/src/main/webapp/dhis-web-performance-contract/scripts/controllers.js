@@ -3,4 +3,4 @@
 'use strict';
 
 /* Controllers */
-var resultsFrameworkControllers = angular.module('resultsFrameworkControllers', []);
+var performanceContractControllers = angular.module('performanceContractControllers', []);

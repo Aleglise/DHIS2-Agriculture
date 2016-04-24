@@ -2,4 +2,4 @@
 
 /* Filters */
 
-var resultsFrameworkFilters = angular.module('resultsFrameworkFilters', []);
+var performanceContractFilters = angular.module('performanceContractFilters', []);

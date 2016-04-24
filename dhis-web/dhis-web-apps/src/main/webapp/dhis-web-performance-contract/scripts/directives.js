@@ -4,7 +4,7 @@
 
 /* Directives */
 
-var resultsFrameworkDirectives = angular.module('resultsFrameworkDirectives', [])
+var performanceContractDirectives = angular.module('performanceContractDirectives', [])
 
 .directive('d2MultiSelect', function ($q) {
     return {

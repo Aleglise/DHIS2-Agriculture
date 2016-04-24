@@ -3,7 +3,7 @@
 'use strict';
 
 /* Controllers */
-var resultsFrameworkControllers = angular.module('resultsFrameworkControllers', [])
+var performanceContractControllers = angular.module('performanceContractControllers', [])
 
 //Controller for settings page
 .controller('PerformanceContractController',

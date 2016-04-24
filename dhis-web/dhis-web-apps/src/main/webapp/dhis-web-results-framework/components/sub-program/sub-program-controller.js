@@ -30,7 +30,7 @@ resultsFramework.controller('SubProgramController',
                         metaAttributesById: [],
                         metaAttributeValues: {}
                     };
-
+                    
     if( selectedSubProgram && selectedSubProgram.id ){        
         SubProgramFactory.get(selectedSubProgram.id).then(function(sp){
             $scope.model.selectedSubProgram = sp;
@@ -92,7 +92,7 @@ resultsFramework.controller('SubProgramController',
                 $scope.selectedProgram.subProgramms.splice(0,0,sp);
                     
                 //reset form              
-                $scope.close($scope.selectedProgram);
+                $scope.close({program: $scope.selectedProgram, outputIndicatorGroups: $scope.model.outputIndicatorGroups});
             }
         });
     };
@@ -124,9 +124,9 @@ resultsFramework.controller('SubProgramController',
                     break;
                 }
             }
-            
+
             //reset form              
-            $scope.close($scope.selectedProgram);
+            $scope.close({program: $scope.selectedProgram, outputIndicatorGroups: $scope.model.outputIndicatorGroups});
         });
     };
     
@@ -148,7 +148,7 @@ resultsFramework.controller('SubProgramController',
                 }
                 
                 //reset form              
-                $scope.close($scope.selectedProgram);
+                $scope.close({program: $scope.selectedProgram, outputIndicatorGroups: $scope.model.outputIndicatorGroups});
                 
             }, function(){
                 var dialogOptions = {

@@ -1,7 +1,7 @@
-/* global resultsFramework, selection */
+/* global performanceContract, selection */
 
 //Controller for column show/hide
-resultsFramework.controller('LeftBarMenuController',
+performanceContract.controller('LeftBarMenuController',
         function($scope, $location) {
     $scope.showPerformanceContract = function(){
         selection.load();

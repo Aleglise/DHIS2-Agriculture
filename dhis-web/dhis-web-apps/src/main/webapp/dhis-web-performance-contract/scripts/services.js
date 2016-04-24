@@ -4,7 +4,7 @@
 
 /* Services */
 
-var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngResource'])
+var performanceContractServices = angular.module('performanceContractServices', ['ngResource'])
 
 .factory('RFStorageService', function(){
     var store = new dhis2.storage.Store({

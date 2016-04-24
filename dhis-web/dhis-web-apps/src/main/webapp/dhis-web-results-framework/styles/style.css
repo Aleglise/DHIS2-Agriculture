@@ -277,15 +277,17 @@ div#leftBar {
 
 .modal-full-window .modal-dialog {
     width: 100%;
-    height: 100%;
+    height: 75%;
 }
 
 .modal {
-    padding-top: 50px;
+    padding-top: 20px;
 }
 
-.modal-dialog {
-    top: 50%;
+.modal-header,
+.modal-body,
+.modal-footer {
+    padding: 10px !important;
 }
 
 #map-container { 
@@ -716,4 +718,9 @@ div#orgUnitTree {
 .scroll {
     height: 400px;
     overflow: auto;
+}
+
+
+.remove-default-top-padding {
+    margin-top: -15px !important;
 }
