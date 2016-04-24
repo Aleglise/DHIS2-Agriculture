@@ -4,15 +4,17 @@
 </div>
 
 <div class="page" id="mainPage">
-    <div class="row top-bar">        
-        <div class="col-sm-12">            
+    <div class="row top-bar">
+        <div class="col-sm-2">
             {{'program'| translate}}
-            <div class="pull-right">
-                <button type="button" class="btn btn-primary" ng-click="showAddProgram()" ng-disabled="model.showEditProgramDiv || model.showAddProgramDiv">
-                    {{'add_new'| translate}}
-                </button>
-            </div>            
-        </div>        
+        </div>
+        <div class="input-group col-sm-10">
+            <input type="text" name="searchText" placeholder="{{'search_by_name' | translate}}" class="form-control" ng-disabled="model.showEditProgramDiv || model.showAddProgramDiv" ng-model="model.searchText" ng-blur="loadPrograms()" d2-enter="loadPrograms()"/>
+            <div class="input-group-btn">                
+                <button class="btn btn-success" type="button" title="{{'search'| translate}}" ng-disabled="model.showEditProgramDiv || model.showAddProgramDiv" ng-click="loadPrograms()"><i class="fa fa-search"></i></button>
+                <button class="btn btn-primary" type="button" title="{{'add_new'| translate}}" ng-disabled="model.showEditProgramDiv || model.showAddProgramDiv" ng-click="showAddProgram()"><i class="fa fa-plus"></i></button>
+            </div>                
+        </div>  
     </div>
     <hr>
     <div class="row">
@@ -26,16 +28,16 @@
                                 <th class="bold" ng-repeat="col in model.gridColumns" ng-click="sortGrid(col)">                                    
                                     <!-- sort icon begins -->                                
                                     <span class="fa-stack">
-                                        <span ng-class="{true: 'red'} [model.sortHeader === col && !reverse]"><i class="fa fa-sort-asc fa-stack-1x"></i></span>
-                                        <span ng-class="{true: 'red'} [model.sortHeader === col && reverse]"><i class="fa fa-sort-desc fa-stack-1x"></i></span>
+                                        <span ng-class="{true: 'red'} [model.sortColumn === col && !model.reverse]"><i class="fa fa-sort-asc fa-stack-1x"></i></span>
+                                        <span ng-class="{true: 'red'} [model.sortColumn === col && model.reverse]"><i class="fa fa-sort-desc fa-stack-1x"></i></span>
                                     </span>
                                     <!-- sort icon ends -->
-                                    {{col | translate}}                           
+                                    {{col | translate}}
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr title="{{'edit'| translate}}" ng-click="showEditProgram(program)" ng-repeat="program in model.programs | orderBy: 'name'">
+                            <tr title="{{'edit'| translate}}" ng-click="showEditProgram(program)" ng-repeat="program in model.programs">
                                 <td ng-repeat="col in model.gridColumns">
                                     <span ng-if="col !== 'lastUpdated'">
                                         {{program[col]}}
@@ -47,6 +49,7 @@
                             </tr>
                         </tbody>
                     </table>
+                    <serverside-paginator></serverside-paginator>
                 </div>
             </div>
         </div>

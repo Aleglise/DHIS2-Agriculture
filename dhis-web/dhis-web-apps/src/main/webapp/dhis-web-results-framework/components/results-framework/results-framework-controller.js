@@ -3,6 +3,7 @@
 //Controller for the header section
 resultsFramework.controller('ResultsFrameworkController',
         function($scope,
+                $rootScope,
                 $filter,
                 orderByFilter,
                 ContextMenuSelectedItem,
@@ -13,7 +14,11 @@ resultsFramework.controller('ResultsFrameworkController',
                 ProgramFactory,
                 DataSetFactory,
                 MetaAttributesFactory,
-                RfUtils) {
+                RfUtils,
+                Paginator) {
+    
+    //Paging
+    $scope.pager = {pageSize: $rootScope.pageSize, page: 1, toolBarDisplay: 5};
     
     $scope.fileNames = [];
     $scope.model = {    showAddResultsFrameworkDiv: false,
@@ -31,7 +36,10 @@ resultsFramework.controller('ResultsFrameworkController',
                         metaAttributes: [],
                         metaAttributeValues: {},
                         metaAttributesById: [],
-                        impactOutcomeDataSets: []
+                        impactOutcomeDataSets: [],
+                        gridColumns: ['name', 'code', 'active', 'lastUpdated'],
+                        sortColumn: 'name',
+                        reverse: false
                     };
                     
     $scope.resultsFrameworkForm = {submitted: false};
@@ -57,19 +65,34 @@ resultsFramework.controller('ResultsFrameworkController',
                         $scope.model.impactOutcomeDataSets = $scope.model.impactDataSets.concat( $scope.model.outcomeDataSets );
 
                         ProgramFactory.getAll().then(function(response){
-                            $scope.model.programs = response.programms;
-
-                            ResultsFrameworkFactory.getAll().then(function(response){
-                                $scope.model.resultsFrameworks = response.resultsFrameworks;
-                            });
+                            $scope.model.programs = response.programms;                            
+                            $scope.loadResultsFrameworks();
                         });
                     });
                 });
             });
         }
-    });    
+    });
+    
+    $scope.loadResultsFrameworks = function(){
+        $scope.model.resultsFrameworks = [];            
+        ResultsFrameworkFactory.getAll( true, $scope.pager, $scope.model.searchText, $scope.model.sortColumn, $scope.model.reverse ).then(function(response){            
+            if( response.pager ){
+                response.pager.pageSize = response.pager.pageSize ? response.pager.pageSize : $scope.pager.pageSize;
+                $scope.pager = response.pager;
+                $scope.pager.toolBarDisplay = 5;
+
+                Paginator.setPage($scope.pager.page);
+                Paginator.setPageCount($scope.pager.pageCount);
+                Paginator.setPageSize($scope.pager.pageSize);
+                Paginator.setItemCount($scope.pager.total);                    
+            }
+            $scope.model.resultsFrameworks = response.resultsFrameworks ? response.resultsFrameworks : [];
+        });        
+    };
             
     $scope.showAddResultsFramework = function(){
+        $scope.model.searchText = "";
         $scope.model.metaAttributeValues = {};
         $scope.model.selectedResultsFramework = {impacts: [], outcomes: [], outputs: [], programms: [], dataSets: []};
         $scope.model.showAddResultsFrameworkDiv = !$scope.model.showAddResultsFrameworkDiv;
@@ -303,5 +326,33 @@ resultsFramework.controller('ResultsFrameworkController',
     $scope.cancel = function(){
         $scope.resultsFrameworkForm.submitted = false;
         $scope.hideResultsFrameworkDivs();
+    };
+    
+    $scope.jumpToPage = function(){        
+        if($scope.pager && $scope.pager.page && $scope.pager.pageCount && $scope.pager.page > $scope.pager.pageCount){
+            $scope.pager.page = $scope.pager.pageCount;
+        }
+        $scope.loadResultsFrameworks();
+    };
+    
+    $scope.resetPageSize = function(){
+        $scope.pager.page = 1;        
+        $scope.loadResultsFrameworks();
+    };
+    
+    $scope.getPage = function(page){    
+        $scope.pager.page = page;
+        $scope.loadResultsFrameworks();
+    };
+    
+    $scope.sortGrid = function(col){
+        if ($scope.model.sortColumn && $scope.model.sortColumn === col){
+            $scope.model.reverse = !$scope.model.reverse;            
+        }
+        else{
+            $scope.model.sortColumn = col;
+            $scope.model.reverse = false;
+        }        
+        $scope.loadResultsFrameworks();
     };
 });

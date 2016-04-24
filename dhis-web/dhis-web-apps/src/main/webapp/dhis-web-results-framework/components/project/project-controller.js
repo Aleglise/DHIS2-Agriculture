@@ -18,8 +18,7 @@ resultsFramework.controller('ProjectController',
                 Paginator) {
     
     //Paging
-    $scope.pager = {pageSize: $rootScope.pageSize, page: 1, toolBarDisplay: 5};
-    
+    $scope.pager = {pageSize: $rootScope.pageSize, page: 1, toolBarDisplay: 5};    
     
     $scope.fileNames = [];
     $scope.model = {    showAddProjectDiv: false,
@@ -34,7 +33,7 @@ resultsFramework.controller('ProjectController',
                         indicatorGroups: [],
                         metaAttributes: [],
                         metaAttributesById: [],
-                        gridColumns: ['name', 'code', 'description'],
+                        gridColumns: ['name', 'code', 'lastUpdated'],
                         sortColumn: 'name',
                         reverse: false,
                         metaAttributeValues: {}

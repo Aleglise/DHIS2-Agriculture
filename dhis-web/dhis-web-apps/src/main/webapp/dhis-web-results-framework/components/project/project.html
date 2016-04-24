@@ -51,7 +51,7 @@
                         <tbody>
                             <tr title="{{'edit'| translate}}" 
                                 ng-click="setSelectedProject(project)"
-                                ng-repeat="project in model.projects | filter: {name: model.searchText} | orderBy: 'name'"
+                                ng-repeat="project in model.projects | filter: {name: model.searchText}"
                                 d2-context-menu 
                                 selected-item={{project}}>
                                 <td ng-repeat="col in model.gridColumns">

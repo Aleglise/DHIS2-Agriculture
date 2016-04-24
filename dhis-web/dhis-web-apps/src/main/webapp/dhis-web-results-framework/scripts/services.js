@@ -265,8 +265,10 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
             });
             return promise;
         },
-        getAll: function(){
-            var promise = $http.get('../api/resultsFrameworks.json?fields=id,name,code,description,lastUpdated,active,impacts[id,name],outcomes[id,name],outputs[id,name],programms[id,name,code,description,outcomes[id,name],outputs[id,name],subProgramms[id,name,code,description,outputs[id,name]]],attributeValues[value,attribute[id,name,code]]&paging=false').then(function(response){
+        getAll: function(paging, pager, filter, sortProperty, order){            
+            var url = '../api/resultsFrameworks.json?fields=id,name,code,description,lastUpdated,active,impacts[id,name],outcomes[id,name],outputs[id,name],programms[id,name,code,description,outcomes[id,name],outputs[id,name],subProgramms[id,name,code,description,outputs[id,name]]],attributeValues[value,attribute[id,name,code]]';
+            url = RfUtils.applyPagingOnUrl( url, paging, pager, filter, sortProperty, order);
+            var promise = $http.get( url ).then(function(response){
                 return response.data;
             }, function(response){
                 RfUtils.errorNotifier(response);
@@ -306,8 +308,10 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
             });
             return promise;
         },
-        getAll: function(){
-            var promise = $http.get('../api/programms.json?fields=id,name,code,description,lastUpdated,outcomes[id,name],outputs[id,name],subProgramms[id,name,code,lastUpdated,description,sortOrder,outputs[id,name],programm[id]],attributeValues[value,attribute[id,name,code]]&paging=false').then(function(response){
+        getAll: function(paging, pager, filter, sortProperty, order){            
+            var url = '../api/programms.json?fields=id,name,code,description,lastUpdated,outcomes[id,name],outputs[id,name],subProgramms[id,name,code,lastUpdated,description,sortOrder,outputs[id,name],programm[id]],attributeValues[value,attribute[id,name,code]]';                       
+            url = RfUtils.applyPagingOnUrl( url, paging, pager, filter, sortProperty, order);
+            var promise = $http.get( url ).then(function(response){
                 return response.data;
             }, function(response){
                 RfUtils.errorNotifier(response);
@@ -389,14 +393,9 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
             return promise;
         },
         getAll: function(paging, pager, filter, sortProperty, order){
-            
-            var sortingParam = '&order='+sortProperty;
-            sortingParam += order ? ':asc' : ':desc';
-            
-            console.log('sortingParam:  ', sortingParam, ' - ', sortProperty);
-            var url = '../api/projects.json?fields=id,name,code,lastUpdated,totalCost,costByGovernment,costByLeadDonor,costByOthers,leadDonor,startDate,endDate,extensionPossible,description,contactName,contactPhone,contactEmail,status,budgetForecastDataSet[id,name],budgetExecutionDataSet[id,name],subProgramms[id,name,code,description],attributeValues[value,attribute[id,name,code]]' + sortingParam;
+            var url = '../api/projects.json?fields=id,name,code,lastUpdated,totalCost,costByGovernment,costByLeadDonor,costByOthers,leadDonor,startDate,endDate,extensionPossible,description,contactName,contactPhone,contactEmail,status,budgetForecastDataSet[id,name],budgetExecutionDataSet[id,name],subProgramms[id,name,code,description],attributeValues[value,attribute[id,name,code]]';
                         
-            url = RfUtils.applyPagingOnUrl( url, paging, pager, filter);
+            url = RfUtils.applyPagingOnUrl( url, paging, pager, filter, sortProperty, order);
             
             var promise = $http.get( url ).then(function(response){
                 return response.data;
@@ -532,7 +531,7 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
             }            
             return obj;
         },
-        applyPagingOnUrl: function(url, paging, pager, filter){            
+        applyPagingOnUrl: function(url, paging, pager, filter, sortProperty, order){            
             if( paging ){
                 var pgSize = pager.pageSize ? pager.pageSize : 50;
                 var pg = pager.page ? pager.page : 1;
@@ -548,7 +547,10 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
                 url = url + '&filter=name:like:' + filter;
             }
             
-            return url;            
+            var sortingParam = '&order='+sortProperty;
+            sortingParam += order ? ':asc' : ':desc';
+            
+            return url + sortingParam;            
         }
     };
 })

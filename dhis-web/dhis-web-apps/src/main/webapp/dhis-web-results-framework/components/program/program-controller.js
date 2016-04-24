@@ -2,7 +2,8 @@
 
 //Controller for the header section
 resultsFramework.controller('ProgramController', 
-        function($scope, 
+        function($scope,
+                $rootScope,
                 $modal, 
                 $filter,
                 DialogService, 
@@ -12,7 +13,11 @@ resultsFramework.controller('ProgramController',
                 DataSetFactory,
                 MetaDataFactory,
                 MetaAttributesFactory,
-                RfUtils) {
+                RfUtils,
+                Paginator) {
+    
+    //Paging
+    $scope.pager = {pageSize: $rootScope.pageSize, page: 1, toolBarDisplay: 5};
     
     $scope.model = {    showAddProgramDiv: false,
                         showEditProgramDiv: false,
@@ -26,7 +31,10 @@ resultsFramework.controller('ProgramController',
                         metaAttributeValues: {},
                         metaAttributesById: [],
                         selectedProgram: {outcomes: [], outputs: [], subProgramms: []},
-                        indicatorGroups: []
+                        indicatorGroups: [],
+                        gridColumns: ['name', 'code', 'lastUpdated'],
+                        sortColumn: 'name',
+                        reverse: false
                     };
 
     $scope.programForm = {submitted: false};
@@ -49,36 +57,53 @@ resultsFramework.controller('ProgramController',
                 $scope.model.impactDataSets = $filter('filter')(dss, {dataSetType: "IMPACT"});
                 $scope.model.outcomeDataSets = $filter('filter')(dss, {dataSetType: "OUTCOME"});
                 $scope.model.outputDataSets = $filter('filter')(dss, {dataSetType: "OUTPUT"});
-
-                ProgramFactory.getAll().then(function(response){
-                    $scope.model.programs = response.programms;
-
-                    ResultsFrameworkFactory.getActive().then(function(response){
-                        $scope.model.activeResultsFramework = response.resultsFrameworks[0] ? response.resultsFrameworks[0] : null;
-                        var assignedOuputIds = [];
-                        if( $scope.model.activeResultsFramework ){
-                            angular.forEach($scope.model.activeResultsFramework.programms, function(pr){
-                                angular.forEach(pr.subProgramms, function(sp){
-                                    angular.forEach(sp.outputs, function(op){
-                                        assignedOuputIds.push(op.id);
-                                    });
+                
+                ResultsFrameworkFactory.getActive().then(function(response){
+                    $scope.model.activeResultsFramework = response.resultsFrameworks[0] ? response.resultsFrameworks[0] : null;
+                    var assignedOuputIds = [];
+                    if( $scope.model.activeResultsFramework ){
+                        angular.forEach($scope.model.activeResultsFramework.programms, function(pr){
+                            angular.forEach(pr.subProgramms, function(sp){
+                                angular.forEach(sp.outputs, function(op){
+                                    assignedOuputIds.push(op.id);
                                 });
                             });
-                        }                        
-                        var outputIndicatorGroups = [];
-                        angular.forEach($scope.model.outputIndicatorGroups, function(o){
-                            if( assignedOuputIds.indexOf(o.id) === -1 ){
-                                outputIndicatorGroups.push(o);
-                            }
-                        });                        
-                        $scope.model.outputIndicatorGroups = outputIndicatorGroups;
-                    });
+                        });
+                    }                        
+                    var outputIndicatorGroups = [];
+                    angular.forEach($scope.model.outputIndicatorGroups, function(o){
+                        if( assignedOuputIds.indexOf(o.id) === -1 ){
+                            outputIndicatorGroups.push(o);
+                        }
+                    });                        
+                    $scope.model.outputIndicatorGroups = outputIndicatorGroups;
                 });
+                
+                $scope.loadPrograms();
             });
         });
-    });
+    });    
+    
+    $scope.loadPrograms = function(){
+        $scope.model.programs = [];            
+        ProgramFactory.getAll( true, $scope.pager, $scope.model.searchText, $scope.model.sortColumn, $scope.model.reverse ).then(function(response){
+            
+            if( response.pager ){
+                response.pager.pageSize = response.pager.pageSize ? response.pager.pageSize : $scope.pager.pageSize;
+                $scope.pager = response.pager;
+                $scope.pager.toolBarDisplay = 5;
+
+                Paginator.setPage($scope.pager.page);
+                Paginator.setPageCount($scope.pager.pageCount);
+                Paginator.setPageSize($scope.pager.pageSize);
+                Paginator.setItemCount($scope.pager.total);                    
+            }
+            $scope.model.programs = response.programms ? response.programms : [];
+        });        
+    };    
     
     $scope.showAddProgram = function(){
+        $scope.model.searchText = "";
         $scope.model.metaAttributeValues = {};
         $scope.model.showAddProgramDiv = !$scope.model.showAddProgramDiv;
     };
@@ -262,5 +287,33 @@ resultsFramework.controller('ProgramController',
     $scope.cancel = function(){
         $scope.programForm.submitted = false;
         $scope.hideAddProgram();
+    };
+    
+    $scope.jumpToPage = function(){        
+        if($scope.pager && $scope.pager.page && $scope.pager.pageCount && $scope.pager.page > $scope.pager.pageCount){
+            $scope.pager.page = $scope.pager.pageCount;
+        }
+        $scope.loadPrograms();
+    };
+    
+    $scope.resetPageSize = function(){
+        $scope.pager.page = 1;        
+        $scope.loadPrograms();
+    };
+    
+    $scope.getPage = function(page){    
+        $scope.pager.page = page;
+        $scope.loadPrograms();
+    };
+    
+    $scope.sortGrid = function(col){
+        if ($scope.model.sortColumn && $scope.model.sortColumn === col){
+            $scope.model.reverse = !$scope.model.reverse;            
+        }
+        else{
+            $scope.model.sortColumn = col;
+            $scope.model.reverse = false;
+        }        
+        $scope.loadPrograms();
     };
 });
