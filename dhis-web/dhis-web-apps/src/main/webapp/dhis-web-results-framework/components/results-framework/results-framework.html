@@ -15,7 +15,7 @@
                 <input type="text" name="searchText" placeholder="{{'search_by_name' | translate}}" class="form-control" ng-disabled="model.showEditResultsFrameworkDiv || model.showAddResultsFrameworkDiv || model.showStructureResultsFrameworkDiv" ng-model="model.searchText" ng-blur="loadResultsFrameworks()" d2-enter="loadResultsFrameworks()"/>
                 <div class="input-group-btn">                
                     <button class="btn btn-success" type="button" title="{{'search'| translate}}" ng-disabled="model.showEditResultsFrameworkDiv || model.showAddResultsFrameworkDiv || model.showStructureResultsFrameworkDiv" ng-click="loadResultsFrameworks()"><i class="fa fa-search"></i></button>
-                    <button class="btn btn-primary" type="button" title="{{'add_new'| translate}}" ng-disabled="model.showEditResultsFrameworkDiv || model.showAddResultsFrameworkDiv || model.showStructureResultsFrameworkDiv"><i class="fa fa-plus"></i></button>
+                    <button class="btn btn-primary" type="button" title="{{'add_new'| translate}}" ng-disabled="model.showEditResultsFrameworkDiv || model.showAddResultsFrameworkDiv || model.showStructureResultsFrameworkDiv" ng-click="showAddResultsFramework()"><i class="fa fa-plus"></i></button>
                 </div>                
             </div>  
         </div>
