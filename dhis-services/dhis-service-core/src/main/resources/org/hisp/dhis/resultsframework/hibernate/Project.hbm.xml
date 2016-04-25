@@ -38,18 +38,16 @@
    	<property name="startDate" />
    	
    	<property name="endDate" />
-   	
-   	<property name="extensionPossible" />
-   	
+  	
    	<property name="status" />
    	
-   	<!-- <property name="status" length="40">
+   	<property name="extensionPossible" length="40">
       <type name="org.hibernate.type.EnumType">
-        <param name="enumClass">org.hisp.dhis.resultsframework.ProjectStatus</param>
+        <param name="enumClass">org.hisp.dhis.resultsframework.ExtensionPossibile</param>
         <param name="useNamed">true</param>
         <param name="type">12</param>
       </type>
-    </property>-->
+    </property>
     
     <set name="subProgramms" table="projectsubprograms">
       <cache usage="read-write" />

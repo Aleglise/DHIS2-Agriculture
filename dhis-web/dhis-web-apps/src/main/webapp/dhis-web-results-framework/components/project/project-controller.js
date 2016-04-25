@@ -74,7 +74,7 @@ resultsFramework.controller('ProjectController',
         DataSetFactory.getAll().then(function(dss){
             
             ProjectFactory.getAll( true, $scope.pager, $scope.model.searchText, $scope.model.sortColumn, $scope.model.reverse ).then(function(response){
-                if( response.pager ){
+                if( response && response.pager ){
                     response.pager.pageSize = response.pager.pageSize ? response.pager.pageSize : $scope.pager.pageSize;
                     $scope.pager = response.pager;
                     $scope.pager.toolBarDisplay = 5;
@@ -98,7 +98,7 @@ resultsFramework.controller('ProjectController',
 
                     pr = RfUtils.convertToUserDate(pr, 'startDate');
                     pr = RfUtils.convertToUserDate(pr, 'endDate');                        
-                    pr.extensionPossible = pr.extensionPossible === true ? "true" : pr.extensionPossible === false ? "false" : "unknown";
+                    //pr.extensionPossible = pr.extensionPossible === true ? "true" : pr.extensionPossible === false ? "false" : "unknown";
                 });
 
                 angular.forEach(dss, function(ds){
@@ -221,7 +221,7 @@ resultsFramework.controller('ProjectController',
         pr.attributeValues = RfUtils.processMetaAttributes($scope.model.metaAttributes, $scope.model.metaAttributeValues);                
         pr = RfUtils.convertToServerDate(pr, 'startDate');
         pr = RfUtils.convertToServerDate(pr, 'endDate');        
-        pr.extensionPossible = pr.extensionPossible === 'true' ? true : pr.extensionPossible === 'false' ? false : "";
+        //pr.extensionPossible = pr.extensionPossible === 'true' ? true : pr.extensionPossible === 'false' ? false : "";
         
         //form is valid, continue with adding
         ProjectFactory.create(pr).then(function(data){
@@ -258,7 +258,7 @@ resultsFramework.controller('ProjectController',
         pr.attributeValues = RfUtils.processMetaAttributes($scope.model.metaAttributes, $scope.model.metaAttributeValues);                
         pr = RfUtils.convertToServerDate(pr, 'startDate');
         pr = RfUtils.convertToServerDate(pr, 'endDate');        
-        pr.extensionPossible = pr.extensionPossible === 'true' ? true : pr.extensionPossible === 'false' ? false : "";
+        //pr.extensionPossible = pr.extensionPossible === 'true' ? true : pr.extensionPossible === 'false' ? false : "";
         
         //form is valid, continue with adding
         ProjectFactory.update(pr).then(function(data){

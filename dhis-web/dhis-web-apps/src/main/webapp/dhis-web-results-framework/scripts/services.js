@@ -400,7 +400,7 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
             var promise = $http.get( url ).then(function(response){
                 return response.data;
             }, function(response){
-                RfUtils.errorNotifier(response);
+                RfUtils.errorNotifer(response);
             });
             return promise;
         },

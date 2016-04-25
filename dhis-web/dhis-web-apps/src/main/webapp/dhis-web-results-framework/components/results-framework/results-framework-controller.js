@@ -77,7 +77,7 @@ resultsFramework.controller('ResultsFrameworkController',
     $scope.loadResultsFrameworks = function(){
         $scope.model.resultsFrameworks = [];            
         ResultsFrameworkFactory.getAll( true, $scope.pager, $scope.model.searchText, $scope.model.sortColumn, $scope.model.reverse ).then(function(response){            
-            if( response.pager ){
+            if( response && response.pager ){
                 response.pager.pageSize = response.pager.pageSize ? response.pager.pageSize : $scope.pager.pageSize;
                 $scope.pager = response.pager;
                 $scope.pager.toolBarDisplay = 5;

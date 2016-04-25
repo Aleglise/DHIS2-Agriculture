@@ -154,9 +154,9 @@
                            class="form-control"
                            ng-model="model.selectedProject.extensionPossible" 
                            data-ng-required="true">
-                        <option value="true">{{'yes' | translate}}</option>
-                        <option value="false">{{'no' | translate}}</option>
-                        <option value="unknown">{{'unknown' | translate}}</option>                        
+                        <option value="YES">{{'yes' | translate}}</option>
+                        <option value="NO">{{'no' | translate}}</option>
+                        <option value="UNKNOWN">{{'unknown' | translate}}</option>                        
                     </select>
                     <div ng-messages="projectForm.extensionPossible.$error" ng-if="interacted(projectForm.endDate, projectForm)" class="required hideInPrint" ng-messages-include="../dhis-web-commons/angular-forms/error-messages.html"></div>
                 </td>

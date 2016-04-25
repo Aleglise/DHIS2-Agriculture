@@ -73,7 +73,15 @@ public class TableAlteror
     {
         int defaultCategoryComboId = getDefaultCategoryCombo();
         int defaultOptionComboId = getDefaultOptionCombo();
-
+        
+        executeSql( "ALTER TABLE subprogramm ALTER COLUMN programmid DROP NOT NULL" );        
+        executeSql( "ALTER TABLE project RENAME datasetid TO budgetexecutiondatasetid" );
+        executeSql( "ALTER TABLE project ALTER COLUMN budgetexecutiondatasetid DROP NOT NULL" );
+        executeSql( "ALTER TABLE project ALTER extensionpossible TYPE text" );
+        executeSql( "update project set extensionpossible = 'YES' where extensionpossible = 'true'" );
+        executeSql( "update project set extensionpossible = 'NO' where extensionpossible = 'false'" );
+        executeSql( "update project set extensionpossible = 'UNKNOWN' where extensionpossible is NULL" );
+        
         // ---------------------------------------------------------------------
         // Drop obsolete tables
         // ---------------------------------------------------------------------

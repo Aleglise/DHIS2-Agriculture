@@ -77,7 +77,7 @@ public class Project
     
     private Date endDate;
     
-    private Boolean extensionPossible;
+    private ExtensionPossibile extensionPossible;
     
     private String status;
     
@@ -305,7 +305,7 @@ public class Project
      */
     @JsonProperty
     @JacksonXmlProperty( namespace = DxfNamespaces.DXF_2_0 )
-    public Boolean getExtensionPossible()
+    public ExtensionPossibile getExtensionPossible()
     {
         return extensionPossible;
     }
@@ -313,7 +313,7 @@ public class Project
     /**
      * @param extensionPossible the extensionPossible to set
      */
-    public void setExtensionPossible( Boolean extensionPossible )
+    public void setExtensionPossible( ExtensionPossibile extensionPossible )
     {
         this.extensionPossible = extensionPossible;
     }
