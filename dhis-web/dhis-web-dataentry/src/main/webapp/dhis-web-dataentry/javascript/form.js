@@ -1161,7 +1161,7 @@ function dataSetSelected()
 
         dhis2.de.multiOrganisationUnit = !!$( '#selectedDataSetId :selected' ).data( 'multiorg' );
 
-        if ( dhis2.de.inputSelected() && previousSelectionValid )
+        /*if ( dhis2.de.inputSelected() && previousSelectionValid )
         {
             showLoader();
             dhis2.de.loadForm();
@@ -1172,7 +1172,11 @@ function dataSetSelected()
         	displayPeriods();
         	dhis2.de.clearSectionFilters();
             dhis2.de.clearEntryForm();
-        }
+        }*/
+        dhis2.de.currentPeriodOffset = 0;
+    	displayPeriods();
+    	dhis2.de.clearSectionFilters();
+        dhis2.de.clearEntryForm();
     }
     else
     {

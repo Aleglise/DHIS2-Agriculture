@@ -60,23 +60,33 @@ resultsFramework.controller('ProgramController',
                 
                 ResultsFrameworkFactory.getActive().then(function(response){
                     $scope.model.activeResultsFramework = response.resultsFrameworks[0] ? response.resultsFrameworks[0] : null;
-                    var assignedOuputIds = [];
+                    var assignedOuputIds = [], assigendDataSetIds = [];
                     if( $scope.model.activeResultsFramework ){
                         angular.forEach($scope.model.activeResultsFramework.programms, function(pr){
                             angular.forEach(pr.subProgramms, function(sp){
                                 angular.forEach(sp.outputs, function(op){
                                     assignedOuputIds.push(op.id);
+                                });                                
+                                angular.forEach(sp.dataSets, function(ds){
+                                    assigendDataSetIds.push(ds.id);
                                 });
                             });
                         });
                     }                        
-                    var outputIndicatorGroups = [];
+                    var outputIndicatorGroups = [], outputDataSets = [];
                     angular.forEach($scope.model.outputIndicatorGroups, function(o){
                         if( assignedOuputIds.indexOf(o.id) === -1 ){
                             outputIndicatorGroups.push(o);
                         }
                     });                        
                     $scope.model.outputIndicatorGroups = outputIndicatorGroups;
+                    
+                    angular.forEach($scope.model.outcomeDataSets, function(ds){
+                        if( assigendDataSetIds.indexOf(ds.id) === -1 ){
+                            outputDataSets.push(ds);
+                        }
+                    });                        
+                    $scope.model.outputDataSets = outputDataSets;
                 });
                 
                 $scope.loadPrograms();
@@ -164,7 +174,10 @@ resultsFramework.controller('ProgramController',
                 }
                 if( obj.outputIndicatorGroups ){
                     $scope.model.outputIndicatorGroups = obj.outputIndicatorGroups;
-                }                
+                }
+                if( obj.outputDataSets ){
+                    $scope.model.outputDataSets = obj.outputDataSets;
+                }
             }
         }, function () {
         });

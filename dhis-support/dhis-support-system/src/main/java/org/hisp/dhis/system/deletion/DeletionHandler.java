@@ -89,6 +89,10 @@ import org.hisp.dhis.relationship.Relationship;
 import org.hisp.dhis.relationship.RelationshipType;
 import org.hisp.dhis.report.Report;
 import org.hisp.dhis.reporttable.ReportTable;
+import org.hisp.dhis.resultsframework.Programm;
+import org.hisp.dhis.resultsframework.Project;
+import org.hisp.dhis.resultsframework.ResultsFramework;
+import org.hisp.dhis.resultsframework.SubProgramm;
 import org.hisp.dhis.security.oauth2.OAuth2Client;
 import org.hisp.dhis.sqlview.SqlView;
 import org.hisp.dhis.trackedentity.TrackedEntity;
@@ -820,6 +824,42 @@ public abstract class DeletionHandler
     }
 
     public String allowDeleteOAuth2Client( OAuth2Client oAuth2Client )
+    {
+        return null;
+    }
+    
+    public void deleteResultsFramework( ResultsFramework resultsFramework )
+    {
+    }
+
+    public String allowDeleteResultsFramework( ResultsFramework resultsFramework )
+    {
+        return null;
+    }
+    
+    public void deleteProgramm( Programm programm )
+    {
+    }
+
+    public String allowDeleteProgramm( Programm programm )
+    {
+        return null;
+    }
+    
+    public void deleteSubProgramm( SubProgramm subProgramm )
+    {
+    }
+
+    public String allowDeleteSubProgramm( SubProgramm subProgramm )
+    {
+        return null;
+    }
+    
+    public void deleteProject( Project project )
+    {
+    }
+
+    public String allowDeleteProject( Project project )
     {
         return null;
     }

@@ -91,8 +91,8 @@ resultsFramework.controller('SubProgramController',
                 sp.id = data.response.lastImported;                
                 $scope.selectedProgram.subProgramms.splice(0,0,sp);
                     
-                //reset form              
-                $scope.close({program: $scope.selectedProgram, outputIndicatorGroups: $scope.model.outputIndicatorGroups});
+                //reset form
+                $scope.close({program: $scope.selectedProgram, outputIndicatorGroups: $scope.model.outputIndicatorGroups, outputDataSets: $scope.model.outputDataSets});
             }
         });
     };
@@ -126,7 +126,7 @@ resultsFramework.controller('SubProgramController',
             }
 
             //reset form              
-            $scope.close({program: $scope.selectedProgram, outputIndicatorGroups: $scope.model.outputIndicatorGroups});
+            $scope.close({program: $scope.selectedProgram, outputIndicatorGroups: $scope.model.outputIndicatorGroups, outputDataSets: $scope.model.outputDataSets});
         });
     };
     
@@ -141,14 +141,22 @@ resultsFramework.controller('SubProgramController',
         ModalService.showModal({}, modalOptions).then(function(){            
             SubProgramFactory.delete($scope.model.selectedSubProgram).then(function(){                
                 for(var i=0; i<$scope.selectedProgram.subProgramms.length; i++){
-                    if( $scope.selectedProgram.subProgramms[i].id === $scope.model.selectedSubProgram.id ){
+                    if( $scope.selectedProgram.subProgramms[i].id === $scope.model.selectedSubProgram.id ){                        
+                        angular.forEach($scope.selectedProgram.subProgramms[i].outputs, function(op){
+                            $scope.model.outputIndicatorGroups.push(op);
+                        });
+                        
+                        angular.forEach($scope.selectedProgram.subProgramms[i].dataSets, function(ds){
+                            $scope.model.outputDataSets.push(ds);
+                        });
+                        
                         $scope.selectedProgram.subProgramms.splice(i,1);    
                         break;
                     }
                 }
                 
                 //reset form              
-                $scope.close({program: $scope.selectedProgram, outputIndicatorGroups: $scope.model.outputIndicatorGroups});
+                $scope.close({program: $scope.selectedProgram, outputIndicatorGroups: $scope.model.outputIndicatorGroups, outputDataSets: $scope.model.outputDataSets});
                 
             }, function(){
                 var dialogOptions = {
