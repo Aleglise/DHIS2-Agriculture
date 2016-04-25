@@ -185,7 +185,11 @@ resultsFramework.controller('ProjectController',
             return;
         }        
     };
-
+    
+    $scope.showSummaryReport = function(){        
+        $scope.model.selectedProject = ContextMenuSelectedItem.getSelectedItem();
+    };
+    
     $scope.setSelectedProject = function(project){
         $scope.model.selectedProject = project;
         ContextMenuSelectedItem.setSelectedItem($scope.model.selectedProject);
