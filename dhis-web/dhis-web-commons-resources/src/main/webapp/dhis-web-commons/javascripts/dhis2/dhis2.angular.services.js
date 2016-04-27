@@ -1067,9 +1067,12 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                 });
                 return promise;
             },
-            upload: function(file){
+            upload: function(file, store){
                 var formData = new FormData();
                 formData.append('file', file);
+                if( store ){
+                    formData.append('fileStore', angular.toJson(store));
+                }
                 var headers = {transformRequest: angular.identity, headers: {'Content-Type': undefined}};
                 var promise = $http.post('../api/fileResources', formData, headers).then(function(response){
                     return response.data;
