@@ -1056,7 +1056,7 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                 return promise;
             },
             delete: function (uid) {
-                var promise = $http.get('../api/fileResources/' + uid).then(function (response) {
+                var promise = $http.delete('../api/fileResources/' + uid).then(function (response) {
                     return response.data;
                 });
                 return promise;

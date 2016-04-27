@@ -106,6 +106,10 @@ resultsFramework.controller('ResultsFrameworkController',
         
         $scope.model.metaAttributeValues = RfUtils.processMetaAttributeValues($scope.model.selectedResultsFramework, $scope.model.metaAttributeValues, $scope.model.metaAttributesById);
         
+        RfUtils.getFileNames($scope.model.selectedResultsFramework, $scope.model.metaAttributesById).then(function(res){
+            $scope.fileNames = res;
+        });
+        
         $scope.model.showEditResultsFrameworkDiv = true;
         $scope.model.showAddResultsFrameworkDiv = false;
         $scope.model.showStructureResultsFrameworkDiv = false;        
@@ -354,5 +358,13 @@ resultsFramework.controller('ResultsFrameworkController',
             $scope.model.reverse = false;
         }        
         $scope.loadResultsFrameworks();
+    };
+    
+    $scope.deleteFile = function(attributeId){        
+        RfUtils.deleteFile(attributeId, $scope.model.metaAttributeValues, $scope.fileNames).then(function(res){            
+            $scope.model.metaAttributeValues = res.obj;
+            $scope.fileNames = res.fileNames;            
+            $scope.update();
+        });
     };
 });

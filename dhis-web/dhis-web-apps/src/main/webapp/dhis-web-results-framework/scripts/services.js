@@ -342,7 +342,6 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
 .factory('SubProgramFactory', function($http, RfUtils) {
 
     return {
-
         get: function(uid){
             var promise = $http.get('../api/subProgramms/' + uid + '.json?fields=id,name,code,description,lastUpdated,sortOrder,programm[id],outputs[id,name],dataSets[id,name],attributeValues[value,attribute[id,name,code]]').then(function(response){
                 return response.data;
@@ -452,7 +451,7 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
     };
 })
 
-.service('RfUtils', function($translate, DialogService, ModalService, DateUtils){
+.service('RfUtils', function($q, $translate, DialogService, ModalService, DateUtils, FileService){
 
     return {
         removeItems: function(bag, items){
@@ -476,7 +475,7 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
         processMetaAttributes: function (attributes, attributeValues){
             var atts = [];
             angular.forEach(attributes, function(att){
-                if(attributeValues[att.id]){
+                if(attributeValues[att.id] || angular.isDefined( attributeValues[att.id] ) ){
                     atts.push({value: attributeValues[att.id], attribute: {id: att.id}});
                 }
             });
@@ -488,17 +487,33 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
             }
             angular.forEach(src.attributeValues, function(av){
                 if( av.attribute.id ){                
-                    /*if( attributesById[av.attribute.id] && attributesById[av.attribute.id].valueType === 'DATE'){
+                    if( attributesById[av.attribute.id] && attributesById[av.attribute.id].valueType === 'DATE'){
                         av.value = DateUtils.formatFromApiToUser( av.value );
-                    }*/                
+                    }               
                     des[av.attribute.id] = av.value;
                 }
             });
             return des;            
         },
+        getFileNames: function(obj, metaAttributesById){
+            var fileNames = [];
+            var def = $q.defer();
+            angular.forEach(obj.attributeValues, function(av){
+                if( metaAttributesById[av.attribute.id] && av.value && metaAttributesById[av.attribute.id].valueType === 'FILE_RESOURCE'){                    
+                    FileService.get(av.value).then(function(response){
+                        if(response && response.displayName){
+                            fileNames[av.attribute.id] = response.displayName;
+                        }                        
+                        def.resolve(fileNames);
+                    });
+                }
+            });
+            def.resolve(fileNames);
+            return def.promise;
+        },        
         deleteFile: function(id, obj, fileNames){
 
-            if( !id || !obj ){
+            if( !id || !obj[id] ){
                 var dialogOptions = {
                     headerText: 'error',
                     bodyText: 'missing_file_identifier'
@@ -509,15 +524,21 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
 
             var modalOptions = {
                 closeButtonText: 'cancel',
-                actionButtonText: 'remove',
-                headerText: 'remove',
-                bodyText: 'are_you_sure_to_remove'
+                actionButtonText: 'delete',
+                headerText: 'delete_attachment',
+                bodyText: 'are_you_sure_to_delete_file'
             };
-
-            ModalService.showModal({}, modalOptions).then(function(result){
-                fileNames[id] = null;
-                obj[id] = null;
+            
+            var def = $q.defer();
+            ModalService.showModal({}, modalOptions).then(function(){                
+                FileService.delete(obj[id]).then(function(){
+                    fileNames[id] = null;
+                    obj[id] = null;
+                    def.resolve({fileName: fileNames, obj: obj});
+                });
             });
+            
+            return def.promise;
         },
         convertToServerDate: function(obj, prop){            
             if(obj[prop]){

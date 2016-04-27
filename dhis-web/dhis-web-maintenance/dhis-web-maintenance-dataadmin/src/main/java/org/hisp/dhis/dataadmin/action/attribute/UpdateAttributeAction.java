@@ -248,7 +248,38 @@ public class UpdateAttributeAction
 
     private boolean legendSetAttribute;
 
-    public void setLegendSetAttribute( boolean legendSetAttribute ) { this.legendSetAttribute = legendSetAttribute; }
+    public void setLegendSetAttribute( boolean legendSetAttribute )
+    {
+        this.legendSetAttribute = legendSetAttribute;
+    }
+    
+    private boolean projectAttribute;
+
+    public void setProjectAttribute( boolean projectAttribute )
+    {
+        this.projectAttribute = projectAttribute;
+    }
+
+    private boolean resultsFrameworkAttribute;
+    
+    public void setResultsFrameworkAttribute( boolean resultsFrameworkAttribute )
+    {
+        this.resultsFrameworkAttribute = resultsFrameworkAttribute;
+    }
+    
+    private boolean programmAttribute;
+    
+    public void setProgrammAttribute( boolean programmAttribute )
+    {
+        this.programmAttribute = programmAttribute;
+    }
+    
+    private boolean subProgrammAttribute;
+    
+    public void setSubProgrammAttribute( boolean subProgrammAttribute )
+    {
+        this.subProgrammAttribute = subProgrammAttribute;
+    }
 
     // -------------------------------------------------------------------------
     // Action implementation
@@ -291,7 +322,10 @@ public class UpdateAttributeAction
             attribute.setOptionSetAttribute( optionSetAttribute );
             attribute.setConstantAttribute( constantAttribute );
             attribute.setLegendSetAttribute( legendSetAttribute );
-
+            attribute.setProjectAttribute( projectAttribute );
+            attribute.setResultsFrameworkAttribute( resultsFrameworkAttribute );
+            attribute.setProgrammAttribute( programmAttribute );
+            attribute.setSubProgrammAttribute( subProgrammAttribute );
 
             attributeService.updateAttribute( attribute );
 

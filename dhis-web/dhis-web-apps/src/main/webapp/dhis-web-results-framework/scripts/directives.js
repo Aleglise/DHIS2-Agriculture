@@ -119,13 +119,13 @@ var resultsFrameworkDirectives = angular.module('resultsFrameworkDirectives', []
     };
 })
 
-.directive('d3FileInput', function(FileService, DialogService){
+.directive('d3FileUpload', function(FileService, DialogService){
     
     return {
         restrict: "A",
         scope: {
-            d3FileInput: '=',
-            d3FileInputName: '='
+            d3FileUpload: '=',
+            d3FileNames: '='
         },
         link: function (scope, element, attrs) {
             var attributeId = attrs.inputFieldId;            
@@ -136,8 +136,8 @@ var resultsFrameworkDirectives = angular.module('resultsFrameworkDirectives', []
                             data.response.fileResource && 
                             data.response.fileResource.id && 
                             data.response.fileResource.name){                                            
-                        scope.d3FileInput[attributeId] = data.response.fileResource.id;   
-                        scope.d3FileInputName[attributeId] = data.response.fileResource.name;                        
+                        scope.d3FileUpload[attributeId] = data.response.fileResource.id;   
+                        scope.d3FileNames[attributeId] = data.response.fileResource.name;                        
                     }
                     else{
                         var dialogOptions = {
@@ -153,32 +153,23 @@ var resultsFrameworkDirectives = angular.module('resultsFrameworkDirectives', []
     };    
 })
 
-.directive('d3FileInputDelete', function($parse, $timeout, FileService, DialogService){
+.directive('d3FileDownload', function($parse, $window, DialogService){
     
     return {
         restrict: "A",
         link: function (scope, element, attrs) {
-            var valueGetter = $parse(attrs.d2FileInputDelete);
-            var nameGetter = $parse(attrs.d2FileInputName);
-            var nameSetter = nameGetter.assign;
-            
-            if(valueGetter(scope)) {
-                FileService.get(valueGetter(scope)).then(function(data){
-                    if(data && data.name && data.id){
-                        $timeout(function(){
-                            nameSetter(scope, data.name);
-                            scope.$apply();
-                        });
-                    }
-                    else{
-                        var dialogOptions = {
-                            headerText: 'error',
-                            bodyText: 'file_missing'
-                        };		
-                        DialogService.showDialog({}, dialogOptions);
-                    }                    
-                });                 
-            }
+            var valueGetter = $parse(attrs.d3FileDownload);
+            element.click(function() {
+                if( !valueGetter(scope) ){            
+                    var dialogOptions = {
+                        headerText: 'error',
+                        bodyText: 'missing_file_identifier'
+                    };
+                    DialogService.showDialog({}, dialogOptions);
+                    return;
+                }
+                $window.open('../api/fileResources/' + valueGetter(scope) + '/data', '_blank', '');                
+            });
         }
     };
 });  

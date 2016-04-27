@@ -127,6 +127,10 @@ resultsFramework.controller('ProgramController',
         
         $scope.model.metaAttributeValues = RfUtils.processMetaAttributeValues($scope.model.selectedProgram, $scope.model.metaAttributeValues, $scope.model.metaAttributesById);
         
+        RfUtils.getFileNames($scope.model.selectedProgram, $scope.model.metaAttributesById).then(function(res){
+            $scope.fileNames = res;
+        });
+        
         $scope.model.showAddProgramDiv = false;
         $scope.model.showEditProgramDiv = true;
     };
@@ -328,5 +332,13 @@ resultsFramework.controller('ProgramController',
             $scope.model.reverse = false;
         }        
         $scope.loadPrograms();
+    };
+    
+    $scope.deleteFile = function(attributeId){        
+        RfUtils.deleteFile(attributeId, $scope.model.metaAttributeValues, $scope.fileNames).then(function(res){            
+            $scope.model.metaAttributeValues = res.obj;
+            $scope.fileNames = res.fileNames;            
+            $scope.updateProgram();
+        });
     };
 });

@@ -54,27 +54,31 @@
 	<tr>
 		<td style="vertical-align: text-top;">$i18n.getString( "assigned_to" )</td>
 		<td>
-      <input type="checkbox" id="dataElementAttribute" name="dataElementAttribute" value="true" /><label for="dataElementAttribute">$i18n.getString( 'data_element' )</label> <br />
-      <input type="checkbox" id="dataElementGroupAttribute" name="dataElementGroupAttribute" value="true" /><label for="dataElementGroupAttribute">$i18n.getString( 'data_element_group' )</label> <br />
-      <input type="checkbox" id="indicatorAttribute" name="indicatorAttribute" value="true" /><label for="indicatorAttribute">$i18n.getString( 'indicator' )</label> <br />
-      <input type="checkbox" id="indicatorGroupAttribute" name="indicatorGroupAttribute" value="true" /><label for="indicatorGroupAttribute">$i18n.getString( 'indicator_group' )</label> <br />
-      <input type="checkbox" id="dataSetAttribute" name="dataSetAttribute" value="true" /><label for="dataSetAttribute">$i18n.getString( 'data_set' )</label> <br />
-      <input type="checkbox" id="organisationUnitAttribute" name="organisationUnitAttribute" value="true" /><label for="organisationUnitAttribute">$i18n.getString( 'organisation_unit' )</label> <br />
-      <input type="checkbox" id="organisationUnitGroupAttribute" name="organisationUnitGroupAttribute" value="true" /><label for="organisationUnitGroupAttribute">$i18n.getString( 'organisation_unit_group' )</label> <br />
-      <input type="checkbox" id="organisationUnitGroupSetAttribute" name="organisationUnitGroupSetAttribute" value="true" /><label for="organisationUnitGroupSetAttribute">$i18n.getString( 'organisation_unit_group_set' )</label> <br />
-      <input type="checkbox" id="userAttribute" name="userAttribute" value="true" /><label for="userAttribute">$i18n.getString( 'user' )</label> <br />
-      <input type="checkbox" id="userGroupAttribute" name="userGroupAttribute" value="true" /><label for="userGroupAttribute">$i18n.getString( 'user_group' )</label> <br />
-      <input type="checkbox" id="programAttribute" name="programAttribute" value="true" /><label for="programAttribute">$i18n.getString( 'program' )</label> <br />
-      <input type="checkbox" id="programStageAttribute" name="programStageAttribute" value="true" /><label for="programStageAttribute">$i18n.getString( 'program_stage' )</label> <br />
-      <input type="checkbox" id="trackedEntityAttribute" name="trackedEntityAttribute" value="true" /><label for="trackedEntityAttribute">$i18n.getString( 'tracked_entity' )</label> <br />
-      <input type="checkbox" id="trackedEntityAttributeAttribute" name="trackedEntityAttributeAttribute" value="true" /><label for="trackedEntityAttributeAttribute">$i18n.getString( 'tracked_entity_attribute' )</label> <br />
-      <input type="checkbox" id="categoryOptionAttribute" name="categoryOptionAttribute" value="true" /><label for="categoryOptionAttribute">$i18n.getString( 'category_option' )</label> <br />
-      <input type="checkbox" id="categoryOptionGroupAttribute" name="categoryOptionGroupAttribute" value="true" /><label for="categoryOptionGroupAttribute">$i18n.getString( 'category_option_group' )</label> <br />
-      <input type="checkbox" id="documentAttribute" name="documentAttribute" value="true" /><label for="documentAttribute">$i18n.getString( 'document' )</label> <br />
-      <input type="checkbox" id="optionAttribute" name="optionAttribute" value="true" /><label for="optionAttribute">$i18n.getString( 'option' )</label> <br />
-      <input type="checkbox" id="optionSetAttribute" name="optionSetAttribute" value="true" /><label for="optionSetAttribute">$i18n.getString( 'option_set' )</label> <br />
-      <input type="checkbox" id="constantAttribute" name="constantAttribute" value="true" /><label for="constantAttribute">$i18n.getString( 'constant' )</label> <br />
-      <input type="checkbox" id="legendSetAttribute" name="legendSetAttribute" value="true" /><label for="legendSetAttribute">$i18n.getString( 'legend_set' )</label> <br />
+              <input type="checkbox" id="dataElementAttribute" name="dataElementAttribute" value="true" /><label for="dataElementAttribute">$i18n.getString( 'data_element' )</label> <br />
+              <input type="checkbox" id="dataElementGroupAttribute" name="dataElementGroupAttribute" value="true" /><label for="dataElementGroupAttribute">$i18n.getString( 'data_element_group' )</label> <br />
+              <input type="checkbox" id="indicatorAttribute" name="indicatorAttribute" value="true" /><label for="indicatorAttribute">$i18n.getString( 'indicator' )</label> <br />
+              <input type="checkbox" id="indicatorGroupAttribute" name="indicatorGroupAttribute" value="true" /><label for="indicatorGroupAttribute">$i18n.getString( 'indicator_group' )</label> <br />
+              <input type="checkbox" id="dataSetAttribute" name="dataSetAttribute" value="true" /><label for="dataSetAttribute">$i18n.getString( 'data_set' )</label> <br />
+              <input type="checkbox" id="organisationUnitAttribute" name="organisationUnitAttribute" value="true" /><label for="organisationUnitAttribute">$i18n.getString( 'organisation_unit' )</label> <br />
+              <input type="checkbox" id="organisationUnitGroupAttribute" name="organisationUnitGroupAttribute" value="true" /><label for="organisationUnitGroupAttribute">$i18n.getString( 'organisation_unit_group' )</label> <br />
+              <input type="checkbox" id="organisationUnitGroupSetAttribute" name="organisationUnitGroupSetAttribute" value="true" /><label for="organisationUnitGroupSetAttribute">$i18n.getString( 'organisation_unit_group_set' )</label> <br />
+              <input type="checkbox" id="userAttribute" name="userAttribute" value="true" /><label for="userAttribute">$i18n.getString( 'user' )</label> <br />
+              <input type="checkbox" id="userGroupAttribute" name="userGroupAttribute" value="true" /><label for="userGroupAttribute">$i18n.getString( 'user_group' )</label> <br />
+              <input type="checkbox" id="programAttribute" name="programAttribute" value="true" /><label for="programAttribute">$i18n.getString( 'program' )</label> <br />
+              <input type="checkbox" id="programStageAttribute" name="programStageAttribute" value="true" /><label for="programStageAttribute">$i18n.getString( 'program_stage' )</label> <br />
+              <input type="checkbox" id="trackedEntityAttribute" name="trackedEntityAttribute" value="true" /><label for="trackedEntityAttribute">$i18n.getString( 'tracked_entity' )</label> <br />
+              <input type="checkbox" id="trackedEntityAttributeAttribute" name="trackedEntityAttributeAttribute" value="true" /><label for="trackedEntityAttributeAttribute">$i18n.getString( 'tracked_entity_attribute' )</label> <br />
+              <input type="checkbox" id="categoryOptionAttribute" name="categoryOptionAttribute" value="true" /><label for="categoryOptionAttribute">$i18n.getString( 'category_option' )</label> <br />
+              <input type="checkbox" id="categoryOptionGroupAttribute" name="categoryOptionGroupAttribute" value="true" /><label for="categoryOptionGroupAttribute">$i18n.getString( 'category_option_group' )</label> <br />
+              <input type="checkbox" id="documentAttribute" name="documentAttribute" value="true" /><label for="documentAttribute">$i18n.getString( 'document' )</label> <br />
+              <input type="checkbox" id="optionAttribute" name="optionAttribute" value="true" /><label for="optionAttribute">$i18n.getString( 'option' )</label> <br />
+              <input type="checkbox" id="optionSetAttribute" name="optionSetAttribute" value="true" /><label for="optionSetAttribute">$i18n.getString( 'option_set' )</label> <br />
+              <input type="checkbox" id="constantAttribute" name="constantAttribute" value="true" /><label for="constantAttribute">$i18n.getString( 'constant' )</label> <br />
+              <input type="checkbox" id="legendSetAttribute" name="legendSetAttribute" value="true" /><label for="legendSetAttribute">$i18n.getString( 'legend_set' )</label> <br />
+        	  <input type="checkbox" id="projectAttribute" name="projectAttribute" value="true" /><label for="projectAttribute">$i18n.getString( 'project' )</label> <br />
+        	  <input type="checkbox" id="resultsFrameworkAttribute" name="resultsFrameworkAttribute" value="true" /><label for="resultsFrameworkAttribute">$i18n.getString( 'results_framework' )</label> <br />
+        	  <input type="checkbox" id="programmAttribute" name="programmAttribute" value="true" /><label for="programmAttribute">$i18n.getString( 'programm' )</label> <br />
+        	  <input type="checkbox" id="subProgrammAttribute" name="subProgrammAttribute" value="true" /><label for="subProgrammAttribute">$i18n.getString( 'sub_programm' )</label> <br />
 		</td>
 	</tr>
 
@@ -86,6 +90,7 @@
 				<option value="LONG_TEXT">$i18n.getString( "long_text" )</option>
 				<option value="BOOLEAN">$i18n.getString( "yes_no" )</option>
 				<option value="DATE">$i18n.getString( "date" )</option>
+				<option value="FILE_RESOURCE">$i18n.getString( "file" )</option>
 				<option value="NUMBER">$i18n.getString( "number" )</option>
 				<option value="INTEGER" >$i18n.getString( "integer" )</option>
 				<option value="INTEGER_POSITIVE">$i18n.getString( "positive_integer" )</option>

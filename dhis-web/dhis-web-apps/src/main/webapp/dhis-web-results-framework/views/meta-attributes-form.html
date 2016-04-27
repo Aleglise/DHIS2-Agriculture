@@ -71,14 +71,6 @@
                                input-field-id={{attribute.id}} 
                                class="form-control"/>
                     </div>
-                    <!--<div ng-switch-when="TEXT">
-                        <input type="text"
-                                ng-model="model.metaAttributeValues[attribute.id]" 
-                                ng-required={{attribute.mandatory}}
-                                name="foo" 
-                                input-field-id={{attribute.id}}
-                                class="form-control"/>
-                    </div>-->
                     <div ng-switch-when="LONG_TEXT">
                         <textarea rows="3"
                                 ng-model="model.metaAttributeValues[attribute.id]" 
@@ -110,29 +102,29 @@
                                input-field-id={{attribute.id}}
                                class="form-control">
                     </div>                    
-                    <div ng-switch-when="TEXT">
+                    <div ng-switch-when="FILE_RESOURCE">
                         <div class="input-group">
                             <div class="form-control">
-                                <a ng-if="model.metaAttributes[attribute.id]" href ng-click="downloadFile(model.metaAttributeValues[attribute.id])" title="{{fileNames[attribute.id]}}">{{fileNames[attribute.id].length > 20 ? fileNames[attribute.id].substr(0,20).contact('...') : fileNames[attribute.id]}}</a>                                        
+                                <div class="link cursor-pointer"
+                                      ng-if="model.metaAttributeValues[attribute.id]" 
+                                      title="{{fileNames[attribute.id]}}" 
+                                      d3-file-download="model.metaAttributeValues[attribute.id]">
+                                    {{fileNames[attribute.id].length > 40 ? fileNames[attribute.id].substr(0,39).concat('...') : fileNames[attribute.id]}}
+                                </div>
                             </div>
                             <span class="input-group-btn">
-                                <span class="btn btn-primary btn-file" ng-if="model.metaAttributeValues[attribute.id]" ng-click="deleteFile(attribute.id)">
-                                    <span
-                                          title="{{'delete' | translate}}" 
-                                          d3-file-input-name="fileNames[attribute.id]" 
-                                          d3-file-input-delete="model.metaAttributeValues[attribute.id]">
-                                        <i class="fa fa-trash"></i>
-                                    </span>
+                                <span title="{{'delete' | translate}}"  class="btn btn-primary btn-file" ng-if="model.metaAttributeValues[attribute.id]" ng-click="deleteFile(attribute.id)">
+                                    <i class="fa fa-trash"></i>
                                 </span>
                                 <span class="btn btn-primary btn-file" ng-if="!model.metaAttributeValues[attribute.id]">
-                                    <span title="{{'upload' | translate}}">
-                                        <i class="fa fa-upload"></i>
+                                    <span title="{{'upload' | translate}}">                                        
                                         <input type="file" 
                                                ng-required={{attribute.mandatory}}
                                                name="foo"
                                                input-field-id={{attribute.id}}
-                                               d3-file-input="model.metaAttributeValues" 
-                                               d3-file-input-name="fileNames">
+                                               d3-file-upload="model.metaAttributeValues" 
+                                               d3-file-names="fileNames">
+                                        <i class="fa fa-upload"></i>
                                     </span>                                                
                                 </span>
                             </span>                

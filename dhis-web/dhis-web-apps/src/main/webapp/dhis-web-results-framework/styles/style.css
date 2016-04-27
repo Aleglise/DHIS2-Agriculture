@@ -560,6 +560,20 @@ div#orgUnitTree {
     word-wrap: break-word;
 }
 
+.link {
+    color: #428bca;
+    text-decoration: none
+}
+.link:hover, .link:focus {
+    color: #2a6496;
+    text-decoration: underline
+}
+.link:focus {
+    outline: thin dotted #333;
+    outline: 5px auto -webkit-focus-ring-color;
+    outline-offset: -2px
+}
+
 .cursor-pointer {
     cursor: pointer;
 }
@@ -719,7 +733,6 @@ div#orgUnitTree {
     height: 400px;
     overflow: auto;
 }
-
 
 .remove-default-top-padding {
     margin-top: -15px !important;

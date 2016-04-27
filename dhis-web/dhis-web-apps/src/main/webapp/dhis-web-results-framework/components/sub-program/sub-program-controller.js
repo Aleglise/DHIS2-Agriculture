@@ -40,6 +40,10 @@ resultsFramework.controller('SubProgramController',
             $scope.model.metaAttributeValues = {};
             
             $scope.model.metaAttributeValues = RfUtils.processMetaAttributeValues($scope.model.selectedSubProgram, $scope.model.metaAttributeValues, $scope.model.metaAttributesById);
+            
+            RfUtils.getFileNames($scope.model.selectedSubProgram, $scope.model.metaAttributesById).then(function(res){
+                $scope.fileNames = res;
+            });
         });
     }
     else{
@@ -170,5 +174,13 @@ resultsFramework.controller('SubProgramController',
     
     $scope.close = function(obj){
         $modalInstance.close(obj);
+    };
+    
+    $scope.deleteFile = function(attributeId){        
+        RfUtils.deleteFile(attributeId, $scope.model.metaAttributeValues, $scope.fileNames).then(function(res){            
+            $scope.model.metaAttributeValues = res.obj;
+            $scope.fileNames = res.fileNames;            
+            $scope.updateSubProgram();
+        });
     };
 });

@@ -97,8 +97,7 @@ resultsFramework.controller('ProjectController',
                     }
 
                     pr = RfUtils.convertToUserDate(pr, 'startDate');
-                    pr = RfUtils.convertToUserDate(pr, 'endDate');                        
-                    //pr.extensionPossible = pr.extensionPossible === true ? "true" : pr.extensionPossible === false ? "false" : "unknown";
+                    pr = RfUtils.convertToUserDate(pr, 'endDate');
                 });
 
                 angular.forEach(dss, function(ds){
@@ -126,6 +125,10 @@ resultsFramework.controller('ProjectController',
         $scope.model.selectedProject = ContextMenuSelectedItem.getSelectedItem();
         
         $scope.model.metaAttributeValues = RfUtils.processMetaAttributeValues($scope.model.selectedProject, $scope.model.metaAttributeValues, $scope.model.metaAttributesById);
+        
+        RfUtils.getFileNames($scope.model.selectedProject, $scope.model.metaAttributesById).then(function(res){
+            $scope.fileNames = res;
+        });
                 
         $scope.model.showAddProjectDiv = false;
         $scope.model.showEditProject = true;
@@ -199,6 +202,7 @@ resultsFramework.controller('ProjectController',
         $scope.model.showAddProjectDiv = false;
         $scope.model.showEditProject = false;
         $scope.model.selectedProject = {};
+        $scope.model.metaAttributeValues = {};
     };
 
     $scope.interacted = function(field, form) {
@@ -224,8 +228,7 @@ resultsFramework.controller('ProjectController',
         
         pr.attributeValues = RfUtils.processMetaAttributes($scope.model.metaAttributes, $scope.model.metaAttributeValues);                
         pr = RfUtils.convertToServerDate(pr, 'startDate');
-        pr = RfUtils.convertToServerDate(pr, 'endDate');        
-        //pr.extensionPossible = pr.extensionPossible === 'true' ? true : pr.extensionPossible === 'false' ? false : "";
+        pr = RfUtils.convertToServerDate(pr, 'endDate');
         
         //form is valid, continue with adding
         ProjectFactory.create(pr).then(function(data){
@@ -257,12 +260,12 @@ resultsFramework.controller('ProjectController',
             return false;
         }
         
+        $scope.model.selectedProject.attributeValues = RfUtils.processMetaAttributes($scope.model.metaAttributes, $scope.model.metaAttributeValues);
         var pr = angular.copy($scope.model.selectedProject);
         
-        pr.attributeValues = RfUtils.processMetaAttributes($scope.model.metaAttributes, $scope.model.metaAttributeValues);                
+        pr.attributeValues = RfUtils.processMetaAttributes($scope.model.metaAttributes, $scope.model.metaAttributeValues);
         pr = RfUtils.convertToServerDate(pr, 'startDate');
-        pr = RfUtils.convertToServerDate(pr, 'endDate');        
-        //pr.extensionPossible = pr.extensionPossible === 'true' ? true : pr.extensionPossible === 'false' ? false : "";
+        pr = RfUtils.convertToServerDate(pr, 'endDate');
         
         //form is valid, continue with adding
         ProjectFactory.update(pr).then(function(data){
@@ -367,5 +370,13 @@ resultsFramework.controller('ProjectController',
             $scope.model.reverse = false;
         }        
         $scope.loadProjects();
+    };
+    
+    $scope.deleteFile = function(attributeId){        
+        RfUtils.deleteFile(attributeId, $scope.model.metaAttributeValues, $scope.fileNames).then(function(res){            
+            $scope.model.metaAttributeValues = res.obj;
+            $scope.fileNames = res.fileNames;            
+            $scope.updateProject();
+        });
     };
 });
