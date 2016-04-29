@@ -12,6 +12,7 @@ resultsFramework.controller('ProjectController',
                 ProjectFactory,
                 MetaDataFactory,
                 DataSetFactory,
+                ResultsFrameworkFactory,
                 MetaAttributesFactory,
                 ContextMenuSelectedItem,
                 RfUtils,
@@ -29,6 +30,7 @@ resultsFramework.controller('ProjectController',
                         donorList: [],
                         statusList: [],
                         selectedProject: {},
+                        selectedSubPrograms: {},
                         budgetExecutionDataSets: [],
                         budgetForecastDataSets: [],
                         indicatorGroups: [],
@@ -62,7 +64,10 @@ resultsFramework.controller('ProjectController',
                 $scope.model.metaAttributesById[att.id] = att;
             });
             
-            $scope.loadProjects();
+            ResultsFrameworkFactory.getActive().then(function(response){
+                $scope.model.activeResultsFramework = response && response.resultsFrameworks && response.resultsFrameworks[0] ? response.resultsFrameworks[0] : null;
+                $scope.loadProjects();
+            });
         });
     });
 
@@ -125,14 +130,12 @@ resultsFramework.controller('ProjectController',
 
     $scope.showEditProject = function(){
         $scope.model.metaAttributeValues = {};
-        $scope.model.selectedProject = ContextMenuSelectedItem.getSelectedItem();
-        
-        $scope.model.metaAttributeValues = RfUtils.processMetaAttributeValues($scope.model.selectedProject, $scope.model.metaAttributeValues, $scope.model.metaAttributesById);
-        
+        $scope.model.selectedProject = ContextMenuSelectedItem.getSelectedItem();        
+        $scope.model.metaAttributeValues = RfUtils.processMetaAttributeValues($scope.model.selectedProject, $scope.model.metaAttributeValues, $scope.model.metaAttributesById);        
         RfUtils.getFileNames($scope.model.selectedProject, $scope.model.metaAttributesById).then(function(res){
             $scope.fileNames = res;
         });
-                
+        
         $scope.model.showAddProjectDiv = false;
         $scope.model.showProjectSummaryDiv = false;
         $scope.model.showEditProject = true;
@@ -194,7 +197,25 @@ resultsFramework.controller('ProjectController',
     };
     
     $scope.showSummaryReport = function(){        
-        $scope.model.selectedProject = ContextMenuSelectedItem.getSelectedItem();
+        $scope.model.metaAttributeValues = {};
+        $scope.model.selectedProject = ContextMenuSelectedItem.getSelectedItem();        
+        $scope.model.metaAttributeValues = RfUtils.processMetaAttributeValues($scope.model.selectedProject, $scope.model.metaAttributeValues, $scope.model.metaAttributesById);        
+        RfUtils.getFileNames($scope.model.selectedProject, $scope.model.metaAttributesById).then(function(res){
+            $scope.fileNames = res;
+        });
+        
+        $scope.model.contributingPrograms = {};
+    
+        angular.forEach($scope.model.selectedProject.subProgramms, function(sp){
+            if( $scope.model.contributingPrograms[sp.programm.name] ){
+                $scope.model.contributingPrograms[sp.programm.name].push(sp.name);
+            }
+            else{
+                $scope.model.contributingPrograms[sp.programm.name] = [sp.name];
+            }
+            //console.log('the sp:  ', sp);
+            //$scope.model.selectedSubPrograms[sp.id] = true;
+        });
         
         $scope.model.showAddProjectDiv = false;
         $scope.model.showEditProject = false;
@@ -335,6 +356,9 @@ resultsFramework.controller('ProjectController',
             resolve: {
                 selectedProject: function () {
                     return $scope.model.selectedProject;
+                },
+                activeResultsFramework: function(){
+                    return $scope.model.activeResultsFramework;
                 }
             }
         });

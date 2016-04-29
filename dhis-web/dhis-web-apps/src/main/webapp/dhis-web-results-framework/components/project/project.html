@@ -9,10 +9,10 @@
             {{'project'| translate}}
         </div>
         <div class="input-group col-sm-10">
-            <input type="text" name="searchText" placeholder="{{'search_by_name' | translate}}" class="form-control" ng-disabled="model.showEditProject || model.showAddProjectDiv" ng-model="model.searchText" ng-blur="loadProjects()" d2-enter="loadProjects()"/>
+            <input type="text" name="searchText" placeholder="{{'search_by_name' | translate}}" class="form-control" ng-disabled="model.showEditProject || model.showAddProjectDiv || model.showProjectSummaryDiv" ng-model="model.searchText" ng-blur="loadProjects()" d2-enter="loadProjects()"/>
             <div class="input-group-btn">                
-                <button class="btn btn-success" type="button" title="{{'search'| translate}}" ng-disabled="model.showEditProject || model.showAddProjectDiv" ng-click="loadProjects()"><i class="fa fa-search"></i></button>
-                <button class="btn btn-primary" type="button" title="{{'add_new'| translate}}" ng-disabled="model.showEditProject || model.showAddProjectDiv" ng-click="showAddProject()"><i class="fa fa-plus"></i></button>
+                <button class="btn btn-success" type="button" title="{{'search'| translate}}" ng-disabled="model.showEditProject || model.showAddProjectDiv || model.showProjectSummaryDiv" ng-click="loadProjects()"><i class="fa fa-search"></i></button>
+                <button class="btn btn-primary" type="button" title="{{'add_new'| translate}}" ng-disabled="model.showEditProject || model.showAddProjectDiv || model.showProjectSummaryDiv" ng-click="showAddProject()"><i class="fa fa-plus"></i></button>
             </div>                
         </div>  
     </div>
@@ -21,9 +21,9 @@
     <!-- context menu begins -->
     <div id="contextMenu" class="contextMenu" style="width: 250px;">
         <ul id="contextMenuItems" class="contextMenuItems">
-            <li><a href ng-click="showEditProject()"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span>&nbsp;&nbsp;{{'edit'| translate}}</a></li>
+            <li><a href ng-click="showEditProject()"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span>&nbsp;&nbsp;{{'edit'| translate}}</a></li>            
+            <li><a href ng-click="showSummaryReport()"><span class="glyphicon glyphicon-align-left" aria-hidden="true"></span>&nbsp;&nbsp;{{'overview'| translate}}</a></li>                    
             <li><a href ng-click="showBudgetForecast()"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>&nbsp;&nbsp;{{'budget_forecast'| translate}}</a></li>
-            <li><a href ng-click="showSummaryReport()"><span class="glyphicon glyphicon-align-left" aria-hidden="true"></span>&nbsp;&nbsp;{{'summary_report'| translate}}</a></li>                    
             <li class="divider"></li>
             <li><a href ng-click="contributionToResultFramework()"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span>&nbsp;&nbsp;{{'contribution_results_framework'| translate}}</a></li>
         </ul>
@@ -71,8 +71,8 @@
     </div>
     <div class="row">
         <form name="projectForm" novalidate>
-            <div class="col-sm-12" ng-if="model.showAddProjectDiv || model.showEditProject">
-                <div ng-include="'components/project/project-form.html'"></div>                
+            <div class="col-sm-8" ng-if="model.showAddProjectDiv || model.showEditProject">
+                <div ng-include="'components/project/project-form.html'"></div>
                 <div class="vertical-spacing">                
                     <button type="button" class="btn btn-primary" ng-click="addProject()" ng-if="model.showAddProjectDiv">{{'save'| translate}} </button>
                     <button type="button" class="btn btn-primary" ng-click="updateProject()" ng-if="model.showEditProject">{{'update'| translate}}</button>
@@ -85,13 +85,42 @@
 
     <div ng-if="model.showProjectSummaryDiv">
         <div class="row">
-            <div class="col-sm-12">
+            <div class="col-sm-8">
                 <div class="pull-right">
-                    <button type="button" class="btn btn-warning" ng-click="showSummaryReport()" title="{{'close' | translate}}">
+                    <button type="button" class="btn btn-primary horizonal-spacing" ng-click="printPdf()" title="{{'pdf_print' | translate}}">
+                        <i class="fa fa-print"></i>
+                    </button>
+                    <button type="button" class="btn btn-default" ng-click="showSummaryReport()" title="{{'close' | translate}}">
                         <i class="fa fa-times-circle"></i>
                     </button>
                 </div>
             </div>
-        </div>        
+        </div>
+        <div class="row">            
+            <div class="col-sm-8">
+                <div ng-include="'components/project/project-form.html'"></div>
+            </div>
+        </div>
+        <div class="row vertical-spacing">
+            <div class="col-sm-8">
+                <div class="alert alert-info">
+                    {{'contribution_results_framework'| translate}} - {{model.activeResultsFramework.name}}
+                </div>
+                <table class="table table-bordered table-condensed">                    
+                    <tbody ng-repeat="(key, value) in model.contributingPrograms">
+                        <tr>
+                            <td class="active">
+                                {{key}}
+                            </td>
+                        </tr>
+                        <tr ng-repeat="v in value | orderBy: 'name'">                            
+                            <td>
+                                <span class="left-horizontal-spacing">{{v}}</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>

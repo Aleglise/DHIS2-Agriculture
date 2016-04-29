@@ -392,7 +392,7 @@ var resultsFrameworkServices = angular.module('resultsFrameworkServices', ['ngRe
             return promise;
         },
         getAll: function(paging, pager, filter, sortProperty, order){
-            var url = '../api/projects.json?fields=id,name,code,lastUpdated,totalCost,costByGovernment,costByLeadDonor,costByOthers,leadDonor,startDate,endDate,extensionPossible,description,contactName,contactPhone,contactEmail,status,budgetForecastDataSet[id,name],budgetExecutionDataSet[id,name],subProgramms[id,name,code,description],attributeValues[value,attribute[id,name,code]]';
+            var url = '../api/projects.json?fields=id,name,code,lastUpdated,totalCost,costByGovernment,costByLeadDonor,costByOthers,leadDonor,startDate,endDate,extensionPossible,description,contactName,contactPhone,contactEmail,status,budgetForecastDataSet[id,name],budgetExecutionDataSet[id,name],subProgramms[id,name,code,description, programm[id,name]],attributeValues[value,attribute[id,name,code]]';
                         
             url = RfUtils.applyPagingOnUrl( url, paging, pager, filter, sortProperty, order);
             
