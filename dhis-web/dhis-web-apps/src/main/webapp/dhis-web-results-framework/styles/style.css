@@ -741,3 +741,15 @@ div#orgUnitTree {
 .remove-default-top-padding {
     margin-top: -15px !important;
 }
+
+.remove-default-padding {
+    margin: -15px !important;
+}
+
+.add-default-padding {
+    margin: 15px !important;
+}
+
+.long-horizontal-spacing {
+    margin-left: 60px;
+}

@@ -20,60 +20,62 @@
             </div>  
         </div>
         <hr>
-
+        
+        <!-- context menu begins -->
+        <div id="contextMenu" class="contextMenu" style="width: 180px;">
+            <ul id="contextMenuItems" class="contextMenuItems">
+                <li><a href ng-click="showEditResultsFramework()"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span>&nbsp;&nbsp;{{'edit'| translate}}</a></li>
+                <li><a href ng-click="showStructureResultsFramework()"><span class="glyphicon glyphicon-align-left" aria-hidden="true"></span>&nbsp;&nbsp;{{'view'| translate}}</a></li>
+                <li class="divider"></li>
+                <li><a href ng-click="showActivateResultsFramework()"><span ng-class="{false: 'glyphicon glyphicon-ok', true: 'glyphicon glyphicon-remove'} [model.selectedResultsFramework.active]" aria-hidden="true"></span>&nbsp;&nbsp;{{model.selectedResultsFramework.active ? 'deactivate' : 'activate'| translate}}</a></li>
+            </ul>
+        </div>
+        <!-- context menu ends --> 
+                        
         <div ng-if="!model.showEditResultsFrameworkDiv && !model.showAddResultsFrameworkDiv && !model.showStructureResultsFrameworkDiv">
             <div class="row">
-                <div ng-if="model.resultsFrameworks.length < 1" class="alert alert-warning">{{'no_results_framework_available'| translate}}</div> 
-                <div ng-if="model.resultsFrameworks.length > 0">
+                <div class="col-sm-12">
+                    <div ng-if="model.resultsFrameworks.length < 1" class="alert alert-warning">{{'no_results_framework_available'| translate}}</div> 
+                    <div ng-if="model.resultsFrameworks.length > 0">
 
-                    <!-- context menu begins -->
-                    <div id="contextMenu" class="contextMenu" style="width: 180px;">
-                        <ul id="contextMenuItems" class="contextMenuItems">
-                            <li><a href ng-click="showEditResultsFramework()"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span>&nbsp;&nbsp;{{'edit'| translate}}</a></li>
-                            <li><a href ng-click="showStructureResultsFramework()"><span class="glyphicon glyphicon-align-left" aria-hidden="true"></span>&nbsp;&nbsp;{{'view'| translate}}</a></li>
-                            <li class="divider"></li>
-                            <li><a href ng-click="showActivateResultsFramework()"><span ng-class="{false: 'glyphicon glyphicon-ok', true: 'glyphicon glyphicon-remove'} [model.selectedResultsFramework.active]" aria-hidden="true"></span>&nbsp;&nbsp;{{model.selectedResultsFramework.active ? 'deactivate' : 'activate'| translate}}</a></li>
-                        </ul>
+                        <table class="listTable dhis2-table-striped-border dhis2-table-hover">
+                            <thead>
+                                <tr>                                
+                                    <th class="bold" ng-repeat="col in model.gridColumns" ng-click="sortGrid(col)">                                    
+                                        <!-- sort icon begins -->                                
+                                        <span class="fa-stack">
+                                            <span ng-class="{true: 'red'} [model.sortColumn === col && !model.reverse]"><i class="fa fa-sort-asc fa-stack-1x"></i></span>
+                                            <span ng-class="{true: 'red'} [model.sortColumn === col && model.reverse]"><i class="fa fa-sort-desc fa-stack-1x"></i></span>
+                                        </span>
+                                        <!-- sort icon ends -->
+                                        {{col === 'active' ? 'status' : col | translate}}
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="resultsFramework in model.resultsFrameworks"                                  
+                                    ng-click="setSelectedResultsFramework(resultsFramework)"
+                                    ng-class="{true: 'alert-danger bold'}[resultsFramework.active]"
+                                    d2-context-menu 
+                                    selected-item={{resultsFramework}}>
+                                    <td ng-repeat="col in model.gridColumns">
+                                        <span ng-switch="col">
+                                            <span ng-switch-when="lastUpdated">
+                                                {{resultsFramework[col] | d2LastUpdated}}
+                                            </span>
+                                            <span ng-switch-when="active">
+                                                {{resultsFramework[col] ? 'active' : 'inactive' | translate}}
+                                            </span>
+                                            <span ng-switch-default>
+                                                {{resultsFramework[col]}}
+                                            </span>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <serverside-paginator></serverside-paginator>
                     </div>
-                    <!-- context menu ends -->         
-
-                    <table class="listTable dhis2-table-striped-border dhis2-table-hover">
-                        <thead>
-                            <tr>                                
-                                <th class="bold" ng-repeat="col in model.gridColumns" ng-click="sortGrid(col)">                                    
-                                    <!-- sort icon begins -->                                
-                                    <span class="fa-stack">
-                                        <span ng-class="{true: 'red'} [model.sortColumn === col && !model.reverse]"><i class="fa fa-sort-asc fa-stack-1x"></i></span>
-                                        <span ng-class="{true: 'red'} [model.sortColumn === col && model.reverse]"><i class="fa fa-sort-desc fa-stack-1x"></i></span>
-                                    </span>
-                                    <!-- sort icon ends -->
-                                    {{col === 'active' ? 'status' : col | translate}}
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr ng-repeat="resultsFramework in model.resultsFrameworks"                                  
-                                ng-click="setSelectedResultsFramework(resultsFramework)"
-                                ng-class="{true: 'alert-danger bold'}[resultsFramework.active]"
-                                d2-context-menu 
-                                selected-item={{resultsFramework}}>
-                                <td ng-repeat="col in model.gridColumns">
-                                    <span ng-switch="col">
-                                        <span ng-switch-when="lastUpdated">
-                                            {{resultsFramework[col] | d2LastUpdated}}
-                                        </span>
-                                        <span ng-switch-when="active">
-                                            {{resultsFramework[col] ? 'active' : 'inactive' | translate}}
-                                        </span>
-                                        <span ng-switch-default>
-                                            {{resultsFramework[col]}}
-                                        </span>
-                                    </span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <serverside-paginator></serverside-paginator>
                 </div>
             </div>
         </div>
