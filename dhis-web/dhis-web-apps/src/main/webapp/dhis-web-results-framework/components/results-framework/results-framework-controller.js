@@ -65,8 +65,8 @@ resultsFramework.controller('ResultsFrameworkController',
                         $scope.model.impactOutcomeDataSets = $scope.model.impactDataSets.concat( $scope.model.outcomeDataSets );
 
                         ProgramFactory.getAll().then(function(response){
-                            $scope.model.programs = response.programms;                            
-                            $scope.loadResultsFrameworks();
+                            $scope.model.programs = response.programms;
+                            $scope.loadResultsFrameworks();                            
                         });
                     });
                 });
@@ -169,20 +169,7 @@ resultsFramework.controller('ResultsFrameworkController',
         $scope.model.showEditResultsFrameworkDiv = false;
     };
     
-    $scope.showActivateResultsFramework = function(){
-        
-        $scope.model.selectedResultsFramework = ContextMenuSelectedItem.getSelectedItem();
-        
-        var otherActiveExists = $filter('filter')($scope.model.resultsFrameworks, {active: true}).length > 0;
-        if(!$scope.model.selectedResultsFramework.active && otherActiveExists){
-            var dialogOptions = {
-                headerText: 'error',
-                bodyText: 'active_results_framework_exists'
-            };
-            DialogService.showDialog({}, dialogOptions);            
-            return;
-        }        
-        
+    var setResultsFramrworkStatus = function(){
         var modalOptions = {
             closeButtonText: 'no',
             actionButtonText: 'yes',
@@ -202,8 +189,35 @@ resultsFramework.controller('ResultsFrameworkController',
                     DialogService.showDialog({}, dialogOptions);
                 }
             });
-        });        
+        });
     };
+    
+    $scope.showActivateResultsFramework = function(){        
+        $scope.model.selectedResultsFramework = ContextMenuSelectedItem.getSelectedItem();
+
+        if( !$scope.model.selectedResultsFramework.active ){//trying to activate RF
+            //see if there is no other active RF
+            ResultsFrameworkFactory.getActive().then(function(response){
+                if( response && response.resultsFrameworks ){
+                    
+                    if( response.resultsFrameworks[0] ){
+                        var dialogOptions = {
+                            headerText: 'error',
+                            bodyText: 'active_results_framework_exists'
+                        };
+                        DialogService.showDialog({}, dialogOptions);            
+                        return;
+                    }
+                    else{
+                        setResultsFramrworkStatus();
+                    }
+                }
+            });
+        }
+        else{
+            setResultsFramrworkStatus();
+        }                
+    };    
     
     $scope.hideResultsFrameworkDivs = function(){
         $scope.model.showAddResultsFrameworkDiv = false;

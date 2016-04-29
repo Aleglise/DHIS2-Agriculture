@@ -23,6 +23,7 @@ resultsFramework.controller('ProjectController',
     $scope.fileNames = [];
     $scope.model = {    showAddProjectDiv: false,
                         showEditProject: false,
+                        showProjectSummaryDiv: false,
                         selectSize: 20,
                         projects: [],
                         donorList: [],
@@ -117,6 +118,8 @@ resultsFramework.controller('ProjectController',
     $scope.showAddProject = function(){
         $scope.model.searchText = "";
         $scope.model.showAddProjectDiv = !$scope.model.showAddProjectDiv;
+        $scope.model.showEditProject = false;
+        $scope.model.showProjectSummaryDiv = false;
         $scope.model.metaAttributeValues = {};
     };
 
@@ -131,6 +134,7 @@ resultsFramework.controller('ProjectController',
         });
                 
         $scope.model.showAddProjectDiv = false;
+        $scope.model.showProjectSummaryDiv = false;
         $scope.model.showEditProject = true;
     };
 
@@ -191,6 +195,10 @@ resultsFramework.controller('ProjectController',
     
     $scope.showSummaryReport = function(){        
         $scope.model.selectedProject = ContextMenuSelectedItem.getSelectedItem();
+        
+        $scope.model.showAddProjectDiv = false;
+        $scope.model.showEditProject = false;
+        $scope.model.showProjectSummaryDiv = !$scope.model.showProjectSummaryDiv;
     };
     
     $scope.setSelectedProject = function(project){

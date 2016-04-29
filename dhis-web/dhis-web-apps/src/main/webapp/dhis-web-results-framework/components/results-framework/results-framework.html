@@ -22,7 +22,7 @@
         <hr>
 
         <div ng-if="!model.showEditResultsFrameworkDiv && !model.showAddResultsFrameworkDiv && !model.showStructureResultsFrameworkDiv">
-            <div class="hideInPrint">
+            <div class="row">
                 <div ng-if="model.resultsFrameworks.length < 1" class="alert alert-warning">{{'no_results_framework_available'| translate}}</div> 
                 <div ng-if="model.resultsFrameworks.length > 0">
 
@@ -79,25 +79,23 @@
         </div>
         <div class="row">
             <form name="resultsFrameworkForm" novalidate>
-                <div class="col-sm-12">
-                    <div ng-if="model.showAddResultsFrameworkDiv || model.showEditResultsFrameworkDiv">
-                        <div ng-include="'components/results-framework/results-framework-form.html'"></div>                        
-                    </div>               
-                    <div class="vertical-spacing" ng-if="model.showAddResultsFrameworkDiv || model.showEditResultsFrameworkDiv">                
+                <div class="col-sm-12" ng-if="model.showAddResultsFrameworkDiv || model.showEditResultsFrameworkDiv">                    
+                    <div ng-include="'components/results-framework/results-framework-form.html'"></div>                                   
+                    <div class="vertical-spacing">                
                         <button type="button" class="btn btn-primary" ng-click="add()" ng-if="model.showAddResultsFrameworkDiv">{{'save'| translate}} </button>
                         <button type="button" class="btn btn-primary" ng-click="update()" ng-if="model.showEditResultsFrameworkDiv">{{'update'| translate}}</button>
                         <button type="button" class="btn btn-danger" ng-click="delete()" ng-if="model.showEditResultsFrameworkDiv">{{'delete'| translate}}</button>
                         <button type="button" class="btn btn-default small-horizonal-spacing" ng-click="cancel()">{{'cancel'| translate}}</button>
-                    </div>
+                    </div>                    
                 </div>
             </form>
         </div>
-        <div ng-if="model.showStructureResultsFrameworkDiv">
-            <div class="row" ng-if="model.showStructureResultsFrameworkDiv">
+        <div ng-if="model.showStructureResultsFrameworkDiv">            
+            <div class="row">
                 <div class="col-sm-12">
                     <div class="pull-right">
-                        <button type="button" class="btn btn-primary" ng-click="hideResultsFrameworkDivs()">
-                            {{'close'| translate}}
+                        <button type="button" class="btn btn-warning" title="{{'close' | translate}}" ng-click="hideResultsFrameworkDivs()">
+                            <i class="fa fa-times-circle"></i>
                         </button>
                     </div>
                 </div>
@@ -120,6 +118,5 @@
     <div ng-if="!model.metaDataCached">
         <img src="../images/ajax-loader-bar.gif" alt="{{'in_progress'| translate}}" ng-if="!selectedOrgUnit"/><br>
         {{'loading_metadata'| translate}}
-    </div>
-    
+    </div>    
 </div>
