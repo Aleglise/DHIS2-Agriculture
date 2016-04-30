@@ -6,56 +6,64 @@
         <div class="row">
             <div class="col-sm-8">
                 <table class="dhis2-list-table-striped dhis2-table-hover">
-                    <tr>
-                        <td>
-                            {{'name'| translate}}
-                            <span class="required">*</span>
-                        </td>
-                        <td>
-                            <input type="text"
-                                   name="name" 
-                                   class="form-control"
-                                   ng-model="model.selectedSubProgram.name" 
-                                   ng-required="true"/>
-                            <div ng-messages="subProgramForm.name.$error" ng-if="interacted(subProgramForm.name, subProgramForm)" class="required hideInPrint" ng-messages-include="../dhis-web-commons/angular-forms/error-messages.html">
+                    <thead>
+                        <tr>
+                            <th class="col-sm-2"></th>
+                            <th class="col-sm-5"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                {{'name'| translate}}
+                                <span class="required">*</span>
+                            </td>
+                            <td>
+                                <input type="text"
+                                       name="name" 
+                                       class="form-control"
+                                       ng-model="model.selectedSubProgram.name" 
+                                       ng-required="true"/>
+                                <div ng-messages="subProgramForm.name.$error" ng-if="interacted(subProgramForm.name, subProgramForm)" class="required hideInPrint" ng-messages-include="../dhis-web-commons/angular-forms/error-messages.html">
 
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            {{'code'| translate}}
-                            <span class="required">*</span>
-                        </td>
-                        <td>
-                            <input type="text"
-                                   name="code" 
-                                   class="form-control"
-                                   ng-model="model.selectedSubProgram.code" 
-                                   ng-required="true"/>
-                            <div ng-messages="subProgramForm.code.$error" ng-if="interacted(subProgramForm.code, subProgramForm)" class="required hideInPrint" ng-messages-include="../dhis-web-commons/angular-forms/error-messages.html">
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                {{'code'| translate}}
+                                <span class="required">*</span>
+                            </td>
+                            <td>
+                                <input type="text"
+                                       name="code" 
+                                       class="form-control"
+                                       ng-model="model.selectedSubProgram.code" 
+                                       ng-required="true"/>
+                                <div ng-messages="subProgramForm.code.$error" ng-if="interacted(subProgramForm.code, subProgramForm)" class="required hideInPrint" ng-messages-include="../dhis-web-commons/angular-forms/error-messages.html">
 
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            {{'description'| translate}}
-                            <span class="required">*</span>
-                        </td>
-                        <td>
-                            <textarea
-                                name="description" 
-                                class="form-control"
-                                rows="4"
-                                ng-model="model.selectedSubProgram.description" 
-                                ng-required="true">                                   
-                            </textarea>
-                            <div ng-messages="subProgramForm.description.$error" ng-if="interacted(subProgramForm.description, subProgramForm)" class="required hideInPrint" ng-messages-include="../dhis-web-commons/angular-forms/error-messages.html">
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                {{'description'| translate}}
+                                <span class="required">*</span>
+                            </td>
+                            <td>
+                                <textarea
+                                    name="description" 
+                                    class="form-control"
+                                    rows="4"
+                                    ng-model="model.selectedSubProgram.description" 
+                                    ng-required="true">                                   
+                                </textarea>
+                                <div ng-messages="subProgramForm.description.$error" ng-if="interacted(subProgramForm.description, subProgramForm)" class="required hideInPrint" ng-messages-include="../dhis-web-commons/angular-forms/error-messages.html">
 
-                            </div>
-                        </td>
-                    </tr>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
                 <div ng-include="'views/meta-attributes-form.html'"></div>
             </div>

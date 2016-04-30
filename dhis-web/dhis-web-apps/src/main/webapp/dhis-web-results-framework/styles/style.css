@@ -61,23 +61,25 @@ table
 /* App specific
 /*----------------------------------------------------------------------------*/
 
-.container-heading {
-    color: white;
+.container-1 {
+	padding-right: 15px;
+	padding-left: 15px;
+	margin-right: auto;
+	margin-left: auto
 }
-
-.container-default-form {
-    width: 50%;
+.container-1:before, .container-1:after {
+	display: table;
+	content: " "
 }
-
-.container-1-1 {
-    width: 100%;
-    float: left;
-    margin-top: 1em;
+.container-1:after {
+	clear: both
 }
-
-.container-1-2 {
-    width: 50%;
-    float: left;
+.container-1:before, .container-1:after {
+	display: table;
+	content: " "
+}
+.container-1:after {
+	clear: both
 }
 
 div.paging a.active

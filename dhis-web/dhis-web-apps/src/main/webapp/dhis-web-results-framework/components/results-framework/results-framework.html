@@ -5,9 +5,9 @@
     <div ng-include="'views/left-bar-menu.html'"></div>    
 </div>
 
-<div class="page" id="mainPage">
+<div class="page container-1" id="mainPage">
     <div ng-if="model.metaDataCached">
-        <div class="row top-bar">
+        <div class="row top-bar" ng-if="!model.showStructureResultsFrameworkDiv">
             <div class="col-sm-4">
                 {{'results_framework'| translate}}
             </div>
@@ -19,13 +19,13 @@
                 </div>                
             </div>  
         </div>
-        <hr>
+        <hr ng-if="!model.showStructureResultsFrameworkDiv">
         
         <!-- context menu begins -->
         <div id="contextMenu" class="contextMenu" style="width: 180px;">
             <ul id="contextMenuItems" class="contextMenuItems">
                 <li><a href ng-click="showEditResultsFramework()"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span>&nbsp;&nbsp;{{'edit'| translate}}</a></li>
-                <li><a href ng-click="showStructureResultsFramework()"><span class="glyphicon glyphicon-align-left" aria-hidden="true"></span>&nbsp;&nbsp;{{'view'| translate}}</a></li>
+                <li><a href ng-click="showStructureResultsFramework()"><span class="glyphicon glyphicon-align-left" aria-hidden="true"></span>&nbsp;&nbsp;{{'overview'| translate}}</a></li>
                 <li class="divider"></li>
                 <li><a href ng-click="showActivateResultsFramework()"><span ng-class="{false: 'glyphicon glyphicon-ok', true: 'glyphicon glyphicon-remove'} [model.selectedResultsFramework.active]" aria-hidden="true"></span>&nbsp;&nbsp;{{model.selectedResultsFramework.active ? 'deactivate' : 'activate'| translate}}</a></li>
             </ul>
@@ -81,7 +81,7 @@
         </div>
         <div class="row">
             <form name="resultsFrameworkForm" novalidate>
-                <div class="col-sm-12" ng-if="model.showAddResultsFrameworkDiv || model.showEditResultsFrameworkDiv">                    
+                <div class="col-sm-8" ng-if="model.showAddResultsFrameworkDiv || model.showEditResultsFrameworkDiv">                    
                     <div ng-include="'components/results-framework/results-framework-form.html'"></div>                                   
                     <div class="vertical-spacing">                
                         <button type="button" class="btn btn-primary" ng-click="add()" ng-if="model.showAddResultsFrameworkDiv">{{'save'| translate}} </button>
@@ -92,18 +92,29 @@
                 </div>
             </form>
         </div>
-        <div ng-if="model.showStructureResultsFrameworkDiv">            
+        <div ng-if="model.showStructureResultsFrameworkDiv">
             <div class="row">
-                <div class="col-sm-12">
-                    <div class="pull-right">
-                        <button type="button" class="btn btn-primary" title="{{'close' | translate}}" ng-click="hideResultsFrameworkDivs()">
+                <div class="col-sm-8">
+                    <span class="alert alert-default remove-default-padding">
+                        <label class="top-bar">{{'results_framework_overview' | translate}}</label>
+                    </span>
+                    <span class="long-horizontal-spacing hideInPrint">
+                        <label class="btn btn-primary horizonal-spacing" onclick="javascript:window.print()" title="{{'pdf_print' | translate}}">
+                            <i class="fa fa-print"></i>
+                        </label>
+                        <label class="btn btn-default" ng-click="hideResultsFrameworkDivs()" title="{{'close' | translate}}">
                             <i class="fa fa-times-circle"></i>
-                        </button>
-                    </div>
+                        </label>
+                    </span>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-sm-12">
+            <div class="row">            
+                <div class="col-sm-8">
+                    <div ng-include="'components/results-framework/results-framework-form.html'"></div>
+                </div>
+            </div>            
+            <div class="row vertical-spacing">
+                <div class="col-sm-8">
                     <table class="table table-bordered table-condensed">
                         <tbody ng-repeat="row in model.frameworkStructure">
                             <tr ng-class="row.class">

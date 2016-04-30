@@ -3,7 +3,7 @@
     <div ng-include="'views/left-bar-menu.html'"></div>    
 </div>
 
-<div class="page" id="mainPage">
+<div class="page container-1" id="mainPage">
     <div class="row top-bar" ng-if="!model.showProjectSummaryDiv">
         <div class="col-sm-2">
             {{'project'| translate}}
@@ -21,8 +21,8 @@
     <!-- context menu begins -->
     <div id="contextMenu" class="contextMenu" style="width: 250px;">
         <ul id="contextMenuItems" class="contextMenuItems">
-            <li><a href ng-click="showEditProject()"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span>&nbsp;&nbsp;{{'edit'| translate}}</a></li>            
-            <li><a href ng-click="showSummaryReport()"><span class="glyphicon glyphicon-align-left" aria-hidden="true"></span>&nbsp;&nbsp;{{'overview'| translate}}</a></li>                    
+            <li><a href ng-click="showEditProject()"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span>&nbsp;&nbsp;{{'edit'| translate}}</a></li>
+            <li><a href ng-click="showSummaryReport()"><span class="glyphicon glyphicon-align-left" aria-hidden="true"></span>&nbsp;&nbsp;{{'overview'| translate}}</a></li>
             <li><a href ng-click="showBudgetForecast()"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>&nbsp;&nbsp;{{'budget_forecast'| translate}}</a></li>
             <li class="divider"></li>
             <li><a href ng-click="contributionToResultFramework()"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span>&nbsp;&nbsp;{{'contribution_results_framework'| translate}}</a></li>
@@ -87,7 +87,7 @@
         <div class="row">
             <div class="col-sm-8">
                 <span class="alert alert-default remove-default-padding">
-                    <label class="btn-default top-bar">{{'project_overview' | translate}}</label>
+                    <label class="top-bar">{{'project_overview' | translate}}</label>
                 </span>
                 <span class="long-horizontal-spacing hideInPrint">
                     <label class="btn btn-primary horizonal-spacing" onclick="javascript:window.print()" title="{{'pdf_print' | translate}}">
