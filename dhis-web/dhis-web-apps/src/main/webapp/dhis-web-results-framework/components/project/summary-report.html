@@ -1,0 +1,85 @@
+<div class="row">
+    <div class="col-sm-12">
+        <span class="alert alert-default remove-default-padding">
+            <label class="top-bar">{{'projects_summary'| translate}}</label>
+        </span>
+        <span class="long-horizontal-spacing hideInPrint">
+            <label class="btn btn-primary horizonal-spacing" onclick="javascript:window.print()" title="{{'pdf_print'| translate}}">
+                <i class="fa fa-print"></i>
+            </label>
+            <label class="btn btn-default" ng-click="showSummaryReport()" title="{{'close'| translate}}">
+                <i class="fa fa-times-circle"></i>
+            </label>
+        </span>
+    </div>
+</div>
+<div class="row vertical-spacing">
+    <div class="col-sm-12">
+        <table class="table table-striped table-bordered table-condensed">            
+            <thead>
+                <tr>                    
+                    <th class="active cursor-pointer" ng-repeat="col in model.summaryColumns" ng-click="sortLocalGrid(col)">
+                        <span class="fa-stack hideInPrint">
+                            <span ng-class="{true: 'red'} [model.localSortColumn === col && !model.localReverse]"><i class="fa fa-sort-asc fa-stack-1x"></i></span>
+                            <span ng-class="{true: 'red'} [model.localSortColumn === col && model.localReverse]"><i class="fa fa-sort-desc fa-stack-1x"></i></span>
+                        </span>
+                        {{col | translate}}
+                    </th>                    
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="pr in model.projects | orderBy:model.localSortColumn:model.localReverse">
+                    <td ng-repeat="col in model.summaryColumns">
+                        <span ng-if="col !== 'extensionPossible'">
+                            {{pr[col]}}
+                        </span>
+                        <span ng-if="col === 'extensionPossible'">
+                            {{pr[col] === 'YES' ? 'Y' : pr[col] === 'NO' ? 'N' : 'U'  }}
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row vertical-spacing">
+    <div class="col-sm-12">
+        <div class="alert alert-info">
+            {{'projects_contribution'| translate}}
+        </div>
+        <table class="table table-bordered table-condensed">
+            <thead>
+                <tr>
+                    <th class="active">{{'programs_subprograms' | translate}}</th>
+                    <th class="active">{{'projects' | translate}}</th>
+                </tr>
+            </thead>
+            <tbody ng-repeat="(key, value) in model.projectSummary" ng-init="programIndex = $index">
+                <tr>
+                    <td class="vertical-center">
+                        {{key}}
+                    </td>
+                    <td>
+                        <ul class="list-unstyled">
+                            <li ng-repeat="project in value.projects">
+                                {{project}}
+                            </li>
+                        </ul>                        
+                    </td>
+                </tr>
+                <tr ng-repeat="sp in value.subprograms">                            
+                    <td class="vertical-center">
+                        <div class="left-horizontal-spacing">{{sp}}</div>
+                    </td>
+                    <td>
+                        <ul class="list-unstyled">
+                            <li ng-repeat="pr in model.projectBySubprogram[sp]">
+                                {{pr}}
+                            </li>
+                        </ul>                        
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

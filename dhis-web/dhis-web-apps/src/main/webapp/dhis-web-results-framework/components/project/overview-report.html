@@ -1,0 +1,41 @@
+<div class="row">
+    <div class="col-sm-8">
+        <span class="alert alert-default remove-default-padding">
+            <label class="top-bar">{{'project_overview'| translate}}</label>
+        </span>
+        <span class="long-horizontal-spacing hideInPrint">
+            <label class="btn btn-primary horizonal-spacing" onclick="javascript:window.print()" title="{{'pdf_print'| translate}}">
+                <i class="fa fa-print"></i>
+            </label>
+            <label class="btn btn-default" ng-click="showOverviewReport()" title="{{'close'| translate}}">
+                <i class="fa fa-times-circle"></i>
+            </label>
+        </span>
+    </div>
+</div>
+<div class="row">            
+    <div class="col-sm-8">
+        <div ng-include="'components/project/project-form.html'"></div>
+    </div>
+</div>
+<div class="row vertical-spacing">
+    <div class="col-sm-8">
+        <div class="alert alert-info">
+            {{'contribution_results_framework'| translate}} - {{model.activeResultsFramework.name}}
+        </div>
+        <table class="table table-bordered table-condensed">                    
+            <tbody ng-repeat="(key, value) in model.contributingPrograms">
+                <tr>
+                    <td class="active">
+                        {{key}}
+                    </td>
+                </tr>
+                <tr ng-repeat="v in value| orderBy: 'name'">                            
+                    <td>
+                        <span class="left-horizontal-spacing">{{v}}</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

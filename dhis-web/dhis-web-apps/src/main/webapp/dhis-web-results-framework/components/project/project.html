@@ -4,25 +4,26 @@
 </div>
 
 <div class="page container-1" id="mainPage">
-    <div class="row top-bar" ng-if="!model.showProjectSummaryDiv">
+    <div class="row top-bar" ng-if="!model.showOverviewDiv && !model.showSummaryDiv">
         <div class="col-sm-2">
             {{'project'| translate}}
         </div>
         <div class="input-group col-sm-10">
-            <input type="text" name="searchText" placeholder="{{'search_by_name' | translate}}" class="form-control" ng-disabled="model.showEditProject || model.showAddProjectDiv || model.showProjectSummaryDiv" ng-model="model.searchText" ng-blur="loadProjects()" d2-enter="loadProjects()"/>
+            <input type="text" name="searchText" placeholder="{{'search_by_name' | translate}}" class="form-control" ng-disabled="model.showEditProject || model.showAddProjectDiv || model.showOverviewDiv" ng-model="model.searchText" ng-blur="loadProjects()" d2-enter="loadProjects()"/>
             <div class="input-group-btn">                
-                <button class="btn btn-success" type="button" title="{{'search'| translate}}" ng-disabled="model.showEditProject || model.showAddProjectDiv || model.showProjectSummaryDiv" ng-click="loadProjects()"><i class="fa fa-search"></i></button>
-                <button class="btn btn-primary" type="button" title="{{'add_new'| translate}}" ng-disabled="model.showEditProject || model.showAddProjectDiv || model.showProjectSummaryDiv" ng-click="showAddProject()"><i class="fa fa-plus"></i></button>
+                <button class="btn btn-success" type="button" title="{{'search'| translate}}" ng-disabled="model.showEditProject || model.showAddProjectDiv || model.showOverviewDiv" ng-click="loadProjects()"><i class="fa fa-search"></i></button>
+                <button class="btn btn-primary" type="button" title="{{'add_new'| translate}}" ng-disabled="model.showEditProject || model.showAddProjectDiv || model.showOverviewDiv" ng-click="showAddProject()"><i class="fa fa-plus"></i></button>
+                <button class="btn btn-info" type="button" title="{{'summary_report'| translate}}" ng-disabled="model.showEditProject || model.showAddProjectDiv || model.showOverviewDiv" ng-click="showSummaryReport()"><i class="fa fa-list"></i></button>
             </div>                
         </div>  
     </div>
-    <hr ng-if="!model.showProjectSummaryDiv">
+    <hr ng-if="!model.showOverviewDiv && !model.showSummaryDiv">
     
     <!-- context menu begins -->
     <div id="contextMenu" class="contextMenu" style="width: 250px;">
         <ul id="contextMenuItems" class="contextMenuItems">
             <li><a href ng-click="showEditProject()"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span>&nbsp;&nbsp;{{'edit'| translate}}</a></li>
-            <li><a href ng-click="showSummaryReport()"><span class="glyphicon glyphicon-align-left" aria-hidden="true"></span>&nbsp;&nbsp;{{'overview'| translate}}</a></li>
+            <li><a href ng-click="showOverviewReport()"><span class="glyphicon glyphicon-align-left" aria-hidden="true"></span>&nbsp;&nbsp;{{'overview'| translate}}</a></li>
             <li><a href ng-click="showBudgetForecast()"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>&nbsp;&nbsp;{{'budget_forecast'| translate}}</a></li>
             <li class="divider"></li>
             <li><a href ng-click="contributionToResultFramework()"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span>&nbsp;&nbsp;{{'contribution_results_framework'| translate}}</a></li>
@@ -30,21 +31,21 @@
     </div>
     <!-- context menu ends -->
     
-    <div class="row" ng-if="!model.showEditProject && !model.showAddProjectDiv && !model.showProjectSummaryDiv">        
-        <div class="col-sm-12">
+    <div class="row" ng-if="!model.showEditProject && !model.showAddProjectDiv && !model.showOverviewDiv && !model.showSummaryDiv">        
+        <div class="col-sm-12" ng-if="model.itemsFetched">
             <div ng-if="model.projects.length < 1" class="alert alert-warning">{{'no_project_available'| translate}}</div> 
             <div ng-if="model.projects.length > 0">
                 <table class="listTable dhis2-table-striped-border dhis2-table-hover">
                     <thead>
                         <tr>                                
-                            <th class="bold" ng-repeat="col in model.gridColumns" ng-click="sortGrid(col)">                                    
+                            <th class="bold" ng-class="col.width" ng-repeat="col in model.gridColumns" ng-click="sortGrid(col.id)">
                                 <!-- sort icon begins -->                                
                                 <span class="fa-stack">
-                                    <span ng-class="{true: 'red'} [model.sortColumn === col && !model.reverse]"><i class="fa fa-sort-asc fa-stack-1x"></i></span>
-                                    <span ng-class="{true: 'red'} [model.sortColumn === col && model.reverse]"><i class="fa fa-sort-desc fa-stack-1x"></i></span>
+                                    <span ng-class="{true: 'red'} [model.sortColumn === col.id && !model.reverse]"><i class="fa fa-sort-asc fa-stack-1x"></i></span>
+                                    <span ng-class="{true: 'red'} [model.sortColumn === col.id && model.reverse]"><i class="fa fa-sort-desc fa-stack-1x"></i></span>
                                 </span>
                                 <!-- sort icon ends -->
-                                {{col | translate}}
+                                {{col.id | translate}}
                             </th>
                         </tr>
                     </thead>
@@ -55,11 +56,11 @@
                             d2-context-menu 
                             selected-item={{project}}>
                             <td ng-repeat="col in model.gridColumns">
-                                <span ng-if="col !== 'lastUpdated'">
-                                    {{project[col]}}
+                                <span ng-if="col.id !== 'lastUpdated'">
+                                    {{project[col.id]}}
                                 </span>
-                                <span ng-if="col === 'lastUpdated'">
-                                    {{project[col] | d2LastUpdated}}
+                                <span ng-if="col.id === 'lastUpdated'">
+                                    {{project[col.id] | d2LastUpdated}}
                                 </span>
                             </td>
                         </tr>
@@ -82,48 +83,16 @@
             </div>
         </form>
     </div>
-
-    <div ng-if="model.showProjectSummaryDiv">
-        <div class="row">
-            <div class="col-sm-8">
-                <span class="alert alert-default remove-default-padding">
-                    <label class="top-bar">{{'project_overview' | translate}}</label>
-                </span>
-                <span class="long-horizontal-spacing hideInPrint">
-                    <label class="btn btn-primary horizonal-spacing" onclick="javascript:window.print()" title="{{'pdf_print' | translate}}">
-                        <i class="fa fa-print"></i>
-                    </label>
-                    <label class="btn btn-default" ng-click="showSummaryReport()" title="{{'close' | translate}}">
-                        <i class="fa fa-times-circle"></i>
-                    </label>
-                </span>
-            </div>
-        </div>
-        <div class="row">            
-            <div class="col-sm-8">
-                <div ng-include="'components/project/project-form.html'"></div>
-            </div>
-        </div>
-        <div class="row vertical-spacing">
-            <div class="col-sm-8">
-                <div class="alert alert-info">
-                    {{'contribution_results_framework'| translate}} - {{model.activeResultsFramework.name}}
-                </div>
-                <table class="table table-bordered table-condensed">                    
-                    <tbody ng-repeat="(key, value) in model.contributingPrograms">
-                        <tr>
-                            <td class="active">
-                                {{key}}
-                            </td>
-                        </tr>
-                        <tr ng-repeat="v in value | orderBy: 'name'">                            
-                            <td>
-                                <span class="left-horizontal-spacing">{{v}}</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    <div ng-if="model.showOverviewDiv">
+        <div ng-include="'components/project/overview-report.html'"></div>
+    </div>
+    
+    <div ng-if="model.showSummaryDiv">
+        <div ng-include="'components/project/summary-report.html'"></div>
+    </div>
+    
+    <div ng-if="!model.itemsFetched">
+        <img src="../images/ajax-loader-bar.gif" alt="{{'in_progress'| translate}}"/><br>
+        {{'loading_projects'| translate}}
     </div>
 </div>

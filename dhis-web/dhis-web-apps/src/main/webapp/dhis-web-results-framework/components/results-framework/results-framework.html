@@ -33,7 +33,7 @@
         <!-- context menu ends --> 
                         
         <div ng-if="!model.showEditResultsFrameworkDiv && !model.showAddResultsFrameworkDiv && !model.showStructureResultsFrameworkDiv">
-            <div class="row">
+            <div class="row" ng-if="model.itemsFetched">
                 <div class="col-sm-12">
                     <div ng-if="model.resultsFrameworks.length < 1" class="alert alert-warning">{{'no_results_framework_available'| translate}}</div> 
                     <div ng-if="model.resultsFrameworks.length > 0">
@@ -131,5 +131,9 @@
     <div ng-if="!model.metaDataCached">
         <img src="../images/ajax-loader-bar.gif" alt="{{'in_progress'| translate}}" ng-if="!selectedOrgUnit"/><br>
         {{'loading_metadata'| translate}}
-    </div>    
+    </div>
+    <div ng-if="model.metaDataCached && !model.itemsFetched">
+        <img src="../images/ajax-loader-bar.gif" alt="{{'in_progress'| translate}}"/><br>
+        {{'loading_results_framework'| translate}}
+    </div>
 </div>

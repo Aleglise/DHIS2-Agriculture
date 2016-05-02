@@ -39,7 +39,8 @@ resultsFramework.controller('ResultsFrameworkController',
                         impactOutcomeDataSets: [],
                         gridColumns: ['name', 'code', 'active', 'lastUpdated'],
                         sortColumn: 'name',
-                        reverse: false
+                        reverse: false,
+                        itemsFetched: false
                     };
                     
     $scope.resultsFrameworkForm = {submitted: false};
@@ -75,7 +76,8 @@ resultsFramework.controller('ResultsFrameworkController',
     });
     
     $scope.loadResultsFrameworks = function(){
-        $scope.model.resultsFrameworks = [];            
+        $scope.model.resultsFrameworks = [];
+        $scope.model.itemsFetched = false;
         ResultsFrameworkFactory.getAll( true, $scope.pager, $scope.model.searchText, $scope.model.sortColumn, $scope.model.reverse ).then(function(response){            
             if( response && response.pager ){
                 response.pager.pageSize = response.pager.pageSize ? response.pager.pageSize : $scope.pager.pageSize;
@@ -87,6 +89,7 @@ resultsFramework.controller('ResultsFrameworkController',
                 Paginator.setPageSize($scope.pager.pageSize);
                 Paginator.setItemCount($scope.pager.total);                    
             }
+            $scope.model.itemsFetched = true;
             $scope.model.resultsFrameworks = response.resultsFrameworks ? response.resultsFrameworks : [];
         });        
     };

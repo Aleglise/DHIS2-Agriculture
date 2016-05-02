@@ -382,7 +382,7 @@ select {
 
 .vertical-center {
     vertical-align: middle !important;
-    line-height: 1.428571429;
+    line-height: inherit;
 }
 
 div#orgUnitTree {

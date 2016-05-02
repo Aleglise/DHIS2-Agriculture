@@ -18,7 +18,7 @@
     </div>
     <hr>
     <div class="row" ng-if="!model.showEditProgramDiv && !model.showAddProgramDiv">        
-        <div class="col-sm-12 hideInPrint">
+        <div class="col-sm-12 hideInPrint" ng-if="model.itemsFetched">
             <div ng-if="model.programs.length < 1" class="alert alert-warning">{{'no_program_available'| translate}}</div> 
             <div ng-if="model.programs.length > 0">
                 <table class="listTable dhis2-table-striped-border dhis2-table-hover">
@@ -65,5 +65,9 @@
                 </div>
             </div>
         </form>
+    </div>
+    <div ng-if="!model.itemsFetched">
+        <img src="../images/ajax-loader-bar.gif" alt="{{'in_progress'| translate}}"/><br>
+        {{'loading_programs'| translate}}
     </div>
 </div>

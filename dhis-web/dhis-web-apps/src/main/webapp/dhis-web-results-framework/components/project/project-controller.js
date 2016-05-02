@@ -24,7 +24,8 @@ resultsFramework.controller('ProjectController',
     $scope.fileNames = [];
     $scope.model = {    showAddProjectDiv: false,
                         showEditProject: false,
-                        showProjectSummaryDiv: false,
+                        showOverviewDiv: false,
+                        showSummaryDiv: false,
                         selectSize: 20,
                         projects: [],
                         donorList: [],
@@ -38,12 +39,16 @@ resultsFramework.controller('ProjectController',
                         metaAttributesById: [],
                         gridColumns: ['name', 'code', 'lastUpdated'],
                         sortColumn: 'name',
+                        localSortColumn: 'name',
+                        localReverse: false,
                         reverse: false,
+                        itemsFetched: false,
                         metaAttributeValues: {}
                     };
 
     $scope.projectForm = {submitted: false};
-    $scope.model.gridColumns = ['name', 'code', 'lastUpdated'];
+    $scope.model.gridColumns = [{id: 'name', width: 'col-sm-8'}, {id: 'code', width: 'col-sm-3'}, {id: 'lastUpdated', width: 'col-sm-3'}];
+    $scope.model.summaryColumns = ['name', 'code', 'totalCost', 'costByGovernment', 'startDate', 'endDate', 'extensionPossible'];
     
     MetaDataFactory.getAll('indicatorGroups').then(function(idgs){
         $scope.model.impactIndicatorGroups = $filter('filter')(idgs, {indicatorGroupType: "IMPACT"});
@@ -76,7 +81,7 @@ resultsFramework.controller('ProjectController',
         $scope.model.budgetExecutionDataSets = [];
         $scope.model.budgetForecastDataSets = [];
         $scope.model.projects = [];
-        
+        $scope.model.itemsFetched = false;
         DataSetFactory.getAll().then(function(dss){
             
             ProjectFactory.getAll( true, $scope.pager, $scope.model.searchText, $scope.model.sortColumn, $scope.model.reverse ).then(function(response){
@@ -116,6 +121,8 @@ resultsFramework.controller('ProjectController',
                         }
                     }
                 });
+                
+                $scope.model.itemsFetched = true;
             });        
         });        
     };
@@ -124,7 +131,8 @@ resultsFramework.controller('ProjectController',
         $scope.model.searchText = "";
         $scope.model.showAddProjectDiv = !$scope.model.showAddProjectDiv;
         $scope.model.showEditProject = false;
-        $scope.model.showProjectSummaryDiv = false;
+        $scope.model.showOverviewDiv = false;
+        $scope.model.showSummaryDiv = false;
         $scope.model.metaAttributeValues = {};
     };
 
@@ -137,7 +145,8 @@ resultsFramework.controller('ProjectController',
         });
         
         $scope.model.showAddProjectDiv = false;
-        $scope.model.showProjectSummaryDiv = false;
+        $scope.model.showOverviewDiv = false;
+        $scope.model.showSummaryDiv = false;
         $scope.model.showEditProject = true;
     };
 
@@ -196,30 +205,69 @@ resultsFramework.controller('ProjectController',
         }        
     };
     
-    $scope.showSummaryReport = function(){        
-        $scope.model.metaAttributeValues = {};
-        $scope.model.selectedProject = ContextMenuSelectedItem.getSelectedItem();        
-        $scope.model.metaAttributeValues = RfUtils.processMetaAttributeValues($scope.model.selectedProject, $scope.model.metaAttributeValues, $scope.model.metaAttributesById);        
-        RfUtils.getFileNames($scope.model.selectedProject, $scope.model.metaAttributesById).then(function(res){
-            $scope.fileNames = res;
-        });
-        
-        $scope.model.contributingPrograms = {};
-    
-        angular.forEach($scope.model.selectedProject.subProgramms, function(sp){
-            if( $scope.model.contributingPrograms[sp.programm.name] ){
-                $scope.model.contributingPrograms[sp.programm.name].push(sp.name);
-            }
-            else{
-                $scope.model.contributingPrograms[sp.programm.name] = [sp.name];
-            }
-            //console.log('the sp:  ', sp);
-            //$scope.model.selectedSubPrograms[sp.id] = true;
-        });
+    $scope.showOverviewReport = function(){
         
         $scope.model.showAddProjectDiv = false;
         $scope.model.showEditProject = false;
-        $scope.model.showProjectSummaryDiv = !$scope.model.showProjectSummaryDiv;
+        $scope.model.showSummaryDiv = false;
+        $scope.model.showOverviewDiv = !$scope.model.showOverviewDiv;
+        
+        if( $scope.model.showOverviewDiv ){            
+            $scope.model.metaAttributeValues = {};
+            $scope.model.selectedProject = ContextMenuSelectedItem.getSelectedItem();        
+            $scope.model.metaAttributeValues = RfUtils.processMetaAttributeValues($scope.model.selectedProject, $scope.model.metaAttributeValues, $scope.model.metaAttributesById);        
+            RfUtils.getFileNames($scope.model.selectedProject, $scope.model.metaAttributesById).then(function(res){
+                $scope.fileNames = res;
+            });
+
+            $scope.model.contributingPrograms = {};
+
+            angular.forEach($scope.model.selectedProject.subProgramms, function(sp){
+                if( $scope.model.contributingPrograms[sp.programm.name] ){
+                    $scope.model.contributingPrograms[sp.programm.name].push(sp.name);
+                }
+                else{
+                    $scope.model.contributingPrograms[sp.programm.name] = [sp.name];
+                }
+            });
+        }
+    };
+    
+    $scope.showSummaryReport = function(){
+        
+        $scope.model.showSummaryDiv = !$scope.model.showSummaryDiv;
+        $scope.model.showAddProjectDiv = false;
+        $scope.model.showEditProject = false;
+        $scope.model.showOverviewDiv = false;
+        
+        if( $scope.model.showSummaryDiv ){
+            $scope.model.projectSummary = {};
+            $scope.model.projectBySubprogram = [];
+            angular.forEach($scope.model.projects, function(project){
+                angular.forEach(project.subProgramms, function(sp){                    
+                    if($scope.model.projectBySubprogram[sp.name]){
+                        $scope.model.projectBySubprogram[sp.name].push(project.name);
+                    }
+                    else{
+                        $scope.model.projectBySubprogram[sp.name] = [project.name];
+                    }
+                    
+                    if( $scope.model.projectSummary[sp.programm.name] ){                        
+                        if($scope.model.projectSummary[sp.programm.name].subprograms.indexOf(sp.name) === -1){                            
+                            $scope.model.projectSummary[sp.programm.name].subprograms.push(sp.name);
+                        }                        
+                        if($scope.model.projectSummary[sp.programm.name].projects.indexOf(project.name) === -1){
+                            $scope.model.projectSummary[sp.programm.name].projects.push(project.name);
+                        }
+                    }
+                    else{
+                        $scope.model.projectSummary[sp.programm.name] = {subprograms: [sp.name], projects: [project.name]};
+                    }
+                });
+            });
+            console.log('summary:  ', $scope.model.projectSummary);
+            console.log('project by subprogram:  ', $scope.model.projectBySubprogram);
+        }
     };
     
     $scope.setSelectedProject = function(project){
@@ -230,6 +278,8 @@ resultsFramework.controller('ProjectController',
     $scope.hideAddProject = function(){
         $scope.model.showAddProjectDiv = false;
         $scope.model.showEditProject = false;
+        $scope.model.showOverviewDiv = false;
+        $scope.model.showSummaryDiv = false;
         $scope.model.selectedProject = {};
         $scope.model.metaAttributeValues = {};
     };
@@ -401,7 +451,17 @@ resultsFramework.controller('ProjectController',
             $scope.model.sortColumn = col;
             $scope.model.reverse = false;
         }        
-        $scope.loadProjects();
+        $scope.loadProjects();      
+    };
+    
+    $scope.sortLocalGrid = function(col){
+        if ($scope.model.localSortColumn && $scope.model.localSortColumn === col){
+            $scope.model.localReverse = !$scope.model.localReverse;            
+        }
+        else{
+            $scope.model.localSortColumn = col;
+            $scope.model.localReverse = false;
+        }        
     };
     
     $scope.deleteFile = function(attributeId){        

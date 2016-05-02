@@ -34,7 +34,8 @@ resultsFramework.controller('ProgramController',
                         indicatorGroups: [],
                         gridColumns: ['name', 'code', 'lastUpdated'],
                         sortColumn: 'name',
-                        reverse: false
+                        reverse: false,
+                        itemsFetched: false
                     };
 
     $scope.programForm = {submitted: false};
@@ -95,7 +96,8 @@ resultsFramework.controller('ProgramController',
     });    
     
     $scope.loadPrograms = function(){
-        $scope.model.programs = [];            
+        $scope.model.programs = [];
+        $scope.model.itemsFetched = false;
         ProgramFactory.getAll( true, $scope.pager, $scope.model.searchText, $scope.model.sortColumn, $scope.model.reverse ).then(function(response){
             
             if( response && response.pager ){
@@ -108,6 +110,7 @@ resultsFramework.controller('ProgramController',
                 Paginator.setPageSize($scope.pager.pageSize);
                 Paginator.setItemCount($scope.pager.total);                    
             }
+            $scope.model.itemsFetched = true;
             $scope.model.programs = response.programms ? response.programms : [];
         });        
     };    
