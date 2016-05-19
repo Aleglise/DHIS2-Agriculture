@@ -44,6 +44,7 @@ var performanceContractControllers = angular.module('performanceContractControll
         $scope.model.optionUrl = null;
         $scope.model.baselineOption = null;
         $scope.model.report = null;
+        $scope.model.periods = [];
         if( angular.isObject($scope.model.selectedDataSet) && $scope.model.selectedDataSet.id){
             $scope.loadDataSetDetails();
         }
@@ -52,14 +53,13 @@ var performanceContractControllers = angular.module('performanceContractControll
     $scope.$watch('model.selectedPeriod', function(){
         $scope.model.periodUrl = null;
         $scope.model.analyticsPeriods = [];
-        if( angular.isObject( $scope.model.selectedPeriod) ){
+        if( angular.isObject( $scope.model.selectedPeriod) && $scope.model.selectedPeriod.id){
             $scope.generateAnalyticsPeriods();
         }
     });
     
     $scope.generateAnalyticsPeriods = function(){        
         $scope.model.periodUrl = 'dimension=pe:';
-        $scope.model.periods = [];
         var invalidPeriod = false;
         switch( $scope.model.selectedDataSet.periodType ){
             case 'Monthly':
