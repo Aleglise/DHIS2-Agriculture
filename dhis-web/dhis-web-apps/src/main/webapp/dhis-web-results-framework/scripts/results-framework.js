@@ -291,5 +291,5 @@ function filterMissingDataSets( ids ){
 }
 
 function getDataSets( ids ){    
-    return dhis2.metadata.getBatches( ids, batchSize, 'dataSets', 'dataSets', '../api/dataSets.json', 'paging=false&fields=id,periodType,name,displayName,version,attributeValues[value,attribute[id,name,code]],indicators[id,indicatorGrop[id]],organisationUnits[id,name],dataElements[id,code,name,description,formName,valueType,optionSetValue,optionSet[id],dataElementGroups[id,dataElementGroupSet[id]],categoryCombo[id,isDefault,categories[id,name,dimension,categoryOptions[id,name,attributeValues[value,attribute[id,name,code]]]]]]', 'idb', dhis2.rf.store, dhis2.metadata.processObject);
+    return dhis2.metadata.getBatches( ids, batchSize, 'dataSets', 'dataSets', '../api/dataSets.json', 'paging=false&fields=id,periodType,name,displayName,version,categoryCombo[id],attributeValues[value,attribute[id,name,code]],indicators[id,indicatorGrop[id]],organisationUnits[id,name],dataElements[id,code,name,description,formName,valueType,optionSetValue,optionSet[id],dataElementGroups[id,dataElementGroupSet[id]],categoryCombo[id,isDefault,categories[id,name,dimension,categoryOptions[id,name,attributeValues[value,attribute[id,name,code]]]]]]', 'idb', dhis2.rf.store, dhis2.metadata.processObject);
 }

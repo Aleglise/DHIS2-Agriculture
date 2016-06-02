@@ -7,6 +7,7 @@ resultsFramework.controller('ProjectController',
                 $filter,
                 $translate,
                 $modal,
+                orderByFilter,
                 DialogService,
                 ModalService,
                 ProjectFactory,
@@ -121,6 +122,9 @@ resultsFramework.controller('ProjectController',
                         }
                     }
                 });
+                
+                $scope.model.budgetExecutionDataSets = orderByFilter($scope.model.budgetExecutionDataSets, '-name').reverse();
+                $scope.model.budgetForecastDataSets = orderByFilter($scope.model.budgetForecastDataSets, '-name').reverse();
                 
                 $scope.model.itemsFetched = true;
             });        
@@ -265,8 +269,6 @@ resultsFramework.controller('ProjectController',
                     }
                 });
             });
-            console.log('summary:  ', $scope.model.projectSummary);
-            console.log('project by subprogram:  ', $scope.model.projectBySubprogram);
         }
     };
     

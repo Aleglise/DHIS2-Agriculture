@@ -13,6 +13,7 @@ var performanceContractControllers = angular.module('performanceContractControll
                 DataSetFactory,
                 PeriodService,
                 AnalyticsService,
+                MetaDataFactory,
                 GridService) {
                     
     $scope.periodOffset = 0;
@@ -86,12 +87,17 @@ var performanceContractControllers = angular.module('performanceContractControll
                 break
             default:
                 invalidPeriod = true;
-                $scope.invalidCategoryDimensionCnfiguration('error', 'invalid_period_performance_contract');
+                $scope.invalidCategoryDimensionConfiguration('error', 'invalid_period_performance_contract');
                 return;    
         }
         
         if( !invalidPeriod ){
-            $scope.model.periodUrl = $scope.model.periodUrl.slice(0,-1);            
+            $scope.model.periodUrl = $scope.model.periodUrl.slice(0,-1);
+            
+            
+            
+            
+            
             AnalyticsService.fetchData( $scope.model.periodUrl + '&' + $scope.model.dimensionUrl, $scope.model.baselineOption, $scope.model.progressOption, $scope.model.targetOption ).then(function(response){
                 $scope.model.report = response.report;
                 $scope.model.templateLayout = GridService.generateColumns();                
@@ -99,8 +105,15 @@ var performanceContractControllers = angular.module('performanceContractControll
         }
     };
     
+    $scope.$watch('model.selectedStakeholder', function(){
+        $scope.model.stakeholderUrl = null;
+        if( angular.isObject( $scope.model.selectedStakeholder) && $scope.model.selectedStakeholder.id){
+            $scope.model.stakeholderUrl = '&filter=ou:' + $scope.selectedOrgUnit.id;
+        }
+    });
+    
     $scope.loadDataSetDetails = function(){
-        if( $scope.model.selectedDataSet && $scope.model.selectedDataSet.id && $scope.model.selectedDataSet.periodType){            
+        if( $scope.model.selectedDataSet && $scope.model.selectedDataSet.id && $scope.model.selectedDataSet.periodType){ 
             
             if( $scope.model.selectedDataSet.periodType === 'Daily' ||
                 $scope.model.selectedDataSet.periodType === 'Weekly' ||   
@@ -109,16 +122,21 @@ var performanceContractControllers = angular.module('performanceContractControll
                 $scope.model.selectedDataSet.periodType === 'FinancialApril' || 
                 $scope.model.selectedDataSet.periodType === 'FinancialOct' ){
                 
-                $scope.invalidCategoryDimensionCnfiguration('error', 'invalid_period_performance_contract');
+                $scope.invalidCategoryDimensionConfiguration('error', 'invalid_period_performance_contract');
                 return;
             }
             
             $scope.model.periods = PeriodService.getPeriods('Yearly', $scope.model.periodOffset);
             
             if(!$scope.model.selectedDataSet.dataElements || $scope.model.selectedDataSet.dataElements.length < 1){                
-                $scope.invalidCategoryDimensionCnfiguration('error', 'missing_data_elements_indicators');
+                $scope.invalidCategoryDimensionConfiguration('error', 'missing_data_elements_indicators');
                 return;
-            }  
+            }            
+            
+            $scope.model.stakeholderList = null;            
+            MetaDataFactory.get('categoryCombos', $scope.model.selectedDataSet.categoryCombo.id).then(function(coc){
+                $scope.model.stakeholderList = coc;
+            });
             
             $scope.model.selectedCategoryCombo = null;
             var selectedDataElementGroupSetId = null;            
@@ -166,12 +184,12 @@ var performanceContractControllers = angular.module('performanceContractControll
                     });                    
                 }
                 else{
-                    $scope.invalidCategoryDimensionCnfiguration('error', 'invalid_baseline_category_dimension');
+                    $scope.invalidCategoryDimensionConfiguration('error', 'invalid_baseline_category_dimension');
                     return;
                 }
             }
             else{
-                $scope.invalidCategoryDimensionCnfiguration('error', 'invalid_baseline_category_dimension');
+                $scope.invalidCategoryDimensionConfiguration('error', 'invalid_baseline_category_dimension');
                 return;
             }
             
@@ -188,7 +206,7 @@ var performanceContractControllers = angular.module('performanceContractControll
         }
     };
     
-    $scope.invalidCategoryDimensionCnfiguration = function( headerText, bodyText){
+    $scope.invalidCategoryDimensionConfiguration = function( headerText, bodyText){
         var dialogOptions = {
             headerText: headerText,
             bodyText: bodyText
