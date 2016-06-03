@@ -46,7 +46,7 @@
                 </div>                
                 <div class="row small-vertical-spacing">
                     <div class="col-sm-4">
-                        {{'indicator_group' | translate}}
+                        {{'data_set' | translate}}
                     </div>
                     <div class="col-sm-8">
                         <ui-select ng-model="model.selectedDataSet" 
@@ -59,14 +59,15 @@
                         </ui-select>
                     </div>
                 </div>
-                <div ng-repeat="category in model.stakeholderList.categories" ng-if="model.selectedDataSet && !model.stakeholderList.isDefault">                
+                <div ng-repeat="category in model.stakeholderList.categories" ng-if="model.selectedDataSet && !model.stakeholderList.isDefault && !model.invalidDimensions">                
                     <div class="row small-vertical-spacing">
                         <div class="col-sm-4">
-                            {{category.name}}                        
+                            {{category.name}}
                         </div>
                         <div class="col-sm-8">
                             <ui-select ng-model="model.selectedStakeholder" 
-                                    theme="select2"                                 
+                                    theme="select2"  
+                                    on-select="manageStakeholder(category, model.selectedStakeholder)"
                                     style="width:100%;">
                                 <ui-select-match allow-clear="true" class="form-control-ui-select" placeholder="{{category.categoryOptions && category.categoryOptions.length > 0 ? 'select_or_search' : 'empty' | translate}}">{{$select.selected.name  || $select.selected}}</ui-select-match>
                                 <ui-select-choices  repeat="option in category.categoryOptions | filter: $select.search | limitTo:maxOptionSize">
@@ -76,7 +77,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row small-vertical-spacing" ng-if="model.selectedDataSet">
+                <div class="row small-vertical-spacing" ng-if="model.selectedDataSet && !model.invalidDimensions">
                     <div class="col-sm-4">
                         {{'period' | translate}}                        
                     </div>
@@ -101,6 +102,9 @@
         </div>        
         <!-- selection ends -->        
         
+        <div class="alert alert-danger vertical-spacing" ng-if="model.invalidDimensions && model.selectedDataSet">
+            {{'data_set_have_invalid_dimension' | translate}}
+        </div>
         <!-- template begins -->
         <div ng-include="'components/performance-contract/performance-contract-template.html'"></div>
         <!-- template ends -->       

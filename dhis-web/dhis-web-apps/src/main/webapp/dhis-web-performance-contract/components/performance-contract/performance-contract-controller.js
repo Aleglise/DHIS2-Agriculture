@@ -17,11 +17,11 @@ var performanceContractControllers = angular.module('performanceContractControll
                 GridService) {
                     
     $scope.periodOffset = 0;
-    $scope.model = {};    
+    $scope.model = {invalidDimensions: false};
     
     //watch for selection of org unit from tree
     $scope.$watch('selectedOrgUnit', function() {
-        $scope.model = {};
+        $scope.model = {invalidDimensions: false};
         if( angular.isObject($scope.selectedOrgUnit)){            
             SessionStorageService.set('SELECTED_OU', $scope.selectedOrgUnit);            
             $scope.loadDataSets($scope.selectedOrgUnit);
@@ -46,71 +46,61 @@ var performanceContractControllers = angular.module('performanceContractControll
         $scope.model.baselineOption = null;
         $scope.model.report = null;
         $scope.model.periods = [];
+        $scope.model.invalidDimensions = false;
         if( angular.isObject($scope.model.selectedDataSet) && $scope.model.selectedDataSet.id){
             $scope.loadDataSetDetails();
         }
     });
     
     $scope.$watch('model.selectedPeriod', function(){
-        $scope.model.periodUrl = null;
-        $scope.model.analyticsPeriods = [];
-        if( angular.isObject( $scope.model.selectedPeriod) && $scope.model.selectedPeriod.id){
-            $scope.generateAnalyticsPeriods();
-        }
+        $scope.generateAnalyticsPeriods();
     });
     
     $scope.generateAnalyticsPeriods = function(){        
-        $scope.model.periodUrl = 'dimension=pe:';
-        var invalidPeriod = false;
-        switch( $scope.model.selectedDataSet.periodType ){
-            case 'Monthly':
-                for(var i=1; i< 13; i++){
-                    $scope.model.periodUrl +=  $scope.model.selectedPeriod.name + ("0" + i).slice(-2) + ';';
-                    $scope.model.analyticsPeriods.push( {id: $scope.model.selectedPeriod.name + ("0" + i).slice(-2), name:  ("0" + i).slice(-2)} );
-                }
-                break
-            case 'Quarterly':
-                for(var i=1; i< 5; i++){
-                    $scope.model.periodUrl +=  $scope.model.selectedPeriod.name + 'Q'+ i + ';';
-                    $scope.model.analyticsPeriods.push( {id: $scope.model.selectedPeriod.name + 'Q'+ i, name: 'Q'+ i} );
-                }
-                break
-            case 'SixMonthly':
-                for(var i=1; i< 3; i++){
-                    $scope.model.periodUrl +=  $scope.model.selectedPeriod.name + 'S'+ i + ';';
-                    $scope.model.analyticsPeriods.push( {id: $scope.model.selectedPeriod.name + 'S'+ i, name:  'S'+ i} );
-                }
-                break
-            case 'Yearly':
-                $scope.periodUrl +=  $scope.model.selectedPeriod.name + ';';
-                $scope.model.analyticsPeriods.push( {id: $scope.model.selectedPeriod.name, name:  $scope.model.selectedPeriod.name} );
-                break
-            default:
-                invalidPeriod = true;
-                $scope.invalidCategoryDimensionConfiguration('error', 'invalid_period_performance_contract');
-                return;    
-        }
-        
-        if( !invalidPeriod ){
-            $scope.model.periodUrl = $scope.model.periodUrl.slice(0,-1);
-            
-            
-            
-            
-            
-            AnalyticsService.fetchData( $scope.model.periodUrl + '&' + $scope.model.dimensionUrl, $scope.model.baselineOption, $scope.model.progressOption, $scope.model.targetOption ).then(function(response){
-                $scope.model.report = response.report;
-                $scope.model.templateLayout = GridService.generateColumns();                
-            });            
+        $scope.model.periodUrl = null;
+        $scope.model.analyticsPeriods = [];
+        if( angular.isObject( $scope.model.selectedPeriod) && $scope.model.selectedPeriod.id){        
+            $scope.model.periodUrl = 'dimension=pe:';
+            var invalidPeriod = false;
+            switch( $scope.model.selectedDataSet.periodType ){
+                case 'Monthly':
+                    for(var i=1; i< 13; i++){
+                        $scope.model.periodUrl +=  $scope.model.selectedPeriod.name + ("0" + i).slice(-2) + ';';
+                        $scope.model.analyticsPeriods.push( {id: $scope.model.selectedPeriod.name + ("0" + i).slice(-2), name:  ("0" + i).slice(-2)} );
+                    }
+                    break
+                case 'Quarterly':
+                    for(var i=1; i< 5; i++){
+                        $scope.model.periodUrl +=  $scope.model.selectedPeriod.name + 'Q'+ i + ';';
+                        $scope.model.analyticsPeriods.push( {id: $scope.model.selectedPeriod.name + 'Q'+ i, name: 'Q'+ i} );
+                    }
+                    break
+                case 'SixMonthly':
+                    for(var i=1; i< 3; i++){
+                        $scope.model.periodUrl +=  $scope.model.selectedPeriod.name + 'S'+ i + ';';
+                        $scope.model.analyticsPeriods.push( {id: $scope.model.selectedPeriod.name + 'S'+ i, name:  'S'+ i} );
+                    }
+                    break
+                case 'Yearly':
+                    $scope.periodUrl +=  $scope.model.selectedPeriod.name + ';';
+                    $scope.model.analyticsPeriods.push( {id: $scope.model.selectedPeriod.name, name:  $scope.model.selectedPeriod.name} );
+                    break
+                default:
+                    invalidPeriod = true;
+                    $scope.invalidCategoryDimensionConfiguration('error', 'invalid_period_performance_contract');
+                    return;    
+            }
+
+            if( !invalidPeriod ){
+                $scope.model.periodUrl = $scope.model.periodUrl.slice(0,-1);
+
+                AnalyticsService.fetchData( $scope.model.periodUrl + '&' + $scope.model.dimensionUrl, $scope.model.stakeholderUrl, $scope.model.baselineOption, $scope.model.progressOption, $scope.model.targetOption ).then(function(response){
+                    $scope.model.report = response.report;
+                    $scope.model.templateLayout = GridService.generateColumns();                
+                });
+            }
         }
     };
-    
-    $scope.$watch('model.selectedStakeholder', function(){
-        $scope.model.stakeholderUrl = null;
-        if( angular.isObject( $scope.model.selectedStakeholder) && $scope.model.selectedStakeholder.id){
-            $scope.model.stakeholderUrl = '&filter=ou:' + $scope.selectedOrgUnit.id;
-        }
-    });
     
     $scope.loadDataSetDetails = function(){
         if( $scope.model.selectedDataSet && $scope.model.selectedDataSet.id && $scope.model.selectedDataSet.periodType){ 
@@ -184,12 +174,12 @@ var performanceContractControllers = angular.module('performanceContractControll
                     });                    
                 }
                 else{
-                    $scope.invalidCategoryDimensionConfiguration('error', 'invalid_baseline_category_dimension');
+                    $scope.invalidCategoryDimensionConfiguration('error', 'data_set_have_invalid_dimension');
                     return;
                 }
             }
             else{
-                $scope.invalidCategoryDimensionConfiguration('error', 'invalid_baseline_category_dimension');
+                $scope.invalidCategoryDimensionConfiguration('error', 'data_set_have_invalid_dimension');
                 return;
             }
             
@@ -206,7 +196,17 @@ var performanceContractControllers = angular.module('performanceContractControll
         }
     };
     
+    $scope.manageStakeholder = function(category, option){        
+        $scope.model.stakeholderUrl = null;
+        if( option && option.id && category && category.id ){
+            $scope.model.stakeholderUrl = '&filter='+ category.id + ':' + option.id;
+        }
+        
+        $scope.generateAnalyticsPeriods();
+    };
+    
     $scope.invalidCategoryDimensionConfiguration = function( headerText, bodyText){
+        $scope.model.invalidDimensions = true;
         var dialogOptions = {
             headerText: headerText,
             bodyText: bodyText

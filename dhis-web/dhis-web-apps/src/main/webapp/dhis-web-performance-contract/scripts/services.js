@@ -373,7 +373,12 @@ var performanceContractServices = angular.module('performanceContractServices', 
     
     return {
         
-        fetchData: function(url, baselineDimension, progressDimension, targetDimension){
+        fetchData: function(url, filterUrl, baselineDimension, progressDimension, targetDimension){
+            
+            if( filterUrl && !angular.isUndefined( filterUrl )){
+                url = url + filterUrl;
+            }
+            
             var promise = $http.get('../api/analytics.json?' + url).then(function(response){
                 
                 response.data.report = {};
