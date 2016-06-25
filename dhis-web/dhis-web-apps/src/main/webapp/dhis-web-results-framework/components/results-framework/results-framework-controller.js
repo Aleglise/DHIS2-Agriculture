@@ -177,7 +177,7 @@ resultsFramework.controller('ResultsFrameworkController',
             closeButtonText: 'no',
             actionButtonText: 'yes',
             headerText: $scope.model.selectedResultsFramework.active ? 'deactivate' : 'activate',
-            bodyText: $scope.model.selectedResultsFramework.active ? 'are_you_sure_to_activate' : 'are_you_sure_to_deactivate'
+            bodyText: $scope.model.selectedResultsFramework.active ? 'are_you_sure_to_deactivate' : 'are_you_sure_to_activate'
         };
 
         ModalService.showModal({}, modalOptions).then(function(){            

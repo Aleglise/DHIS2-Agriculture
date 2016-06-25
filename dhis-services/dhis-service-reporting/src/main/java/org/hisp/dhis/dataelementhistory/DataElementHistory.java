@@ -44,6 +44,8 @@ public class DataElementHistory
     private DataElement dataElement;
     
     private DataElementCategoryOptionCombo optionCombo;
+    
+    private DataElementCategoryOptionCombo attributeOptionCombo;
 
     private OrganisationUnit organisationUnit;
     
@@ -122,9 +124,17 @@ public class DataElementHistory
     public void setOptionCombo( DataElementCategoryOptionCombo optionCombo )
     {
     	this.optionCombo = optionCombo;
-    }
+    }    
 
-    public int getHistoryLength()
+    public DataElementCategoryOptionCombo getAttributeOptionCombo() {
+		return attributeOptionCombo;
+	}
+
+	public void setAttributeOptionCombo(DataElementCategoryOptionCombo attributeOptionCombo) {
+		this.attributeOptionCombo = attributeOptionCombo;
+	}
+
+	public int getHistoryLength()
     {
         return historyLength;
     }

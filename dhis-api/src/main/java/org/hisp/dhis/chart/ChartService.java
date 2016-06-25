@@ -79,7 +79,7 @@ public interface ChartService
                               Map<String, Double> categoryValues );
 
     JFreeChart getJFreeChartHistory( DataElement dataElement, DataElementCategoryOptionCombo categoryOptionCombo,
-                                     Period lastPeriod, OrganisationUnit organisationUnit, int historyLength, I18nFormat format );
+    		DataElementCategoryOptionCombo attributeOptionCombo, Period lastPeriod, OrganisationUnit organisationUnit, int historyLength, I18nFormat format );
 
     // -------------------------------------------------------------------------
     // Chart CRUD

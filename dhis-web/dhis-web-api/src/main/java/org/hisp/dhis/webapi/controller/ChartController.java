@@ -219,6 +219,7 @@ public class ChartController
     public void getHistoryChart(
         @RequestParam String de,
         @RequestParam String co,
+        @RequestParam String cp,
         @RequestParam String pe,
         @RequestParam String ou,
         @RequestParam( defaultValue = "525", required = false ) int width,
@@ -238,6 +239,13 @@ public class ChartController
         {
             throw new WebMessageException( WebMessageUtils.conflict( "Category option combo does not exist: " + co ) );
         }
+        
+        DataElementCategoryOptionCombo attributeOptionCombo = categoryService.getDataElementCategoryOptionCombo( cp );
+
+        if ( attributeOptionCombo == null )
+        {
+            throw new WebMessageException( WebMessageUtils.conflict( "Category option combo does not exist: " + cp ) );
+        }
 
         Period period = PeriodType.getPeriodFromIsoString( pe );
 
@@ -255,7 +263,7 @@ public class ChartController
 
         contextUtils.configureResponse( response, ContextUtils.CONTENT_TYPE_PNG, CacheStrategy.RESPECT_SYSTEM_SETTING, "chart.png", false );
 
-        JFreeChart chart = chartService.getJFreeChartHistory( dataElement, categoryOptionCombo, period, organisationUnit, 13, i18nManager.getI18nFormat() );
+        JFreeChart chart = chartService.getJFreeChartHistory( dataElement, categoryOptionCombo, attributeOptionCombo, period, organisationUnit, 13, i18nManager.getI18nFormat() );
 
         ChartUtilities.writeChartAsPNG( response.getOutputStream(), chart, width, height );
     }
